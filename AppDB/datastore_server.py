@@ -480,7 +480,7 @@ class DatastoreDistributed():
       rev_row_keys += [str(ii[0]) for ii in rev_group_rows]
       for ii in rev_group_rows:
         rev_row_values[str(ii[0])] = {'reference': str(ii[1])}
-    
+   
     # TODO  these in parallel
     self.datastore_batch.batch_put_entity(dbconstants.ASC_PROPERTY_TABLE, 
                           row_keys, 
@@ -1862,10 +1862,6 @@ class DatastoreDistributed():
                                           start_inclusive=start_inclusive, 
                                           end_inclusive=end_inclusive)      
 
-    #TODO byte stuff value for self._SEPARATOR character? Since it's an escape 
-    # character and we might have issues if data contains this char
-    # This query has a value it bases the query on for a property name
-    # The difference between operators is what the end and start key are
     if len(filter_ops) == 1:
       oper = filter_ops[0][0]
       value = str(filter_ops[0][1])
@@ -1916,7 +1912,6 @@ class DatastoreDistributed():
 
       if force_start_key_exclusive:
         start_inclusive = False
-
       ret = self.datastore_batch.range_query(table_name, 
                                           column_names, 
                                           startrow, 
@@ -1925,7 +1920,7 @@ class DatastoreDistributed():
                                           offset=0, 
                                           start_inclusive=start_inclusive, 
                                           end_inclusive=end_inclusive)      
-
+ 
       return ret 
 
     # Here we have two filters and so we set the start and end key to 
@@ -2114,14 +2109,12 @@ class DatastoreDistributed():
                                     datastore_pb.Query_Order.ASCENDING,
                                     last_result)
 
-  
         # We use equality filters only so order ops should always be ASC. 
         order_ops = []
         for i in order_info:
           if i[0] == prop_name:
             order_ops = [i]
             break
-   
         temp_res[prop_name] = self.__apply_filters(filter_ops, 
                                      order_ops, 
                                      prop_name, 
@@ -2152,10 +2145,15 @@ class DatastoreDistributed():
           index_value = indexes[index_key]['reference']
           last_keys_of_scans[prop_name] = index_value
       
-      # Purge keys which did not intersect from all equality filters:
+      # Purge keys which did not intersect from all equality filters. You 
+      # cannot loop on a dictionary and delete from it at the same time.
+      keys_to_delete = []
       for key in reference_counter_hash:
         if reference_counter_hash[key] != len(filter_info.keys()):
-          del reference_counter_hash[key]
+          keys_to_delete.append(key)
+
+      for key in keys_to_delete:
+        del reference_counter_hash[key]
 
       # We are looking for the earliest (alphabetically) of the keys.
       start_key = ""
