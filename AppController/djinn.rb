@@ -103,6 +103,8 @@ ZK_LOCATIONS_FILE = "/etc/appscale/zookeeper_locations.json"
 # ports this machine is using for nginx, haproxy, and AppServers.
 APPSERVER_STATE_FILE = "/opt/appscale/appserver-state.json"
 
+# The port on which the EAGER service should be listening.
+EAGER_PORT = 18444
 
 # Djinn (interchangeably known as 'the AppController') automatically
 # configures and deploys all services for a single node. It relies on other
@@ -3504,6 +3506,31 @@ class Djinn
     stop_cmd = "/usr/bin/pkill -9 app_manager_server"
     port = [AppManagerClient::SERVER_PORT]
     MonitInterface.start(:appmanagerserver, start_cmd, stop_cmd, port, env_vars)
+  end
+
+  def start_eager_service
+    if HelperFunctions.is_port_open?("localhost", EAGER_PORT, HelperFunctions::USE_SSL)
+      Djinn.log_debug("EAGER is already running locally - " +
+        "don't start it again.")
+      return
+    end
+
+    start_cmd = "/usr/bin/python #{APPSCALE_HOME}/Eager/eager_service.py"
+    stop_cmd = "/usr/bin/pkill -9 eager_service"
+    port = [EAGER_PORT]
+    env = {
+      'APPSCALE_HOME' => APPSCALE_HOME,
+      'EC2_HOME' => ENV['EC2_HOME'],
+      'JAVA_HOME' => ENV['JAVA_HOME']
+    }
+
+    MonitInterface.start(:eager, start_cmd, stop_cmd, port, env)
+    Djinn.log_info("Started Eager successfully!")
+  end
+
+  def stop_eager_service
+    Djinn.log_info("Stopping EAGER service")
+    MonitInterface.stop(:eager)
   end
 
   def start_soap_server
