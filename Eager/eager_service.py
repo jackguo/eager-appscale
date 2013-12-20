@@ -3,7 +3,6 @@ from utils import utils
 from eager import Eager
 import os
 import SOAPpy
-import sys
 
 __author__ = 'hiranya'
 __email__ = 'hiranya@appscale.com'
