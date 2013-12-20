@@ -14,6 +14,7 @@ class Eager:
   # Default reasons which might be returned by this module
   REASON_BAD_SECRET = 'bad secret'
   REASON_ALIVE = 'service alive'
+  REASON_API_VALIDATION_SUCCESS = 'api validated successfully'
 
   def __init__(self):
     self.secret = utils.get_secret()
@@ -23,6 +24,13 @@ class Eager:
       return self.__generate_response(False, self.REASON_BAD_SECRET)
     else:
       return self.__generate_response(True, self.REASON_ALIVE)
+
+  def validate_api_for_deployment(self, secret, api):
+    if self.secret != secret:
+      return self.__generate_response(False, self.REASON_BAD_SECRET)
+    # TODO: Perform the actual validation
+    utils.log("Validating API = {0}; Version = {1}".format(api['name'], api['version']))
+    return self.__generate_response(True, self.REASON_API_VALIDATION_SUCCESS)
 
   def __generate_response(self, status, msg, extra=None):
     """

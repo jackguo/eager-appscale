@@ -64,6 +64,7 @@ class EagerService:
 
     e = Eager()
     self.server.registerFunction(e.ping)
+    self.server.registerFunction(e.validate_api_for_deployment)
     self.started = False
 
   def start(self):
