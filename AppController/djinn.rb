@@ -767,6 +767,9 @@ class Djinn
       TaskQueue.stop_flower if my_node.is_login?
 
       stop_app_manager_server
+      if my_node.is_shadow?
+        stop_eager_service
+      end
       stop_infrastructure_manager
     end
 
@@ -1418,6 +1421,10 @@ class Djinn
 
     start_infrastructure_manager
     data_restored, need_to_start_jobs = restore_appcontroller_state
+
+    if my_node.is_shadow?
+      start_eager_service
+    end
 
     if data_restored
       parse_creds
