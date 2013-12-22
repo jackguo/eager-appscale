@@ -3,6 +3,11 @@
 import getpass
 import os
 
+MYSQL_USER = 'mysql_user'
+MYSQL_PASS = 'mysql_pass'
+AM_USER = 'am_user'
+AM_PASS = 'am_pass'
+
 def get_input(prop, default=None):
   if default:
     input = raw_input('Enter {0} (default: {1}) : '.format(prop, default))
@@ -43,10 +48,10 @@ def get_user_input():
     proceed = raw_input('Proceed with above settings? (yes/no)\n')
     if proceed == 'yes':
       result = {
-        'mysql_user': mysql_user,
-        'mysql_pass': mysql_pass,
-        'am_admin': am_admin,
-        'am_pass': am_pass,
+        MYSQL_USER : mysql_user,
+        MYSQL_PASS : mysql_pass,
+        AM_USER : am_admin,
+        AM_PASS : am_pass,
       }
       return result
     elif proceed == 'no':
@@ -55,7 +60,8 @@ def get_user_input():
       print 'Please enter either "yes" or "no"'
 
 def setup_mysql(inputs):
-  status = os.system("sh setup_mysql.sh '{0}' '{1}'".format(inputs['mysql_user'], inputs['mysql_pass']))
+  status = os.system("sh setup_mysql.sh '{0}' '{1}'".format(inputs[MYSQL_USER],
+    inputs[MYSQL_PASS]))
   if status:
     print 'MySQL setup failed. Aborting...'
     exit(1)
