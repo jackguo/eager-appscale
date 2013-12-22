@@ -32,7 +32,7 @@ import java.util.*;
 
 public class EagerAdmin {
 
-    public boolean isAPIExists(String name, String version,
+    public boolean isAPIAvailable(String name, String version,
                                String providerName) throws APIManagementException {
         APIProvider provider = getAPIProvider(providerName);
         APIIdentifier apiId = new APIIdentifier(providerName, name, version);
