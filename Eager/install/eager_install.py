@@ -75,7 +75,35 @@ def setup_mysql(inputs):
     exit(1)
 
 def setup_api_manager(inputs):
-  pass
+  file_path = '/root/wso2am-1.4.0.zip'
+  if os.path.exists(file_path):
+    status = os.system("sh setup_am.sh '{0}' '{1}'".format(file_path, inputs[MYSQL_ROOT_PASS]))
+    if status:
+      print 'API Manager setup failed. Aborting...'
+      exit(1)
+
+    print 'Updating data source configuration...'
+    with open('master-datasources.xml', 'r') as ds_file:
+      content = ds_file.read().replace('${mysql.user}',
+        inputs[MYSQL_USER]).replace('${mysql.password}', inputs[MYSQL_PASS])
+      output_file = open('/root/APIManager/repository/conf/datasources/master-datasources.xml', 'w')
+      output_file.write(content)
+      output_file.flush()
+      output_file.close()
+
+    print 'Updating user manager configuration...'
+    with open('user-mgt.xml', 'r') as ds_file:
+      content = ds_file.read().replace('${am.user}',
+        inputs[AM_USER]).replace('${am.password}', inputs[AM_PASS])
+      output_file = open('/root/APIManager/repository/conf/user-mgt.xml', 'w')
+      output_file.write(content)
+      output_file.flush()
+      output_file.close()
+
+    print 'All done.'
+  else:
+    print 'Failed to locate API Manager archive in /root. Aborting...'
+    exit(1)
 
 if __name__ == '__main__':
   inputs = None
