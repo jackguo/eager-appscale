@@ -18,7 +18,13 @@ def get_input(prop, default=None):
     return get_input(prop, default)
 
 def get_password_input(prop):
-  return getpass.getpass('Enter {0} : '.format(prop))
+  pass1 = getpass.getpass('Enter {0} : '.format(prop))
+  pass2 = getpass.getpass('Confirm {0} : '.format(prop))
+  if pass1 == pass2:
+    return pass1
+  else:
+    print 'Entries do not match. Please try again.'
+    return get_password_input(prop)
 
 def get_user_input():
   mysql_user = get_input('MySQL user', 'root')
@@ -28,6 +34,7 @@ def get_user_input():
   am_pass = get_password_input('API Manager admin password')
 
   while True:
+    print
     print 'MySQL user:', mysql_user
     print 'MySQL password:', '*' * len(mysql_pass)
     print 'API Manager admin user:', am_admin
@@ -60,6 +67,6 @@ if __name__ == '__main__':
   inputs = None
   while not inputs:
     inputs = get_user_input()
-  print
+    print
   setup_mysql(inputs)
   setup_api_manager(inputs)
