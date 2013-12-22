@@ -1,4 +1,7 @@
+#!/usr/bin/python
+
 import getpass
+import os
 
 def get_input(prop, default=None):
   if default:
@@ -45,7 +48,10 @@ def get_user_input():
       print 'Please enter either "yes" or "no"'
 
 def setup_mysql(inputs):
-  pass
+  status = os.system("sh setup_mysql.sh '{0}' '{1}'".format(inputs['mysql_user'], inputs['mysql_pass']))
+  if status:
+    print 'MySQL setup failed. Aborting...'
+    exit(1)
 
 def setup_api_manager(inputs):
   pass
@@ -54,5 +60,6 @@ if __name__ == '__main__':
   inputs = None
   while not inputs:
     inputs = get_user_input()
+  print
   setup_mysql(inputs)
   setup_api_manager(inputs)
