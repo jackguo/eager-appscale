@@ -41,6 +41,7 @@ case "$1" in
         postinstalltornado
         installflexmock
         installnose
+        installsuds
 	installzookeeper
 	postinstallzookeeper
         installrabbitmq
@@ -98,6 +99,7 @@ case "$1" in
         installtornado
         installflexmock
         installnose
+        installsuds
         postinstalltornado
 	installzookeeper
 	postinstallzookeeper

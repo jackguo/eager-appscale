@@ -232,6 +232,11 @@ installtornado()
     fi
 }
 
+installsuds()
+{
+  easy_install suds
+}
+
 installnose()
 {
   easy_install nose
