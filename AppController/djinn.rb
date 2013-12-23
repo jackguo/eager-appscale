@@ -3536,16 +3536,9 @@ class Djinn
 
     if File.exist?('/root/APIManager')
       Djinn.log_info("API Manager installed - Attempting to start")
-      start_cmd = "/root/APIManager/bin/wso2server.sh start"
-      stop_cmd = "/root/APIManager/bin/wso2server.sh stop"
-      port = [9443]
-      env = {
-          'APPSCALE_HOME' => APPSCALE_HOME,
-          'EC2_HOME' => ENV['EC2_HOME'],
-          'JAVA_HOME' => ENV['JAVA_HOME']
-      }
-
-      MonitInterface.start(:api_manager, start_cmd, stop_cmd, port, env)
+      start_cmd = "export JAVA_HOME=#{ENV['JAVA_HOME']}; /root/APIManager/bin/wso2server.sh start"
+      `#{start_cmd}`
+      HelperFunctions.sleep_until_port_is_open(ip, 9443)
       Djinn.log_info("API Manager started successfully!")
     end
   end
@@ -3554,7 +3547,9 @@ class Djinn
     Djinn.log_info("Stopping EAGER service")
     MonitInterface.stop(:eager)
     if File.exist?('/root/APIManager')
-      MonitInterface.stop(:api_manager)
+      Djinn.log_info("Stopping API Manager")
+      stop_cmd = "export JAVA_HOME=#{ENV['JAVA_HOME']}; /root/APIManager/bin/wso2server.sh stop"
+      `#{stop_cmd}`
     end
   end
 

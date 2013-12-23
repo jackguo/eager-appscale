@@ -111,4 +111,5 @@ if __name__ == '__main__':
     inputs = get_user_input()
     print
   setup_mysql(inputs)
+  print
   setup_api_manager(inputs)
