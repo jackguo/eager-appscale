@@ -1422,10 +1422,6 @@ class Djinn
     start_infrastructure_manager
     data_restored, need_to_start_jobs = restore_appcontroller_state
 
-    if my_node.is_shadow?
-      start_eager_service
-    end
-
     if data_restored
       parse_creds
     else
@@ -1436,6 +1432,10 @@ class Djinn
 
     if need_to_start_jobs
       change_job
+    end
+
+    if my_node.is_shadow?
+      start_eager_service
     end
 
     @done_loading = true
