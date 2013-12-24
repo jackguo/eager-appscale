@@ -3538,7 +3538,7 @@ class Djinn
       Djinn.log_info("API Manager installed - Attempting to start")
       start_cmd = "export JAVA_HOME=#{ENV['JAVA_HOME']}; /root/APIManager/bin/wso2server.sh start"
       `#{start_cmd}`
-      HelperFunctions.sleep_until_port_is_open(ip, 9443)
+      HelperFunctions.sleep_until_port_is_open("localhost", 9443)
       Djinn.log_info("API Manager started successfully!")
     end
   end
