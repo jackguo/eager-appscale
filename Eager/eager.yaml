@@ -1,0 +1,6 @@
+api_manager:
+  provider: wso2am1.4
+  host: localhost
+  port: 9443
+  user: admin
+  password: admin

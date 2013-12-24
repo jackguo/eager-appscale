@@ -1,3 +1,5 @@
+import yaml
+from apimgt import adaptor_factory
 from utils import utils
 
 __author__ = 'hiranya'
@@ -18,6 +20,10 @@ class Eager:
 
   def __init__(self):
     self.secret = utils.get_secret()
+    eager_yaml = open('eager.yaml', 'r')
+    conf = yaml.load(eager_yaml)
+    eager_yaml.close()
+    self.adaptor = adaptor_factory.get_adaptor(conf)
 
   def ping(self, secret):
     if self.secret != secret:
@@ -28,8 +34,14 @@ class Eager:
   def validate_api_for_deployment(self, secret, api):
     if self.secret != secret:
       return self.__generate_response(False, self.REASON_BAD_SECRET)
-    # TODO: Perform the actual validation
-    utils.log("Validating API = {0}; Version = {1}".format(api['name'], api['version']))
+
+    name = api['name']
+    version = api['version']
+    if self.adaptor.is_api_available(name, version):
+      utils.log("Validating API = {0}; Version = {1}".format(name, version))
+    else:
+      utils.log("API {0}-v{1} does not exist yet. Skipping dependency validation".format(
+        name, version))
     return self.__generate_response(True, self.REASON_API_VALIDATION_SUCCESS)
 
   def __generate_response(self, status, msg, extra=None):
