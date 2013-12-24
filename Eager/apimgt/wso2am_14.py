@@ -8,10 +8,12 @@ class WSO2APIManager14Adaptor(APIManagerAdaptor):
     self.url = 'https://{0}:{1}/services/EagerAdmin'.format(conf['host'],
       conf['port'])
     self.user = conf['user']
+    self.__init_service_client(conf)
+
+  def __init_service_client(self, conf):
     if conf.get('debug'):
       logging.basicConfig(level=logging.INFO)
       logging.getLogger('suds.client').setLevel(logging.DEBUG)
-
     transport = HttpAuthenticated(username=conf['user'], password=conf['password'])
     self.client = Client(self.url + '?wsdl', location=self.url,
       transport=transport, cache=None)

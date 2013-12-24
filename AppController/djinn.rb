@@ -3516,6 +3516,14 @@ class Djinn
   end
 
   def start_eager_service
+    if File.exist?('/root/APIManager')
+      Djinn.log_info("API Manager installed - Attempting to start")
+      start_cmd = "export JAVA_HOME=#{ENV['JAVA_HOME']}; /root/APIManager/bin/wso2server.sh start"
+      `#{start_cmd}`
+      HelperFunctions.sleep_until_port_is_open("localhost", 9443)
+      Djinn.log_info("API Manager started successfully!")
+    end
+
     if HelperFunctions.is_port_open?("localhost", EAGER_PORT, HelperFunctions::USE_SSL)
       Djinn.log_debug("EAGER is already running locally - " +
         "don't start it again.")
@@ -3533,14 +3541,6 @@ class Djinn
 
     MonitInterface.start(:eager, start_cmd, stop_cmd, port, env)
     Djinn.log_info("Started Eager successfully!")
-
-    if File.exist?('/root/APIManager')
-      Djinn.log_info("API Manager installed - Attempting to start")
-      start_cmd = "export JAVA_HOME=#{ENV['JAVA_HOME']}; /root/APIManager/bin/wso2server.sh start"
-      `#{start_cmd}`
-      HelperFunctions.sleep_until_port_is_open("localhost", 9443)
-      Djinn.log_info("API Manager started successfully!")
-    end
   end
 
   def stop_eager_service
