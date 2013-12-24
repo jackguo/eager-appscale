@@ -2,6 +2,7 @@
 
 import getpass
 import os
+import yaml
 
 MYSQL_ROOT_PASS = 'mysql_root_pass'
 MYSQL_USER = 'mysql_user'
@@ -99,6 +100,18 @@ def setup_api_manager(inputs):
       output_file.write(content)
       output_file.flush()
       output_file.close()
+
+    print 'Writing eager.conf file'
+    conf = { 'api_manager' : {} }
+    conf['api_manager']['provider'] = 'wso2am1.4'
+    conf['api_manager']['host'] = 'localhost'
+    conf['api_manager']['port'] = 9443
+    conf['api_manager']['user'] = inputs[AM_USER]
+    conf['api_manager']['password'] = inputs[AM_PASS]
+    eager_conf = open('/root/appscale/Eager/eager.conf', 'w')
+    yaml.dump(conf, eager_conf, default_flow_style=False)
+    eager_conf.flush()
+    eager_conf.close()
 
     print 'All done.'
   else:

@@ -1,3 +1,5 @@
+import os
+import sys
 import yaml
 from apimgt import adaptor_factory
 from utils import utils
@@ -18,9 +20,13 @@ class Eager:
   REASON_ALIVE = 'service alive'
   REASON_API_VALIDATION_SUCCESS = 'api validated successfully'
 
+  CONFIG_FILE = 'eager.yaml'
+
   def __init__(self):
     self.secret = utils.get_secret()
-    eager_yaml = open('eager.yaml', 'r')
+    parent_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
+    config_file = os.path.join(parent_dir, self.CONFIG_FILE)
+    eager_yaml = open(config_file, 'r')
     conf = yaml.load(eager_yaml)
     eager_yaml.close()
     self.adaptor = adaptor_factory.get_adaptor(conf)
