@@ -12,9 +12,11 @@ __email__ = 'hiranya@appscale.com'
 class TestEager(TestCase):
   def setUp(self):
     flexmock(utils).should_receive('get_secret').and_return('secret')
+    flexmock(utils).should_receive('get_adaptor').and_return(None)
 
   def tearDown(self):
     flexmock(utils).should_receive('get_secret').reset()
+    flexmock(utils).should_receive('get_adaptor').reset()
 
   def test_initialize(self):
     e = Eager()

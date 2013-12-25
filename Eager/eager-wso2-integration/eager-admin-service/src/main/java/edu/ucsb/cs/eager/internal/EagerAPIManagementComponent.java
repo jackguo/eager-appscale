@@ -62,6 +62,9 @@ public class EagerAPIManagementComponent {
             log.debug("EAGER API manager component activated");
         }
         eagerAdmin = ServerConfiguration.getInstance().getFirstProperty("Eager.Admin");
+        if (eagerAdmin == null) {
+            log.warn("EAGER admin user hasn't been configured in carbon.xml");
+        }
     }
 
     protected void deactivate(ComponentContext componentContext) {
@@ -119,7 +122,7 @@ public class EagerAPIManagementComponent {
 
     public static String getEagerAdmin() {
         if (eagerAdmin == null) {
-            throw new IllegalStateException("EAGER admin value has not been set");
+            throw new IllegalStateException("EAGER admin user has not been set");
         }
         return eagerAdmin;
     }

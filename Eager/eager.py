@@ -1,7 +1,5 @@
 import os
 import sys
-import yaml
-from apimgt import adaptor_factory
 from utils import utils
 
 __author__ = 'hiranya'
@@ -19,17 +17,14 @@ class Eager:
   REASON_BAD_SECRET = 'bad secret'
   REASON_ALIVE = 'service alive'
   REASON_API_VALIDATION_SUCCESS = 'api validated successfully'
+  REASON_BAD_API_METADATA = 'api contains wrong or invalid metadata'
+  REASON_AMBIGUOUS_API_NAME = 'api name is too similar to some names already in use'
 
   CONFIG_FILE = 'eager.yaml'
 
   def __init__(self):
     self.secret = utils.get_secret()
-    parent_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
-    config_file = os.path.join(parent_dir, self.CONFIG_FILE)
-    eager_yaml = open(config_file, 'r')
-    conf = yaml.load(eager_yaml)
-    eager_yaml.close()
-    self.adaptor = adaptor_factory.get_adaptor(conf)
+    self.adaptor = utils.get_adaptor(os.path.dirname(os.path.realpath(sys.argv[0])))
 
   def ping(self, secret):
     if self.secret != secret:
@@ -43,12 +38,30 @@ class Eager:
 
     name = api['name']
     version = api['version']
+
+    if not self.__is_api_name_valid(name):
+      detail = { 'detail' : 'API name contains invalid characters' }
+      return self.__generate_response(False, self.REASON_BAD_API_METADATA, detail)
+
     if self.adaptor.is_api_available(name, version):
       utils.log("Validating API = {0}; Version = {1}".format(name, version))
     else:
       utils.log("API {0}-v{1} does not exist yet. Skipping dependency validation".format(
         name, version))
+      context = '/' + name.lower()
+      api_list = self.adaptor.get_api_list_with_context(context)
+      for api_info in api_list:
+        if api_info.name != name:
+          detail = { 'detail' : 'API name is too similar to: {0}'.format(api_info.name) }
+          self.__generate_response(False, self.REASON_AMBIGUOUS_API_NAME, detail)
+
     return self.__generate_response(True, self.REASON_API_VALIDATION_SUCCESS)
+
+  def __is_api_name_valid(self, name):
+    for char in "'/ &+@%\"":
+      if char in name:
+        return False
+    return True
 
   def __generate_response(self, status, msg, extra=None):
     """

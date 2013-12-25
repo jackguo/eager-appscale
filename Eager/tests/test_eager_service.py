@@ -21,6 +21,9 @@ class TestEagerService(TestCase):
     (flexmock(utils)
      .should_receive('get_secret')
      .and_return('secret'))
+    (flexmock(utils)
+     .should_receive('get_adaptor')
+     .and_return(None))
     self.service, self.port = self.__start_service()
     sleep(2)
 
@@ -49,4 +52,5 @@ class TestEagerService(TestCase):
 
   def tearDown(self):
     flexmock(utils).should_receive('get_secret').reset()
+    flexmock(utils).should_receive('get_adaptor').reset()
     self.service.stop()

@@ -1,7 +1,7 @@
 import logging
 from suds.client import Client
 from suds.transport.http import HttpAuthenticated
-from apimgt.adaptor import APIManagerAdaptor
+from apimgt.adaptor import APIManagerAdaptor, APIInfo
 
 class WSO2APIManager14Adaptor(APIManagerAdaptor):
   def __init__(self, conf):
@@ -20,3 +20,10 @@ class WSO2APIManager14Adaptor(APIManagerAdaptor):
   def is_api_available(self, name, version):
     api = { 'name' : name, 'version' : version }
     return self.client.service.isAPIAvailable(api=api)
+
+  def get_api_list_with_context(self, context):
+    results = self.client.service.getAPIsWithContext(context)
+    api_list = []
+    for result in results:
+      api_list.append(APIInfo(result['name'], result['version']))
+    return api_list

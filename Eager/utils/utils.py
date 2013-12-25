@@ -6,6 +6,8 @@ import os
 import sys
 import time
 import uuid
+import yaml
+from apimgt import adaptor_factory
 
 __author__ = 'hiranya'
 __email__ = 'hiranya@appscale.com'
@@ -179,5 +181,12 @@ def sleep(seconds):
     seconds Number of seconds to sleep
   """
   time.sleep(seconds)
+
+def get_adaptor(self, parent_dir):
+  config_file = os.path.join(parent_dir, self.CONFIG_FILE)
+  eager_yaml = open(config_file, 'r')
+  conf = yaml.load(eager_yaml)
+  eager_yaml.close()
+  return adaptor_factory.get_adaptor(conf)
 
 
