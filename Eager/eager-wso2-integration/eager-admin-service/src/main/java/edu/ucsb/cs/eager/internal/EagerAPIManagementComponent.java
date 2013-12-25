@@ -54,16 +54,20 @@ public class EagerAPIManagementComponent {
 
     private static final Log log = LogFactory.getLog(EagerAPIManagementComponent.class);
 
+    private static String eagerAdmin = null;
+
     protected void activate(ComponentContext componentContext) throws Exception {
         if (log.isDebugEnabled()) {
             log.debug("EAGER API manager component activated");
         }
+        eagerAdmin = "admin"; //TODO: Read from a config file
     }
 
     protected void deactivate(ComponentContext componentContext) {
         if (log.isDebugEnabled()) {
             log.debug("Deactivating API manager component");
         }
+        eagerAdmin = null;
     }
 
     protected void setRegistryService(RegistryService registryService) {
@@ -110,6 +114,13 @@ public class EagerAPIManagementComponent {
 
     protected void unsetTenantRegistryLoader(TenantRegistryLoader tenantRegistryLoader) {
 
+    }
+
+    public static String getEagerAdmin() {
+        if (eagerAdmin == null) {
+            throw new IllegalStateException("EAGER admin value has not been set");
+        }
+        return eagerAdmin;
     }
 
 }

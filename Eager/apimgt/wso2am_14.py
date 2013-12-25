@@ -7,7 +7,6 @@ class WSO2APIManager14Adaptor(APIManagerAdaptor):
   def __init__(self, conf):
     self.url = 'https://{0}:{1}/services/EagerAdmin'.format(conf['host'],
       conf['port'])
-    self.user = conf['user']
     self.__init_service_client(conf)
 
   def __init_service_client(self, conf):
@@ -19,5 +18,5 @@ class WSO2APIManager14Adaptor(APIManagerAdaptor):
       transport=transport, cache=None)
 
   def is_api_available(self, name, version):
-    return self.client.service.isAPIAvailable(name=name,
-      version=version, providerName=self.user)
+    api = { 'name' : name, 'version' : version }
+    return self.client.service.isAPIAvailable(api=api)

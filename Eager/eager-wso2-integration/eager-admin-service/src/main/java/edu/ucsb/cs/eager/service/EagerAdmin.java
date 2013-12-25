@@ -19,6 +19,10 @@
 
 package edu.ucsb.cs.eager.service;
 
+import edu.ucsb.cs.eager.internal.EagerAPIManagementComponent;
+import edu.ucsb.cs.eager.models.APIInfo;
+import edu.ucsb.cs.eager.models.DependencyInfo;
+import edu.ucsb.cs.eager.models.ValidationInfo;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.APIProvider;
 import org.wso2.carbon.apimgt.api.model.API;
@@ -32,34 +36,56 @@ import java.util.*;
 
 public class EagerAdmin {
 
-    public boolean isAPIAvailable(String name, String version,
-                               String providerName) throws APIManagementException {
-        APIProvider provider = getAPIProvider(providerName);
-        APIIdentifier apiId = new APIIdentifier(providerName, name, version);
+    public boolean isAPIAvailable(APIInfo api) throws APIManagementException {
+        String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
+        APIProvider provider = getAPIProvider(eagerAdmin);
+        APIIdentifier apiId = new APIIdentifier(eagerAdmin, api.getName(), api.getVersion());
         return provider.isAPIAvailable(apiId);
     }
 
-    public APIIdentifier[] getAPIsWithContext(String context,
-                                           String providerName) throws APIManagementException {
-        APIProvider provider = getAPIProvider(providerName);
+    public APIInfo[] getAPIsWithContext(String context) throws APIManagementException {
+        String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
+        APIProvider provider = getAPIProvider(eagerAdmin);
         List<API> apiList = provider.getAllAPIs();
-        List<APIIdentifier> results = new ArrayList<APIIdentifier>();
+        List<APIInfo> results = new ArrayList<APIInfo>();
         for (API api : apiList) {
             if (api.getContext().equals(context)) {
-                results.add(api.getId());
+                results.add(new APIInfo(api.getId()));
             }
         }
-        return results.toArray(new APIIdentifier[results.size()]);
+        return results.toArray(new APIInfo[results.size()]);
     }
 
-    public boolean createAndPublishAPI(String name, String version,
-                                       String providerName) throws APIManagementException {
-        APIProvider provider = getAPIProvider(providerName);
-        APIIdentifier apiId = new APIIdentifier(providerName, name, version);
-        API api = new API(apiId);
-        api.setContext("/" + name.toLowerCase());
-        api.setUrl("http://test.com");
-        api.setStatus(APIStatus.CREATED);
+    /**
+     * Record the dependencies of an API
+     *
+     * @param api Dependent API
+     * @param dependencies An array of DependencyInfo objects, one per dependency
+     * @return a boolean value indicating success or failure
+     */
+    public boolean recordDependencies(APIInfo api, DependencyInfo[] dependencies) {
+        return true;
+    }
+
+    /**
+     * Get the information required to perform dependency checking.
+     *
+     * @param api A potential dependency API
+     * @return A ValidationInfo object carrying the specification of the API and its dependents
+     */
+    public ValidationInfo getValidationInfo(APIInfo api) {
+        return null;
+    }
+
+    public boolean createAndPublishAPI(APIInfo api,
+                                       String specification) throws APIManagementException {
+        String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
+        APIProvider provider = getAPIProvider(eagerAdmin);
+        APIIdentifier apiId = new APIIdentifier(eagerAdmin, api.getName(), api.getVersion());
+        API newAPI = new API(apiId);
+        newAPI.setContext("/" + api.getName().toLowerCase());
+        newAPI.setUrl("http://test.com");
+        newAPI.setStatus(APIStatus.CREATED);
 
         String[] methods = new String[] {
             "GET", "POST", "PUT", "DELETE", "OPTIONS"
@@ -73,10 +99,10 @@ public class EagerAdmin {
             template.setResourceURI("http://test.com");
             templates.add(template);
         }
-        api.setUriTemplates(templates);
-        api.setLastUpdated(new Date());
-        provider.addAPI(api);
-        provider.changeAPIStatus(api, APIStatus.PUBLISHED, providerName, true);
+        newAPI.setUriTemplates(templates);
+        newAPI.setLastUpdated(new Date());
+        provider.addAPI(newAPI);
+        provider.changeAPIStatus(newAPI, APIStatus.PUBLISHED, eagerAdmin, true);
         return true;
     }
 
