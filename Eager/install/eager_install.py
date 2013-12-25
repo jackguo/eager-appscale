@@ -93,10 +93,18 @@ def setup_api_manager(inputs):
       output_file.close()
 
     print 'Updating user manager configuration...'
-    with open('user-mgt.xml', 'r') as ds_file:
-      content = ds_file.read().replace('${am.user}',
+    with open('user-mgt.xml', 'r') as um_file:
+      content = um_file.read().replace('${am.user}',
         inputs[AM_USER]).replace('${am.password}', inputs[AM_PASS])
       output_file = open('/root/APIManager/repository/conf/user-mgt.xml', 'w')
+      output_file.write(content)
+      output_file.flush()
+      output_file.close()
+
+    print 'Updating Carbon configuration...'
+    with open('carbon.xml', 'r') as carbon_file:
+      content = carbon_file.read().replace('${am.user}', inputs[AM_USER])
+      output_file = open('/root/APIManager/repository/conf/carbon.xml', 'w')
       output_file.write(content)
       output_file.flush()
       output_file.close()

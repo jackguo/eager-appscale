@@ -23,6 +23,7 @@ import org.apache.axis2.engine.ListenerManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
+import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
 import org.wso2.carbon.user.core.service.RealmService;
@@ -60,7 +61,7 @@ public class EagerAPIManagementComponent {
         if (log.isDebugEnabled()) {
             log.debug("EAGER API manager component activated");
         }
-        eagerAdmin = "admin"; //TODO: Read from a config file
+        eagerAdmin = ServerConfiguration.getInstance().getFirstProperty("Eager.Admin");
     }
 
     protected void deactivate(ComponentContext componentContext) {
