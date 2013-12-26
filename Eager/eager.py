@@ -52,10 +52,14 @@ class Eager:
         name, version))
       context = '/' + name.lower()
       api_list = self.adaptor.get_api_list_with_context(context)
-      for api_info in api_list:
-        if api_info.name != name:
-          detail = { 'detail' : 'API name is too similar to: {0}'.format(api_info.name) }
-          self.__generate_response(False, self.REASON_AMBIGUOUS_API_NAME, detail)
+      if api_list:
+        for api_info in api_list:
+          if api_info.name != name:
+            detail = { 'detail' : 'API name is too similar to: {0}'.format(api_info.name) }
+            self.__generate_response(False, self.REASON_AMBIGUOUS_API_NAME, detail)
+        utils.log("Context {0} is available for use".format(context))
+      else:
+        utils.log("Context {0} is not taken by any other API".format(context))
 
     return self.__generate_response(True, self.REASON_API_VALIDATION_SUCCESS)
 
