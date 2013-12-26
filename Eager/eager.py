@@ -47,6 +47,7 @@ class Eager:
 
     if self.adaptor.is_api_available(name, version):
       utils.log("Validating API = {0}; Version = {1}".format(name, version))
+      # TODO: Get ValidationInfo and run dependency checker algorithm
     else:
       utils.log("API {0}-v{1} does not exist yet. Skipping dependency validation".format(
         name, version))
@@ -60,6 +61,7 @@ class Eager:
         utils.log("Context {0} is available for use".format(context))
       else:
         utils.log("Context {0} is not taken by any other API".format(context))
+      # TODO: Create API stub in API Manager (with a place holder URL)
 
     return self.__generate_response(True, self.REASON_API_VALIDATION_SUCCESS)
 

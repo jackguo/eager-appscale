@@ -77,14 +77,17 @@ public class EagerAdmin {
         return null;
     }
 
-    public boolean createAndPublishAPI(APIInfo api,
-                                       String specification) throws APIManagementException {
+    public boolean createAPI(APIInfo api, String specification) throws APIManagementException {
+        if (isAPIAvailable(api)) {
+            return false;
+        }
+
         String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
         APIProvider provider = getAPIProvider(eagerAdmin);
         APIIdentifier apiId = new APIIdentifier(eagerAdmin, api.getName(), api.getVersion());
         API newAPI = new API(apiId);
         newAPI.setContext("/" + api.getName().toLowerCase());
-        newAPI.setUrl("http://test.com");
+        newAPI.setUrl("http://eager4appscale.com");
         newAPI.setStatus(APIStatus.CREATED);
 
         String[] methods = new String[] {
@@ -96,14 +99,35 @@ public class EagerAdmin {
             template.setHTTPVerb(method);
             template.setUriTemplate("/*");
             template.setAuthType(APIConstants.AUTH_APPLICATION_OR_USER_LEVEL_TOKEN);
-            template.setResourceURI("http://test.com");
+            template.setResourceURI("http://eager4appscale.com");
             templates.add(template);
         }
         newAPI.setUriTemplates(templates);
         newAPI.setLastUpdated(new Date());
         provider.addAPI(newAPI);
-        provider.changeAPIStatus(newAPI, APIStatus.PUBLISHED, eagerAdmin, true);
         return true;
+    }
+
+    public boolean publishAPI(APIInfo api, String url) throws APIManagementException {
+        if (!isAPIAvailable(api)) {
+            return false;
+        }
+
+        String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
+        APIProvider provider = getAPIProvider(eagerAdmin);
+        APIIdentifier apiId = new APIIdentifier(eagerAdmin, api.getName(), api.getVersion());
+        API existingAPI = provider.getAPI(apiId);
+        if (existingAPI.getStatus() != APIStatus.PUBLISHED) {
+            existingAPI.setUrl(url);
+            for (URITemplate template : existingAPI.getUriTemplates()) {
+                template.setResourceURI(url);
+            }
+            existingAPI.setLastUpdated(new Date());
+            provider.updateAPI(existingAPI);
+            provider.changeAPIStatus(existingAPI, APIStatus.PUBLISHED, eagerAdmin, true);
+            return true;
+        }
+        return false;
     }
 
     private APIProvider getAPIProvider(String providerName) throws APIManagementException {
