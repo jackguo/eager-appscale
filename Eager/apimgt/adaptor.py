@@ -10,3 +10,6 @@ class APIManagerAdaptor(object):
 
   def get_api_list_with_context(self, context):
     raise NotImplementedError
+
+  def create_api(self, name, version, specification):
+    raise NotImplementedError

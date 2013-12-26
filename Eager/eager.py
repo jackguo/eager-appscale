@@ -61,7 +61,10 @@ class Eager:
         utils.log("Context {0} is available for use".format(context))
       else:
         utils.log("Context {0} is not taken by any other API".format(context))
-      # TODO: Create API stub in API Manager (with a place holder URL)
+        if self.adaptor(name, version, ''):
+          utils.log("Successfully registered the API {0}-v{1}".format(name, version))
+        else:
+          utils.log("API {0}-v{1} is already registered".format(name, version))
 
     return self.__generate_response(True, self.REASON_API_VALIDATION_SUCCESS)
 

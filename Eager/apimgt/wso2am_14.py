@@ -27,3 +27,7 @@ class WSO2APIManager14Adaptor(APIManagerAdaptor):
     for result in results:
       api_list.append(APIInfo(result['name'], result['version']))
     return api_list
+
+  def create_api(self, name, version, specification):
+    api = { 'name' : name, 'version' : version }
+    return self.client.service.createAPI(api=api, specification=specification)
