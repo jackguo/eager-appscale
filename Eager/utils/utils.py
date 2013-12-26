@@ -182,8 +182,7 @@ def sleep(seconds):
   """
   time.sleep(seconds)
 
-def get_adaptor(parent_dir):
-  config_file = os.path.join(parent_dir, self.CONFIG_FILE)
+def get_adaptor(config_file):
   eager_yaml = open(config_file, 'r')
   conf = yaml.load(eager_yaml)
   eager_yaml.close()

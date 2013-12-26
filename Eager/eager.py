@@ -24,7 +24,9 @@ class Eager:
 
   def __init__(self):
     self.secret = utils.get_secret()
-    self.adaptor = utils.get_adaptor(os.path.dirname(os.path.realpath(sys.argv[0])))
+    parent_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
+    config_file = os.path.join(parent_dir, self.CONFIG_FILE)
+    self.adaptor = utils.get_adaptor(config_file)
 
   def ping(self, secret):
     if self.secret != secret:
