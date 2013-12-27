@@ -83,7 +83,9 @@ public abstract class AbstractAPIGatewayAdminClient {
             throw new AxisFault("API gateway URL is malformed", e);
         }
 
-        AuthenticationAdminStub authAdminStub = new AuthenticationAdminStub(null, url + "AuthenticationAdmin");
+        AuthenticationAdminStub authAdminStub = new AuthenticationAdminStub(
+                ServiceReferenceHolder.getContextService().getClientConfigContext(),
+                url + "AuthenticationAdmin");
         ServiceClient client = authAdminStub._getServiceClient();
         Options options = client.getOptions();
         options.setManageSession(true);

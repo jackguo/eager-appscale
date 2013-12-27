@@ -107,6 +107,8 @@ public class EagerAdmin {
         }
         newAPI.setUriTemplates(templates);
         newAPI.setLastUpdated(new Date());
+        newAPI.setVisibility(APIConstants.API_GLOBAL_VISIBILITY);
+        newAPI.addAvailableTiers(provider.getTiers());
         provider.addAPI(newAPI);
         log.info("Registered API: " + api.getName() + "-v" + api.getVersion());
 
@@ -148,9 +150,19 @@ public class EagerAdmin {
         API existingAPI = provider.getAPI(apiId);
         if (existingAPI.getStatus() != APIStatus.PUBLISHED) {
             existingAPI.setUrl(url);
-            for (URITemplate template : existingAPI.getUriTemplates()) {
+            String[] methods = new String[] {
+                    "GET", "POST", "PUT", "DELETE", "OPTIONS"
+            };
+            Set<URITemplate> templates = new HashSet<URITemplate>();
+            for (String method : methods) {
+                URITemplate template = new URITemplate();
+                template.setHTTPVerb(method);
+                template.setUriTemplate("/*");
+                template.setAuthType(APIConstants.AUTH_APPLICATION_OR_USER_LEVEL_TOKEN);
                 template.setResourceURI(url);
+                templates.add(template);
             }
+            existingAPI.setUriTemplates(templates);
             existingAPI.setLastUpdated(new Date());
             provider.updateAPI(existingAPI);
             provider.changeAPIStatus(existingAPI, APIStatus.PUBLISHED, eagerAdmin, true);

@@ -18,6 +18,7 @@ package org.wso2.carbon.apimgt.impl.utils;
 
 import org.apache.axis2.AxisFault;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
+import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.template.APITemplateBuilder;
 import org.wso2.carbon.rest.api.stub.RestApiAdminStub;
 import org.wso2.carbon.rest.api.stub.types.carbon.APIData;
@@ -33,7 +34,9 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
                 ":v" + apiId.getVersion();
         String providerDomain = apiId.getProviderName();
         providerDomain=providerDomain.replace("-AT-", "@");
-        restApiAdminStub = new RestApiAdminStub(null, getServiceEndpoint("RestApiAdmin"));
+        restApiAdminStub = new RestApiAdminStub(
+                ServiceReferenceHolder.getContextService().getClientConfigContext(),
+                getServiceEndpoint("RestApiAdmin"));
         setup(restApiAdminStub);
     }
     
