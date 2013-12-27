@@ -23,6 +23,8 @@ class Eager:
   REASON_API_PUBLISH_SUCCESS = 'api published successfully'
   REASON_API_ALREADY_PUBLISHED = 'api already published'
   REASON_API_SPEC_UPDATE_FAILED = 'failed to update api specification'
+  REASON_BAD_API_DEPENDENCIES = 'bad api dependencies'
+  REASON_DEPENDENCY_RECORDING_FAILED = 'failed to record api dependencies'
 
   CONFIG_FILE = 'eager.yaml'
 
@@ -45,10 +47,15 @@ class Eager:
     name = api['name']
     version = api['version']
     specification = api['specification']
+    dependencies = api['dependencies']
 
     if not self.__is_api_name_valid(name):
       detail = { 'detail' : 'API name contains invalid characters' }
       return self.__generate_response(False, self.REASON_BAD_API_METADATA, detail)
+
+    if dependencies and self.adaptor.validate_api_dependencies(name, version, dependencies):
+      detail = { 'detail' : 'One or more declared dependencies do not exist' }
+      return self.__generate_response(False, self.REASON_BAD_API_DEPENDENCIES, detail)
 
     if self.adaptor.is_api_available(name, version):
       utils.log("Validating API = {0}; Version = {1}".format(name, version))
@@ -79,7 +86,10 @@ class Eager:
         else:
           utils.log("API {0}-v{1} is already registered".format(name, version))
 
-    # TODO: Record API dependencies
+    if not self.adaptor.record_api_dependencies(name, version, dependencies):
+      utils.log("Failed to record dependencies for {0}-v{1}".format(name, version))
+      return self.__generate_response(False, self.REASON_DEPENDENCY_RECORDING_FAILED)
+
     return self.__generate_response(True, self.REASON_API_VALIDATION_SUCCESS)
 
   def publish_api(self, secret, api, url):

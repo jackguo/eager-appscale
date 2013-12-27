@@ -70,6 +70,20 @@ public class EagerAdmin {
         }
     }
 
+    public boolean validateDependencies(APIInfo api,
+                                           DependencyInfo[] dependencies) throws EagerException {
+        String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
+        for (DependencyInfo dependency : dependencies) {
+            APIIdentifier apiId = new APIIdentifier(eagerAdmin, dependency.getName(),
+                    dependency.getVersion());
+            APIInfo dependencyApi = new APIInfo(apiId);
+            if (!isAPIAvailable(dependencyApi)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * Record the dependencies of an API
      *
