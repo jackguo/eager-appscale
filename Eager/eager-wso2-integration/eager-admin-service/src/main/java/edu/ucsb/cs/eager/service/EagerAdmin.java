@@ -22,6 +22,7 @@ package edu.ucsb.cs.eager.service;
 import edu.ucsb.cs.eager.internal.EagerAPIManagementComponent;
 import edu.ucsb.cs.eager.models.APIInfo;
 import edu.ucsb.cs.eager.models.DependencyInfo;
+import edu.ucsb.cs.eager.models.EagerException;
 import edu.ucsb.cs.eager.models.ValidationInfo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,24 +40,34 @@ public class EagerAdmin {
 
     private static final String EAGER_DOC_NAME = "EagerSpec";
 
-    public boolean isAPIAvailable(APIInfo api) throws APIManagementException {
-        String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
-        APIProvider provider = getAPIProvider(eagerAdmin);
-        APIIdentifier apiId = new APIIdentifier(eagerAdmin, api.getName(), api.getVersion());
-        return provider.isAPIAvailable(apiId);
+    public boolean isAPIAvailable(APIInfo api) throws EagerException {
+        try {
+            String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
+            APIProvider provider = getAPIProvider(eagerAdmin);
+            APIIdentifier apiId = new APIIdentifier(eagerAdmin, api.getName(), api.getVersion());
+            return provider.isAPIAvailable(apiId);
+        } catch (APIManagementException e) {
+            handleException("Error while checking for the existence of API", e);
+            return false;
+        }
     }
 
-    public APIInfo[] getAPIsWithContext(String context) throws APIManagementException {
+    public APIInfo[] getAPIsWithContext(String context) throws EagerException {
         String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
-        APIProvider provider = getAPIProvider(eagerAdmin);
-        List<API> apiList = provider.getAllAPIs();
-        List<APIInfo> results = new ArrayList<APIInfo>();
-        for (API api : apiList) {
-            if (api.getContext().equals(context)) {
-                results.add(new APIInfo(api.getId()));
+        try {
+            APIProvider provider = getAPIProvider(eagerAdmin);
+            List<API> apiList = provider.getAllAPIs();
+            List<APIInfo> results = new ArrayList<APIInfo>();
+            for (API api : apiList) {
+                if (api.getContext().equals(context)) {
+                    results.add(new APIInfo(api.getId()));
+                }
             }
+            return results.toArray(new APIInfo[results.size()]);
+        } catch (APIManagementException e) {
+            handleException("Error while retrieving APIs", e);
+            return null;
         }
-        return results.toArray(new APIInfo[results.size()]);
     }
 
     /**
@@ -80,78 +91,22 @@ public class EagerAdmin {
         return null;
     }
 
-    public boolean createAPI(APIInfo api, String specification) throws APIManagementException {
+    public boolean createAPI(APIInfo api, String specification) throws EagerException {
         if (isAPIAvailable(api)) {
             return false;
         }
 
-        String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
-        APIProvider provider = getAPIProvider(eagerAdmin);
-        APIIdentifier apiId = new APIIdentifier(eagerAdmin, api.getName(), api.getVersion());
-        API newAPI = new API(apiId);
-        newAPI.setContext("/" + api.getName().toLowerCase());
-        newAPI.setUrl("http://eager4appscale.com");
-        newAPI.setStatus(APIStatus.CREATED);
+        try {
+            String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
+            APIProvider provider = getAPIProvider(eagerAdmin);
+            APIIdentifier apiId = new APIIdentifier(eagerAdmin, api.getName(), api.getVersion());
+            API newAPI = new API(apiId);
+            newAPI.setContext("/" + api.getName().toLowerCase());
+            newAPI.setUrl("http://eager4appscale.com");
+            newAPI.setStatus(APIStatus.CREATED);
 
-        String[] methods = new String[] {
-            "GET", "POST", "PUT", "DELETE", "OPTIONS"
-        };
-        Set<URITemplate> templates = new HashSet<URITemplate>();
-        for (String method : methods) {
-            URITemplate template = new URITemplate();
-            template.setHTTPVerb(method);
-            template.setUriTemplate("/*");
-            template.setAuthType(APIConstants.AUTH_APPLICATION_OR_USER_LEVEL_TOKEN);
-            template.setResourceURI("http://eager4appscale.com");
-            templates.add(template);
-        }
-        newAPI.setUriTemplates(templates);
-        newAPI.setLastUpdated(new Date());
-        newAPI.setVisibility(APIConstants.API_GLOBAL_VISIBILITY);
-        newAPI.addAvailableTiers(provider.getTiers());
-        provider.addAPI(newAPI);
-        log.info("Registered API: " + api.getName() + "-v" + api.getVersion());
-
-        Documentation doc = new Documentation(DocumentationType.OTHER, EAGER_DOC_NAME);
-        doc.setSourceType(Documentation.DocumentSourceType.INLINE);
-        doc.setLastUpdated(new Date());
-        doc.setOtherTypeName(EAGER_DOC_NAME);
-        provider.addDocumentation(apiId, doc);
-        provider.addDocumentationContent(apiId, EAGER_DOC_NAME, specification);
-        return true;
-    }
-
-    public boolean updateAPISpec(APIInfo api, String specification) throws APIManagementException {
-        if (!isAPIAvailable(api)) {
-            return false;
-        }
-
-        String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
-        APIProvider provider = getAPIProvider(eagerAdmin);
-        APIIdentifier apiId = new APIIdentifier(eagerAdmin, api.getName(), api.getVersion());
-
-        Documentation doc = new Documentation(DocumentationType.OTHER, EAGER_DOC_NAME);
-        doc.setSourceType(Documentation.DocumentSourceType.INLINE);
-        doc.setLastUpdated(new Date());
-        doc.setOtherTypeName(EAGER_DOC_NAME);
-        provider.updateDocumentation(apiId, doc);
-        provider.addDocumentationContent(apiId, EAGER_DOC_NAME, specification);
-        return true;
-    }
-
-    public boolean publishAPI(APIInfo api, String url) throws APIManagementException {
-        if (!isAPIAvailable(api)) {
-            return false;
-        }
-
-        String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
-        APIProvider provider = getAPIProvider(eagerAdmin);
-        APIIdentifier apiId = new APIIdentifier(eagerAdmin, api.getName(), api.getVersion());
-        API existingAPI = provider.getAPI(apiId);
-        if (existingAPI.getStatus() != APIStatus.PUBLISHED) {
-            existingAPI.setUrl(url);
             String[] methods = new String[] {
-                    "GET", "POST", "PUT", "DELETE", "OPTIONS"
+                "GET", "POST", "PUT", "DELETE", "OPTIONS"
             };
             Set<URITemplate> templates = new HashSet<URITemplate>();
             for (String method : methods) {
@@ -159,19 +114,106 @@ public class EagerAdmin {
                 template.setHTTPVerb(method);
                 template.setUriTemplate("/*");
                 template.setAuthType(APIConstants.AUTH_APPLICATION_OR_USER_LEVEL_TOKEN);
-                template.setResourceURI(url);
+                template.setResourceURI("http://eager4appscale.com");
                 templates.add(template);
             }
-            existingAPI.setUriTemplates(templates);
-            existingAPI.setLastUpdated(new Date());
-            provider.updateAPI(existingAPI);
-            provider.changeAPIStatus(existingAPI, APIStatus.PUBLISHED, eagerAdmin, true);
+            newAPI.setUriTemplates(templates);
+            newAPI.setLastUpdated(new Date());
+            newAPI.setVisibility(APIConstants.API_GLOBAL_VISIBILITY);
+            newAPI.addAvailableTiers(provider.getTiers());
+            provider.addAPI(newAPI);
+            log.info("Registered API: " + api.getName() + "-v" + api.getVersion());
+
+            Documentation doc = new Documentation(DocumentationType.OTHER, EAGER_DOC_NAME);
+            doc.setSourceType(Documentation.DocumentSourceType.INLINE);
+            doc.setLastUpdated(new Date());
+            doc.setOtherTypeName(EAGER_DOC_NAME);
+            provider.addDocumentation(apiId, doc);
+            provider.addDocumentationContent(apiId, EAGER_DOC_NAME, specification);
+            return true;
+        } catch (APIManagementException e) {
+            handleException("Error while creating new API", e);
+            return false;
         }
-        return true;
+    }
+
+    public boolean updateAPISpec(APIInfo api, String specification) throws EagerException {
+        if (!isAPIAvailable(api)) {
+            return false;
+        }
+
+        try {
+            String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
+            APIProvider provider = getAPIProvider(eagerAdmin);
+            APIIdentifier apiId = new APIIdentifier(eagerAdmin, api.getName(), api.getVersion());
+
+            Documentation doc = new Documentation(DocumentationType.OTHER, EAGER_DOC_NAME);
+            doc.setSourceType(Documentation.DocumentSourceType.INLINE);
+            doc.setLastUpdated(new Date());
+            doc.setOtherTypeName(EAGER_DOC_NAME);
+            provider.updateDocumentation(apiId, doc);
+            provider.addDocumentationContent(apiId, EAGER_DOC_NAME, specification);
+            return true;
+        } catch (APIManagementException e) {
+            handleException("Error while updating API specification", e);
+            return false;
+        }
+    }
+
+    /**
+     * Publish the specified API to the API Store and Gateway.
+     *
+     * @param api API to be publishes
+     * @param url Backend URL to which API should forward traffic
+     * @return true if the operation is successful, and false if the API is already in a
+     * published state
+     * @throws EagerException If the specified API does not exist or if some other
+     * runtime error occurs
+     */
+    public boolean publishAPI(APIInfo api, String url) throws EagerException {
+        if (!isAPIAvailable(api)) {
+            throw new EagerException("API " + api.getName() + "-v" +
+                    api.getVersion() + " does not exist");
+        }
+
+        try {
+            String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
+            APIProvider provider = getAPIProvider(eagerAdmin);
+            APIIdentifier apiId = new APIIdentifier(eagerAdmin, api.getName(), api.getVersion());
+            API existingAPI = provider.getAPI(apiId);
+            if (existingAPI.getStatus() != APIStatus.PUBLISHED) {
+                existingAPI.setUrl(url);
+                String[] methods = new String[] {
+                        "GET", "POST", "PUT", "DELETE", "OPTIONS"
+                };
+                Set<URITemplate> templates = new HashSet<URITemplate>();
+                for (String method : methods) {
+                    URITemplate template = new URITemplate();
+                    template.setHTTPVerb(method);
+                    template.setUriTemplate("/*");
+                    template.setAuthType(APIConstants.AUTH_APPLICATION_OR_USER_LEVEL_TOKEN);
+                    template.setResourceURI(url);
+                    templates.add(template);
+                }
+                existingAPI.setUriTemplates(templates);
+                existingAPI.setLastUpdated(new Date());
+                provider.updateAPI(existingAPI);
+                provider.changeAPIStatus(existingAPI, APIStatus.PUBLISHED, eagerAdmin, true);
+                return true;
+            }
+        } catch (APIManagementException e) {
+            handleException("Error while publishing API", e);
+        }
+        return false;
     }
 
     private APIProvider getAPIProvider(String providerName) throws APIManagementException {
         return APIManagerFactory.getInstance().getAPIProvider(providerName);
+    }
+
+    private void handleException(String msg, Exception ex) throws EagerException {
+        log.error(msg, ex);
+        throw new EagerException(msg, ex);
     }
 
 }

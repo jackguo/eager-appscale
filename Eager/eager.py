@@ -21,7 +21,7 @@ class Eager:
   REASON_BAD_API_METADATA = 'api contains wrong or invalid metadata'
   REASON_AMBIGUOUS_API_NAME = 'api name is too similar to some names already in use'
   REASON_API_PUBLISH_SUCCESS = 'api published successfully'
-  REASON_API_PUBLISH_FAILURE = 'api not published'
+  REASON_API_ALREADY_PUBLISHED = 'api already published'
 
   CONFIG_FILE = 'eager.yaml'
 
@@ -84,8 +84,8 @@ class Eager:
       utils.log("API {0}-v{1} published successfully".format(name, version))
       return self.__generate_response(True, self.REASON_API_PUBLISH_SUCCESS)
     else:
-      detail = { 'detail' : 'API {0}-v{1} does not exist'.format(name, version) }
-      return self.__generate_response(False, self.REASON_API_PUBLISH_FAILURE, detail)
+      utils.log("API {0}-v{1} is already published".format(name, version))
+      return self.__generate_response(True, self.REASON_API_ALREADY_PUBLISHED)
 
   def __is_api_name_valid(self, name):
     for char in "'/ &+@%\"<>":
