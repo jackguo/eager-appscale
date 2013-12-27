@@ -108,12 +108,31 @@ public class EagerAdmin {
         newAPI.setUriTemplates(templates);
         newAPI.setLastUpdated(new Date());
         provider.addAPI(newAPI);
+        log.info("Registered API: " + api.getName() + "-v" + api.getVersion());
 
         Documentation doc = new Documentation(DocumentationType.OTHER, EAGER_DOC_NAME);
         doc.setSourceType(Documentation.DocumentSourceType.INLINE);
         doc.setLastUpdated(new Date());
         doc.setOtherTypeName(EAGER_DOC_NAME);
         provider.addDocumentation(apiId, doc);
+        provider.addDocumentationContent(apiId, EAGER_DOC_NAME, specification);
+        return true;
+    }
+
+    public boolean updateAPISpec(APIInfo api, String specification) throws APIManagementException {
+        if (!isAPIAvailable(api)) {
+            return false;
+        }
+
+        String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
+        APIProvider provider = getAPIProvider(eagerAdmin);
+        APIIdentifier apiId = new APIIdentifier(eagerAdmin, api.getName(), api.getVersion());
+
+        Documentation doc = new Documentation(DocumentationType.OTHER, EAGER_DOC_NAME);
+        doc.setSourceType(Documentation.DocumentSourceType.INLINE);
+        doc.setLastUpdated(new Date());
+        doc.setOtherTypeName(EAGER_DOC_NAME);
+        provider.updateDocumentation(apiId, doc);
         provider.addDocumentationContent(apiId, EAGER_DOC_NAME, specification);
         return true;
     }
@@ -135,9 +154,8 @@ public class EagerAdmin {
             existingAPI.setLastUpdated(new Date());
             provider.updateAPI(existingAPI);
             provider.changeAPIStatus(existingAPI, APIStatus.PUBLISHED, eagerAdmin, true);
-            return true;
         }
-        return false;
+        return true;
     }
 
     private APIProvider getAPIProvider(String providerName) throws APIManagementException {

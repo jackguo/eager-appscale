@@ -13,3 +13,9 @@ class APIManagerAdaptor(object):
 
   def create_api(self, name, version, specification):
     raise NotImplementedError
+
+  def get_dependency_validation_info(self, name, version):
+    raise NotImplementedError
+
+  def publish_api(self, name, version, url):
+    raise NotImplementedError

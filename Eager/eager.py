@@ -20,6 +20,8 @@ class Eager:
   REASON_API_VALIDATION_SUCCESS = 'api validated successfully'
   REASON_BAD_API_METADATA = 'api contains wrong or invalid metadata'
   REASON_AMBIGUOUS_API_NAME = 'api name is too similar to some names already in use'
+  REASON_API_PUBLISH_SUCCESS = 'api published successfully'
+  REASON_API_PUBLISH_FAILURE = 'api not published'
 
   CONFIG_FILE = 'eager.yaml'
 
@@ -50,6 +52,7 @@ class Eager:
     if self.adaptor.is_api_available(name, version):
       utils.log("Validating API = {0}; Version = {1}".format(name, version))
       # TODO: Get ValidationInfo and run dependency checker algorithm
+      # TODO: If successful, update the API spec in API Manager
     else:
       utils.log("API {0}-v{1} does not exist yet. Skipping dependency validation".format(
         name, version))
@@ -68,10 +71,24 @@ class Eager:
         else:
           utils.log("API {0}-v{1} is already registered".format(name, version))
 
+    # TODO: Record API dependencies
     return self.__generate_response(True, self.REASON_API_VALIDATION_SUCCESS)
 
+  def publish_api(self, secret, api, url):
+    if self.secret != secret:
+      return self.__generate_response(False, self.REASON_BAD_SECRET)
+
+    name = api['name']
+    version = api['version']
+    if self.adaptor.publish_api(name, version, url):
+      utils.log("API {0}-v{1} published successfully".format(name, version))
+      return self.__generate_response(True, self.REASON_API_PUBLISH_SUCCESS)
+    else:
+      detail = { 'detail' : 'API {0}-v{1} does not exist'.format(name, version) }
+      return self.__generate_response(False, self.REASON_API_PUBLISH_FAILURE, detail)
+
   def __is_api_name_valid(self, name):
-    for char in "'/ &+@%\"":
+    for char in "'/ &+@%\"<>":
       if char in name:
         return False
     return True
