@@ -32,3 +32,4 @@ fi
 
 echo "Creating WSO2AM_DB database tables..."
 mysql -uroot -p$2 WSO2AM_DB < /root/APIManager/dbscripts/apimgt/mysql.sql
+mysql -uroot -p$2 WSO2AM_DB < /root/appscale/Eager/install/eager.sql
