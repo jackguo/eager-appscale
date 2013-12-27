@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 from utils import utils
@@ -40,6 +41,7 @@ class Eager:
 
     name = api['name']
     version = api['version']
+    specification = api['specification']
 
     if not self.__is_api_name_valid(name):
       detail = { 'detail' : 'API name contains invalid characters' }
@@ -61,7 +63,7 @@ class Eager:
         utils.log("Context {0} is available for use".format(context))
       else:
         utils.log("Context {0} is not taken by any other API".format(context))
-        if self.adaptor.create_api(name, version, ''):
+        if self.adaptor.create_api(name, version, json.dumps(specification)):
           utils.log("Successfully registered the API {0}-v{1}".format(name, version))
         else:
           utils.log("API {0}-v{1} is already registered".format(name, version))

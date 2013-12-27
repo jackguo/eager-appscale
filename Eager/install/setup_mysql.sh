@@ -16,22 +16,3 @@ EOSQL
     echo "Done setting MySQL root password."
 fi
 
-echo "Creating databases and user accounts."
-
-mysql -uroot -p$1 -e <<EOSQL "DROP DATABASE IF EXISTS WSO2CARBON_DB; CREATE DATABASE WSO2CARBON_DB; GRANT ALL PRIVILEGES ON WSO2CARBON_DB.* TO $2@localhost IDENTIFIED BY '$3'"
-EOSQL
-RC=$?
-if [ $RC != 0 ]; then
-    exit $RC
-fi
-echo "Created database WSO2_CARBON_DB for user $2"
-
-mysql -uroot -p$1 -e <<EOSQL "DROP DATABASE IF EXISTS WSO2AM_DB; CREATE DATABASE WSO2AM_DB; GRANT ALL PRIVILEGES ON WSO2AM_DB.* TO $2@localhost IDENTIFIED BY '$3'"
-EOSQL
-RC=$?
-if [ $RC != 0 ]; then
-    exit $RC
-fi
-echo "Created database WSO2_AM_DB for user $2"
-
-echo "All done."

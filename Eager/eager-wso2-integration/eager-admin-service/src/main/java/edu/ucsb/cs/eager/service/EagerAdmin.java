@@ -23,18 +23,21 @@ import edu.ucsb.cs.eager.internal.EagerAPIManagementComponent;
 import edu.ucsb.cs.eager.models.APIInfo;
 import edu.ucsb.cs.eager.models.DependencyInfo;
 import edu.ucsb.cs.eager.models.ValidationInfo;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.APIProvider;
-import org.wso2.carbon.apimgt.api.model.API;
-import org.wso2.carbon.apimgt.api.model.APIIdentifier;
-import org.wso2.carbon.apimgt.api.model.APIStatus;
-import org.wso2.carbon.apimgt.api.model.URITemplate;
+import org.wso2.carbon.apimgt.api.model.*;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerFactory;
 
 import java.util.*;
 
 public class EagerAdmin {
+
+    private static final Log log = LogFactory.getLog(EagerAdmin.class);
+
+    private static final String EAGER_DOC_NAME = "EagerSpec";
 
     public boolean isAPIAvailable(APIInfo api) throws APIManagementException {
         String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
@@ -105,6 +108,13 @@ public class EagerAdmin {
         newAPI.setUriTemplates(templates);
         newAPI.setLastUpdated(new Date());
         provider.addAPI(newAPI);
+
+        Documentation doc = new Documentation(DocumentationType.OTHER, EAGER_DOC_NAME);
+        doc.setSourceType(Documentation.DocumentSourceType.INLINE);
+        doc.setLastUpdated(new Date());
+        doc.setOtherTypeName(EAGER_DOC_NAME);
+        provider.addDocumentation(apiId, doc);
+        provider.addDocumentationContent(apiId, EAGER_DOC_NAME, specification);
         return true;
     }
 

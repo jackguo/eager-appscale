@@ -69,8 +69,7 @@ def get_user_input():
       print 'Please enter either "yes" or "no"'
 
 def setup_mysql(inputs):
-  status = os.system("sh setup_mysql.sh '{0}' '{1}' '{2}'".format(inputs[MYSQL_ROOT_PASS],
-    inputs[MYSQL_USER], inputs[MYSQL_PASS]))
+  status = os.system("sh setup_mysql.sh '{0}'".format(inputs[MYSQL_ROOT_PASS]))
   if status:
     print 'MySQL setup failed. Aborting...'
     exit(1)
@@ -78,7 +77,8 @@ def setup_mysql(inputs):
 def setup_api_manager(inputs):
   file_path = '/root/wso2am-1.4.0.zip'
   if os.path.exists(file_path):
-    status = os.system("sh setup_am.sh '{0}' '{1}'".format(file_path, inputs[MYSQL_ROOT_PASS]))
+    status = os.system("sh setup_am.sh '{0}' '{1}' '{2}' '{3}'".format(file_path,
+      inputs[MYSQL_ROOT_PASS], inputs[MYSQL_USER], inputs[MYSQL_PASS]))
     if status:
       print 'API Manager setup failed. Aborting...'
       exit(1)
