@@ -51,8 +51,9 @@ class Eager:
 
     if self.adaptor.is_api_available(name, version):
       utils.log("Validating API = {0}; Version = {1}".format(name, version))
-      # TODO: Get ValidationInfo and run dependency checker algorithm
-      # TODO: If successful, update the API spec in API Manager
+      validation_info = self.adaptor.get_validation_info(name, version)
+      if self.__perform_validation(specification, validation_info):
+        self.adaptor.update_api_specification(name, version, specification)
     else:
       utils.log("API {0}-v{1} does not exist yet. Skipping dependency validation".format(
         name, version))
@@ -111,3 +112,8 @@ class Eager:
       for key, value in extra.items():
         response[key] = value
     return response
+
+  def __perform_validation(self, specification, validation_info):
+    utils.log("Retrieved specification: " + str(validation_info.specifcation))
+    # TODO: Run dependency checker + other policy enforcement logic
+    return True

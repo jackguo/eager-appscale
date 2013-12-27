@@ -28,7 +28,15 @@ public class ValidationInfo {
         return specification;
     }
 
+    public void setSpecification(String specification) {
+        this.specification = specification;
+    }
+
     public DependencyInfo[] getDependents() {
         return dependents;
+    }
+
+    public void setDependents(DependencyInfo[] dependents) {
+        this.dependents = dependents;
     }
 }

@@ -29,12 +29,23 @@ public class DependencyInfo {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getVersion() {
         return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     public String[] getOperations() {
         return operations;
     }
 
+    public void setOperations(String[] operations) {
+        this.operations = operations;
+    }
 }

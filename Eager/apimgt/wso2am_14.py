@@ -1,7 +1,7 @@
 import logging
 from suds.client import Client
 from suds.transport.http import HttpAuthenticated
-from apimgt.adaptor import APIManagerAdaptor, APIInfo
+from apimgt.adaptor import APIManagerAdaptor, APIInfo, DependencyInfo, ValidationInfo
 
 class WSO2APIManager14Adaptor(APIManagerAdaptor):
   def __init__(self, conf):
@@ -40,3 +40,21 @@ class WSO2APIManager14Adaptor(APIManagerAdaptor):
   def publish_api(self, name, version, url):
     api = { 'name' : name, 'version' : version }
     return self.client.service.publishAPI(api=api, url=url)
+
+  def update_api_specification(self, name, version, specification):
+    api = { 'name' : name, 'version' : version }
+    return self.client.service.updateAPISpec(api=api, specification=specification)
+
+  def get_validation_info(self, name, version):
+    api = { 'name' : name, 'version' : version }
+    result = self.client.service.getValidationInfo(api=api)
+    dependents = []
+    for dependent in result.dependents:
+      dep_name = dependent.name
+      dep_version = dependent.version
+      dep_operations = []
+      for op in dependent.operations:
+        dep_operations.append(op)
+      d = DependencyInfo(dep_name, dep_version, dep_operations)
+      dependents.append(d)
+    return ValidationInfo(result.specification, dependents)

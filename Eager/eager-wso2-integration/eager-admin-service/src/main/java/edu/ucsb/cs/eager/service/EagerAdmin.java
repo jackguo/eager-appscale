@@ -87,8 +87,20 @@ public class EagerAdmin {
      * @param api A potential dependency API
      * @return A ValidationInfo object carrying the specification of the API and its dependents
      */
-    public ValidationInfo getValidationInfo(APIInfo api) {
-        return null;
+    public ValidationInfo getValidationInfo(APIInfo api) throws EagerException {
+        try {
+            String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
+            APIProvider provider = getAPIProvider(eagerAdmin);
+            APIIdentifier apiId = new APIIdentifier(eagerAdmin, api.getName(), api.getVersion());
+            String specification = provider.getDocumentationContent(apiId, EAGER_DOC_NAME);
+            // TODO: get recorded dependents
+            ValidationInfo info = new ValidationInfo();
+            info.setSpecification(specification);
+            return info;
+        } catch (APIManagementException e) {
+            handleException("Error while obtaining API validation information", e);
+            return null;
+        }
     }
 
     public boolean createAPI(APIInfo api, String specification) throws EagerException {
