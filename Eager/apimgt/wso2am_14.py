@@ -3,6 +3,9 @@ from suds.client import Client
 from suds.transport.http import HttpAuthenticated
 from apimgt.adaptor import APIManagerAdaptor, APIInfo, DependencyInfo, ValidationInfo
 
+__author__ = 'hiranya'
+__email__ = 'hiranya@cs.ucsb.edu'
+
 class WSO2APIManager14Adaptor(APIManagerAdaptor):
   def __init__(self, conf):
     self.url = 'https://{0}:{1}/services/EagerAdmin'.format(conf['host'],

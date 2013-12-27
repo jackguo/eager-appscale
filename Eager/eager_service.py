@@ -5,7 +5,7 @@ import os
 import SOAPpy
 
 __author__ = 'hiranya'
-__email__ = 'hiranya@appscale.com'
+__email__ = 'hiranya@cs.ucsb.edu'
 
 class EagerService:
 

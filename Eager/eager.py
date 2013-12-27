@@ -4,7 +4,7 @@ import sys
 from utils import utils
 
 __author__ = 'hiranya'
-__email__ = 'hiranya@appscale.com'
+__email__ = 'hiranya@cs.ucsb.edu'
 
 class Eager:
   """
@@ -22,6 +22,7 @@ class Eager:
   REASON_AMBIGUOUS_API_NAME = 'api name is too similar to some names already in use'
   REASON_API_PUBLISH_SUCCESS = 'api published successfully'
   REASON_API_ALREADY_PUBLISHED = 'api already published'
+  REASON_API_SPEC_UPDATE_FAILED = 'failed to update api specification'
 
   CONFIG_FILE = 'eager.yaml'
 
@@ -53,7 +54,13 @@ class Eager:
       utils.log("Validating API = {0}; Version = {1}".format(name, version))
       validation_info = self.adaptor.get_validation_info(name, version)
       if self.__perform_validation(specification, validation_info):
-        self.adaptor.update_api_specification(name, version, specification)
+        if self.adaptor.update_api_specification(name, version, json.dumps(specification)):
+          utils.log("API specification updated successfully for {0}-v{1}".format(name, version))
+        else:
+          msg = "Failed to update API specification for {0}-v{1}".format(name, version)
+          utils.log(msg)
+          detail = { 'detail' : msg }
+          return self.__generate_response(False, self.REASON_API_SPEC_UPDATE_FAILED, detail)
     else:
       utils.log("API {0}-v{1} does not exist yet. Skipping dependency validation".format(
         name, version))
@@ -106,7 +113,6 @@ class Eager:
     Returns:
       A dictionary containing the operation response
     """
-    utils.log("Sending success = {0}, reason = {1}".format(status, msg))
     response = {'success': status, 'reason': msg}
     if extra is not None:
       for key, value in extra.items():
@@ -114,6 +120,6 @@ class Eager:
     return response
 
   def __perform_validation(self, specification, validation_info):
-    utils.log("Retrieved specification: " + str(validation_info.specifcation))
+    utils.log("Retrieved specification: " + str(validation_info.specification))
     # TODO: Run dependency checker + other policy enforcement logic
     return True

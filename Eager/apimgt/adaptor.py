@@ -1,5 +1,8 @@
 import json
 
+__author__ = 'hiranya'
+__email__ = 'hiranya@cs.ucsb.edu'
+
 class APIInfo:
   def __init__(self, name, version):
     self.name = name
