@@ -52,14 +52,15 @@ class WSO2APIManager14Adaptor(APIManagerAdaptor):
     api = { 'name' : name, 'version' : version }
     result = self.client.service.getValidationInfo(api=api)
     dependents = []
-    for dependent in result.dependents:
-      dep_name = dependent.name
-      dep_version = dependent.version
-      dep_operations = []
-      for op in dependent.operations:
-        dep_operations.append(op)
-      d = DependencyInfo(dep_name, dep_version, dep_operations)
-      dependents.append(d)
+    if hasattr(result, 'dependents'):
+      for dependent in result.dependents:
+        dep_name = dependent.name
+        dep_version = dependent.version
+        dep_operations = []
+        for op in dependent.operations:
+          dep_operations.append(op)
+        d = DependencyInfo(dep_name, dep_version, dep_operations)
+        dependents.append(d)
     return ValidationInfo(result.specification, dependents)
 
   def validate_api_dependencies(self, name, version, dependencies):
