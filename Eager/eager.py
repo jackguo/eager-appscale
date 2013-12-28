@@ -18,6 +18,7 @@ class Eager:
   REASON_BAD_SECRET = 'bad secret'
   REASON_ALIVE = 'service alive'
   REASON_API_VALIDATION_SUCCESS = 'api validated successfully'
+  REASON_API_VALIDATION_FAILED = 'api validation failed'
   REASON_BAD_API_METADATA = 'api contains wrong or invalid metadata'
   REASON_AMBIGUOUS_API_NAME = 'api name is too similar to some names already in use'
   REASON_API_PUBLISH_SUCCESS = 'api published successfully'
@@ -60,7 +61,8 @@ class Eager:
     if self.adaptor.is_api_available(name, version):
       utils.log("Validating API = {0}; Version = {1}".format(name, version))
       validation_info = self.adaptor.get_validation_info(name, version)
-      if self.__check_dependencies(specification, validation_info):
+      val_status, val_message = self.__check_dependencies(specification, validation_info)
+      if val_status:
         if self.adaptor.update_api_specification(name, version, json.dumps(specification)):
           utils.log("API specification updated successfully for {0}-v{1}".format(name, version))
         else:
@@ -68,6 +70,9 @@ class Eager:
           utils.log(msg)
           detail = { 'detail' : msg }
           return self.__generate_response(False, self.REASON_API_SPEC_UPDATE_FAILED, detail)
+      else:
+        detail = { 'detail' : val_message }
+        return self.__generate_response(False, self.REASON_API_VALIDATION_FAILED, detail)
     else:
       utils.log("API {0}-v{1} does not exist yet. Skipping dependency validation".format(
         name, version))
@@ -81,10 +86,11 @@ class Eager:
         utils.log("Context {0} is available for use".format(context))
       else:
         utils.log("Context {0} is not taken by any other API".format(context))
-        if self.adaptor.create_api(name, version, json.dumps(specification)):
-          utils.log("Successfully registered the API {0}-v{1}".format(name, version))
-        else:
-          utils.log("API {0}-v{1} is already registered".format(name, version))
+
+      if self.adaptor.create_api(name, version, json.dumps(specification)):
+        utils.log("Successfully registered the API {0}-v{1}".format(name, version))
+      else:
+        utils.log("API {0}-v{1} is already registered".format(name, version))
 
     if not self.adaptor.record_api_dependencies(name, version, dependencies):
       utils.log("Failed to record dependencies for {0}-v{1}".format(name, version))
@@ -130,6 +136,7 @@ class Eager:
     return response
 
   def __check_dependencies(self, specification, validation_info):
+    utils.log("Current specification:" + str(specification))
     utils.log("Retrieved specification: " + str(validation_info.specification))
     # TODO: Run dependency checker + other policy enforcement logic
-    return True
+    return True, 'api validated successfully'
