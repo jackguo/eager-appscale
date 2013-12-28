@@ -59,38 +59,15 @@ class Eager:
       return self.__generate_response(False, self.REASON_BAD_API_DEPENDENCIES, detail)
 
     if self.adaptor.is_api_available(name, version):
-      utils.log("Validating API = {0}; Version = {1}".format(name, version))
-      validation_info = self.adaptor.get_validation_info(name, version)
-      val_status, val_message = self.__check_dependencies(specification, validation_info)
-      if val_status:
-        if self.adaptor.update_api_specification(name, version, json.dumps(specification)):
-          utils.log("API specification updated successfully for {0}-v{1}".format(name, version))
-        else:
-          msg = "Failed to update API specification for {0}-v{1}".format(name, version)
-          utils.log(msg)
-          detail = { 'detail' : msg }
-          return self.__generate_response(False, self.REASON_API_SPEC_UPDATE_FAILED, detail)
-      else:
-        detail = { 'detail' : val_message }
-        return self.__generate_response(False, self.REASON_API_VALIDATION_FAILED, detail)
+      passed, reason, message = self.__invoke_api_validations(name, version, specification)
     else:
-      utils.log("API {0}-v{1} does not exist yet. Skipping dependency validation".format(
-        name, version))
-      context = '/' + name.lower()
-      api_list = self.adaptor.get_api_list_with_context(context)
-      if api_list:
-        for api_info in api_list:
-          if api_info.name != name:
-            detail = { 'detail' : 'API name is too similar to: {0}'.format(api_info.name) }
-            self.__generate_response(False, self.REASON_AMBIGUOUS_API_NAME, detail)
-        utils.log("Context {0} is available for use".format(context))
-      else:
-        utils.log("Context {0} is not taken by any other API".format(context))
+      passed, reason, message = self.__handle_new_api(name, version, specification)
 
-      if self.adaptor.create_api(name, version, json.dumps(specification)):
-        utils.log("Successfully registered the API {0}-v{1}".format(name, version))
+    if not passed:
+      if message:
+        return self.__generate_response(False, reason, { 'detail' : message })
       else:
-        utils.log("API {0}-v{1} is already registered".format(name, version))
+        return self.__generate_response(False, reason)
 
     if not self.adaptor.record_api_dependencies(name, version, dependencies):
       utils.log("Failed to record dependencies for {0}-v{1}".format(name, version))
@@ -134,6 +111,42 @@ class Eager:
       for key, value in extra.items():
         response[key] = value
     return response
+
+  def __invoke_api_validations(self, name, version, specification):
+    utils.log("Validating API = {0}; Version = {1}".format(name, version))
+    validation_info = self.adaptor.get_validation_info(name, version)
+    val_status, val_message = self.__check_dependencies(specification, validation_info)
+    if val_status:
+      if self.adaptor.update_api_specification(name, version, json.dumps(specification)):
+        utils.log("API specification updated successfully for {0}-v{1}".format(name, version))
+        return True, self.REASON_API_VALIDATION_SUCCESS, None
+      else:
+        utils.log("Failed to update API specification for {0}-v{1}".format(name, version))
+        return False, self.REASON_API_SPEC_UPDATE_FAILED, None
+    else:
+      utils.log("API dependency validation failed for {0}-v{1}: {2}".format(name, version, val_message))
+      return False, self.REASON_API_VALIDATION_FAILED, val_message
+
+  def __handle_new_api(self, name, version, specification):
+    utils.log("API {0}-v{1} does not exist yet. Skipping dependency validation".format(
+      name, version))
+    context = '/' + name.lower()
+    api_list = self.adaptor.get_api_list_with_context(context)
+    if api_list:
+      for api_info in api_list:
+        if api_info.name != name:
+          message = 'API name is too similar to: {0}'.format(api_info.name)
+          return False, self.REASON_AMBIGUOUS_API_NAME, message
+      utils.log("Context {0} is available for use".format(context))
+    else:
+      utils.log("Context {0} is not taken by any other API".format(context))
+
+    if self.adaptor.create_api(name, version, json.dumps(specification)):
+      utils.log("Successfully registered the API {0}-v{1}".format(name, version))
+    else:
+      utils.log("API {0}-v{1} is already registered".format(name, version))
+
+    return True, self.REASON_API_VALIDATION_SUCCESS, None
 
   def __check_dependencies(self, specification, validation_info):
     utils.log("Current specification:" + str(specification))
