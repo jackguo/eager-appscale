@@ -60,7 +60,7 @@ class Eager:
     if self.adaptor.is_api_available(name, version):
       utils.log("Validating API = {0}; Version = {1}".format(name, version))
       validation_info = self.adaptor.get_validation_info(name, version)
-      if self.__perform_validation(specification, validation_info):
+      if self.__check_dependencies(specification, validation_info):
         if self.adaptor.update_api_specification(name, version, json.dumps(specification)):
           utils.log("API specification updated successfully for {0}-v{1}".format(name, version))
         else:
@@ -129,7 +129,7 @@ class Eager:
         response[key] = value
     return response
 
-  def __perform_validation(self, specification, validation_info):
+  def __check_dependencies(self, specification, validation_info):
     utils.log("Retrieved specification: " + str(validation_info.specification))
     # TODO: Run dependency checker + other policy enforcement logic
     return True
