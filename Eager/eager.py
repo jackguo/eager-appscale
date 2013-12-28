@@ -54,7 +54,7 @@ class Eager:
       detail = { 'detail' : 'API name contains invalid characters' }
       return self.__generate_response(False, self.REASON_BAD_API_METADATA, detail)
 
-    if dependencies and self.adaptor.validate_api_dependencies(name, version, dependencies):
+    if dependencies and not self.adaptor.validate_api_dependencies(name, version, dependencies):
       detail = { 'detail' : 'One or more declared dependencies do not exist' }
       return self.__generate_response(False, self.REASON_BAD_API_DEPENDENCIES, detail)
 
