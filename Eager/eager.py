@@ -15,17 +15,17 @@ class Eager:
   """
 
   # Default reasons which might be returned by this module
-  REASON_BAD_SECRET = 'bad secret'
-  REASON_ALIVE = 'service alive'
-  REASON_API_VALIDATION_SUCCESS = 'api validated successfully'
-  REASON_API_VALIDATION_FAILED = 'api validation failed'
-  REASON_BAD_API_METADATA = 'api contains wrong or invalid metadata'
-  REASON_AMBIGUOUS_API_NAME = 'api name is too similar to some names already in use'
-  REASON_API_PUBLISH_SUCCESS = 'api published successfully'
-  REASON_API_ALREADY_PUBLISHED = 'api already published'
-  REASON_API_SPEC_UPDATE_FAILED = 'failed to update api specification'
-  REASON_BAD_API_DEPENDENCIES = 'bad api dependencies'
-  REASON_DEPENDENCY_RECORDING_FAILED = 'failed to record api dependencies'
+  REASON_BAD_SECRET = 'Bad secret'
+  REASON_ALIVE = 'Service alive'
+  REASON_API_VALIDATION_SUCCESS = 'API validated successfully'
+  REASON_API_VALIDATION_FAILED = 'API validation failed'
+  REASON_BAD_API_METADATA = 'API contains wrong or invalid metadata'
+  REASON_AMBIGUOUS_API_NAME = 'API name is too similar to some names already in use'
+  REASON_API_PUBLISH_SUCCESS = 'API published successfully'
+  REASON_API_ALREADY_PUBLISHED = 'API already published'
+  REASON_API_SPEC_UPDATE_FAILED = 'Failed to update API specification'
+  REASON_BAD_API_DEPENDENCIES = 'Bad API dependencies'
+  REASON_DEPENDENCY_RECORDING_FAILED = 'Failed to record API dependencies'
 
   CONFIG_FILE = 'eager.yaml'
 
