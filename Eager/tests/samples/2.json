@@ -1,0 +1,43 @@
+{
+  "apiName" : "TestMe",
+  "apiVersion" : "1.0",
+  "swaggerVersion" : "1.2",
+  "basePath" : "/resources",
+  "resourcePath" : "/foo2",
+  "apis" : [ {
+    "path" : "/foo",
+    "description" : "",
+    "operations" : [ {
+      "method" : "GET",
+      "nickname" : "getStudents",
+      "type" : "StudentList",
+      "produces" : [ "application/json" ]
+    } ]
+  } ],
+  "models" : {
+    "StudentList" : {
+      "id" : "StudentList",
+      "properties" : {
+        "students" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "Student"
+          }
+        }
+      },
+      "required" : [ "students" ]
+    },
+    "Student" : {
+      "id" : "Student",
+      "properties" : {
+        "lastName" : {
+          "type" : "string"
+        },
+        "firstName" : {
+          "type" : "string"
+        }
+      },
+      "required" : [ "lastName", "firstName" ]
+    }
+  }
+}
