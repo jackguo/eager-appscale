@@ -47,3 +47,15 @@ class TestSwagger(TestCase):
     status, message = swagger.is_api_compatible(api1, api2)
     self.assertFalse(status)
 
+  def test_output_type_incompatibility_missing_field(self):
+    api1 = self.load_file('7.json')
+    api2 = self.load_file('8.json')
+    status, message = swagger.is_api_compatible(api1, api2)
+    self.assertFalse(status)
+
+  def test_output_type_incompatibility_renamed_field(self):
+    api1 = self.load_file('7.json')
+    api2 = self.load_file('9.json')
+    status, message = swagger.is_api_compatible(api1, api2)
+    self.assertFalse(status)
+
