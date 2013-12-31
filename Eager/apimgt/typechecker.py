@@ -73,12 +73,12 @@ def is_output_compatible(type1, type2, errors):
   if isinstance(type1, PrimitiveType):
     compatible = isinstance(type2, PrimitiveType) and type1.name == type2.name
     if not compatible:
-      errors.append('Primitive type match incompatible')
+      errors.append('Primitive types incompatible')
     return compatible
   elif isinstance(type1, ContainerType):
     compatible = isinstance(type2, ContainerType) and type1.container == type2.container and is_output_compatible(type1.child, type2.child, errors)
     if not compatible:
-      errors.append('Container type match incompatible')
+      errors.append('Container types incompatible')
     return compatible
   elif isinstance(type1, ComplexType):
     if not isinstance(type2, ComplexType): return False

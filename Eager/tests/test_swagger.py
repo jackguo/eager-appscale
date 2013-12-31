@@ -65,6 +65,13 @@ class TestSwagger(TestCase):
     status, message = swagger.is_api_compatible(api1, api2)
     self.assertFalse(status)
 
+  def test_output_type_incompatibility_different_containers(self):
+    api1 = self.load_file('13.json')
+    api2 = self.load_file('14.json')
+    status, message = swagger.is_api_compatible(api1, api2)
+    self.assertFalse(status)
+    print message
+
   def test_output_type_compatibility_different_type_name(self):
     api1 = self.load_file('7.json')
     api2 = self.load_file('11.json')
