@@ -60,11 +60,17 @@
         "Student":{
             "id":"Student",
             "properties":{
+                "lastName":{
+                    "type":"string"
+                },
                 "firstName":{
+                    "type":"string"
+                },
+                "middleName":{
                     "type":"string"
                 }
             },
-            "required":[ "firstName" ]
+            "required":[ "lastName", "firstName" ]
         },
         "Error":{
             "id":"Error",

@@ -12,7 +12,7 @@
                 {
                     "method":"POST",
                     "nickname":"addStudent",
-                    "type":"Student",
+                    "type":"Student2",
                     "parameters":[
                         {
                             "paramType":"form",
@@ -57,14 +57,17 @@
             },
             "required":[ "students" ]
         },
-        "Student":{
-            "id":"Student",
+        "Student2":{
+            "id":"Student2",
             "properties":{
+                "lastName":{
+                    "type":"string"
+                },
                 "firstName":{
                     "type":"string"
                 }
             },
-            "required":[ "firstName" ]
+            "required":[ "lastName", "firstName" ]
         },
         "Error":{
             "id":"Error",

@@ -50,18 +50,18 @@ def compare_output_types(old_op, old_spec, new_op, new_spec):
     new_output_type = swagger_to_eager_type(new_output, new_spec)
     compatible = is_output_compatible(old_output_type, new_output_type, errors)
     if not compatible:
-      errors.append("Output types incompatible: Old API = {0}; New API = {1}".format(
+      errors.append("Output types incompatible: Old operation = {0}; New operation = {1}".format(
         old_op['nickname'], new_op['nickname']))
 
   return errors
 
 def get_output_type(operation):
-  if operation.get('type'):
-    return operation['type']
-  elif operation.get('responseMessages'):
+  if operation.get('responseMessages'):
     for rm in operation['responseMessages']:
       if 200 <= rm['code'] < 210 and rm.get('responseModel'):
         return rm['responseModel']
+  if operation.get('type'):
+    return operation['type']
   return None
 
 def find_operation(api, key_op):
