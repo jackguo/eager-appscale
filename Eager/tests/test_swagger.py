@@ -125,3 +125,9 @@ class TestSwagger(TestCase):
     status, message = swagger.is_api_compatible(api1, api2)
     self.assertTrue(status)
 
+  def test_input_param_compatibility_less_fields(self):
+    api1 = self.load_file('22.json')
+    api2 = self.load_file('23.json')
+    status, message = swagger.is_api_compatible(api1, api2)
+    self.assertTrue(status)
+
