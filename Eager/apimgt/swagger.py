@@ -1,4 +1,4 @@
-from apimgt.typechecker import PrimitiveType, TypeCheckerException, Field, ContainerType, ComplexType, is_output_compatible
+from apimgt.typechecker import PrimitiveType, TypeCheckerException, Field, ContainerType, ComplexType, is_output_compatible, is_input_compatible
 
 def is_api_compatible(old_spec, new_spec, ops=[]):
   old_api = old_spec['apis'][0]
@@ -21,6 +21,7 @@ def is_api_compatible(old_spec, new_spec, ops=[]):
         errors.append("Operation '{0}' not present in the new API".format(old_operation['nickname']))
       else:
         errors += compare_operations(old_operation, old_spec, new_operation, new_spec)
+        new_api['operations'].remove(new_operation)
 
   if not errors:
     return True, None
@@ -33,8 +34,53 @@ def compare_operations(old_op, old_spec, new_op, new_spec):
   if old_op['method'] != new_op['method']:
     errors.append("HTTP method incompatibility in operation '{0}': Old API = {1}; " \
                   "New API = {2}".format(op_name, old_op['method'], new_op['method']))
+  errors += compare_input_params(old_op, old_spec, new_op, new_spec)
   errors += compare_output_types(old_op, old_spec, new_op, new_spec)
   return errors
+
+def compare_input_params(old_op, old_spec, new_op, new_spec):
+  errors = []
+  old_params = old_op.get('parameters')
+  new_params = new_op.get('parameters')
+  if not new_params:
+    return errors
+
+  if old_params:
+    for old_p in old_params:
+      new_p = find_parameter(new_params, old_p)
+      if not new_p:
+        continue
+      if old_p['paramType'] != new_p['paramType']:
+        errors.append("Type of the parameter '{0}' has changed: Old API = {1}; " \
+                      "New API = {2}".format(old_p['name'], old_p['paramType'], new_p['paramType']))
+      if not old_p.get('required') and new_p.get('required'):
+        errors.append("Optional parameter '{0}' has been made mandatory in the " \
+                      "new API".format(old_p['name']))
+      old_param_type = swagger_to_eager_type(old_p['dataType'], old_spec)
+      new_param_type = swagger_to_eager_type(new_p['dataType'], new_spec)
+      compatible = is_input_compatible(old_param_type, new_param_type, errors)
+      if not compatible:
+        errors.append("Types of the parameter '{0}' are incompatible: Old API = {1}; " \
+                      "New API = {2}".format(old_p['name'], old_p['dataType'], new_p['dataType']))
+      new_params.remove(new_p)
+
+  for new_p in new_params:
+    if new_p.get('required'):
+      errors.append("Required parameter '{0}' introduced in new API".format(new_p['name']))
+  return errors
+
+def find_parameter(params, key_param):
+  if not params:
+    return None
+  if key_param['paramType'] == 'body':
+    for param in params:
+      if param['paramType'] == 'body':
+        return param
+    return None
+  for param in params:
+    if param['name'] == key_param['name']:
+      return param
+  return None
 
 def compare_output_types(old_op, old_spec, new_op, new_spec):
   errors = []

@@ -70,7 +70,6 @@ class TestSwagger(TestCase):
     api2 = self.load_file('14.json')
     status, message = swagger.is_api_compatible(api1, api2)
     self.assertFalse(status)
-    print message
 
   def test_output_type_compatibility_different_type_name(self):
     api1 = self.load_file('7.json')
@@ -81,6 +80,48 @@ class TestSwagger(TestCase):
   def test_output_type_compatibility_additional_fields(self):
     api1 = self.load_file('7.json')
     api2 = self.load_file('12.json')
+    status, message = swagger.is_api_compatible(api1, api2)
+    self.assertTrue(status)
+
+  def test_input_param_incompatibility_additional_fields(self):
+    api1 = self.load_file('7.json')
+    api2 = self.load_file('15.json')
+    status, message = swagger.is_api_compatible(api1, api2)
+    self.assertFalse(status)
+
+  def test_input_param_incompatibility_invalid_data_type(self):
+    api1 = self.load_file('7.json')
+    api2 = self.load_file('16.json')
+    status, message = swagger.is_api_compatible(api1, api2)
+    self.assertFalse(status)
+
+  def test_input_param_incompatibility_invalid_param_type(self):
+    api1 = self.load_file('7.json')
+    api2 = self.load_file('17.json')
+    status, message = swagger.is_api_compatible(api1, api2)
+    self.assertFalse(status)
+
+  def test_input_param_incompatibility_optional_param_made_required(self):
+    api1 = self.load_file('18.json')
+    api2 = self.load_file('15.json')
+    status, message = swagger.is_api_compatible(api1, api2)
+    self.assertFalse(status)
+
+  def test_input_param_incompatibility_additional_required_field(self):
+    api1 = self.load_file('19.json')
+    api2 = self.load_file('20.json')
+    status, message = swagger.is_api_compatible(api1, api2)
+    self.assertFalse(status)
+
+  def test_input_param_compatibility_additional_optional_param(self):
+    api1 = self.load_file('15.json')
+    api2 = self.load_file('18.json')
+    status, message = swagger.is_api_compatible(api1, api2)
+    self.assertTrue(status)
+
+  def test_input_param_compatibility_additional_optional_field(self):
+    api1 = self.load_file('19.json')
+    api2 = self.load_file('21.json')
     status, message = swagger.is_api_compatible(api1, api2)
     self.assertTrue(status)
 

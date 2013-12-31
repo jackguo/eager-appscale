@@ -37,16 +37,16 @@ class ComplexType(DataType):
     else:
       raise TypeCheckerException('Fields must be a list')
 
-def is_input_compatible(type1, type2):
+def is_input_compatible(type1, type2, errors):
   if isinstance(type1, PrimitiveType):
     compatible = isinstance(type2, PrimitiveType) and type1.name == type2.name
     if not compatible:
-      print 'Primitive match incompatible'
+      errors.append('Primitive types incompatible')
     return compatible
   elif isinstance(type1, ContainerType):
-    compatible = isinstance(type2, ContainerType) and type1.container == type2.container and is_input_compatible(type1.child, type2.child)
+    compatible = isinstance(type2, ContainerType) and type1.container == type2.container and is_input_compatible(type1.child, type2.child, errors)
     if not compatible:
-      print 'Container match incompatible'
+      errors.append('Container types incompatible')
     return compatible
   elif isinstance(type1, ComplexType):
     if not isinstance(type2, ComplexType): return False
@@ -54,16 +54,16 @@ def is_input_compatible(type1, type2):
       match_found = None
       for f2 in type2.fields:
         if f1.name == f2.name:
-          compatible = is_input_compatible(f1.data_type, f2.data_type)
+          compatible = is_input_compatible(f1.data_type, f2.data_type, errors)
           if not compatible:
-            print 'Field ' + f1.name + ' type incompatible'
+            errors.append('Field ' + f1.name + ' type incompatible')
             return False
           match_found = f2
           break
       if match_found is not None: type2.fields.remove(match_found)
     for f2 in type2.fields:
       if not f2.optional:
-        print 'Extra field ' + f2.name + ' not optional'
+        errors.append('Extra field ' + f2.name + ' not optional')
         return False
     return True
   else:
