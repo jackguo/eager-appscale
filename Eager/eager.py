@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+from apimgt import swagger
 from utils import utils
 
 __author__ = 'hiranya'
@@ -26,6 +27,7 @@ class Eager:
   REASON_API_SPEC_UPDATE_FAILED = 'Failed to update API specification'
   REASON_BAD_API_DEPENDENCIES = 'Bad API dependencies'
   REASON_DEPENDENCY_RECORDING_FAILED = 'Failed to record API dependencies'
+  REASON_BAD_API_SPEC = 'Bad API specification'
 
   CONFIG_FILE = 'eager.yaml'
 
@@ -53,6 +55,11 @@ class Eager:
     if not self.__is_api_name_valid(name):
       detail = { 'detail' : 'API name contains invalid characters' }
       return self.__generate_response(False, self.REASON_BAD_API_METADATA, detail)
+
+    spec_valid, spec_errors = swagger.validate_swagger_description(specification)
+    if not spec_valid:
+      detail = { 'detail' : spec_errors }
+      return self.__generate_response(False, self.REASON_BAD_API_SPEC, detail)
 
     if dependencies and not self.adaptor.validate_api_dependencies(name, version, dependencies):
       detail = { 'detail' : 'One or more declared dependencies do not exist' }
@@ -149,7 +156,14 @@ class Eager:
     return True, self.REASON_API_VALIDATION_SUCCESS, None
 
   def __check_dependencies(self, specification, validation_info):
-    utils.log("Current specification:" + str(specification))
-    utils.log("Retrieved specification: " + str(validation_info.specification))
-    # TODO: Run dependency checker + other policy enforcement logic
-    return True, 'api validated successfully'
+    operations = set()
+    for dependent in validation_info.dependents:
+      ops = dependent.operations
+      for op in ops:
+        operations.add(op)
+    api_compatible, errors = swagger.is_api_compatible(validation_info.specification,
+      specification, list(operations))
+    if api_compatible:
+      return True, 'api validated successfully'
+    else:
+      return False, errors
