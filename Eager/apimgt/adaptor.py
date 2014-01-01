@@ -16,8 +16,8 @@ class DependencyInfo:
 
 class ValidationInfo:
   def __init__(self, specification, dependents=[]):
-    if isinstance(specification, str):
-      self.specification = json.loads(specification)
+    if not isinstance(specification, dict):
+      self.specification = json.loads(str(specification))
     else:
       self.specification = specification
     self.dependents = dependents
