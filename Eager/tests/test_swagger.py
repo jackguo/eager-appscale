@@ -131,3 +131,21 @@ class TestSwagger(TestCase):
     status, message = swagger.is_api_compatible(api1, api2)
     self.assertTrue(status)
 
+  def test_mime_type_incompatibility_output(self):
+    api1 = self.load_file('7.json')
+    api2 = self.load_file('24.json')
+    status, message = swagger.is_api_compatible(api1, api2)
+    self.assertFalse(status)
+
+  def test_mime_type_incompatibility_input(self):
+    api1 = self.load_file('7.json')
+    api2 = self.load_file('25.json')
+    status, message = swagger.is_api_compatible(api1, api2)
+    self.assertFalse(status)
+
+  def test_mime_type_compatibility_more_media_types(self):
+    api1 = self.load_file('7.json')
+    api2 = self.load_file('26.json')
+    status, message = swagger.is_api_compatible(api1, api2)
+    self.assertTrue(status)
+

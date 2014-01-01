@@ -34,8 +34,25 @@ def compare_operations(old_op, old_spec, new_op, new_spec):
   if old_op['method'] != new_op['method']:
     errors.append("HTTP method incompatibility in operation '{0}': Old API = {1}; " \
                   "New API = {2}".format(op_name, old_op['method'], new_op['method']))
+  errors += compare_mime_types(old_op, new_op)
   errors += compare_input_params(old_op, old_spec, new_op, new_spec)
   errors += compare_output_types(old_op, old_spec, new_op, new_spec)
+  return errors
+
+def compare_mime_types(old_op, new_op):
+  errors = []
+  old_consumes = old_op.get('consumes', [])
+  new_consumes = new_op.get('consumes', [])
+  for mime in old_consumes:
+    if mime not in new_consumes:
+      errors.append("Input media type '{0}' is not supported by the new API".format(mime))
+
+  old_produces = old_op.get('produces', [])
+  new_produces = new_op.get('produces', [])
+  for mime in old_produces:
+    if mime not in new_produces:
+      errors.append("Output media type '{0}' is not supported by the new API".format(mime))
+
   return errors
 
 def compare_input_params(old_op, old_spec, new_op, new_spec):
