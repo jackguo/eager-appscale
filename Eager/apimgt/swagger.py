@@ -70,6 +70,18 @@ def compare_input_params(old_op, old_spec, new_op, new_spec):
   return errors
 
 def find_parameter(params, key_param):
+  """
+  Find a parameter in params that matches key_param. If key_param is of type 'body', this
+  method looks for a matching 'body' parameter among params. Otherwise, it matches up
+  parameters by name.
+
+  Args:
+    params - A list of parameters
+    key_param - A Swagger parameter description (dictionary)
+
+  Returns:
+    A parameter that matches key_param, or None if nothing found
+  """
   if not params:
     return None
   if key_param['paramType'] == 'body':
@@ -102,6 +114,19 @@ def compare_output_types(old_op, old_spec, new_op, new_spec):
   return errors
 
 def get_output_type(operation):
+  """
+  Find the name of the output type of the specified operation. This method first explores
+  the responseMessages defined for the operation. If a successful responseMessage (i.e.
+  response code in 200's range), has been declared with a responseModel, that will be
+  considered output type of the operation. Otherwise, it will fallback to the 'type'
+  attribute defined in the operation. If neither is defined, returns None.
+
+  Args:
+    operation - A Swagger operation description (dictionary)
+
+  Returns:
+    A string representing a data type name or None
+  """
   if operation.get('responseMessages'):
     for rm in operation['responseMessages']:
       if 200 <= rm['code'] < 210 and rm.get('responseModel'):
@@ -111,6 +136,17 @@ def get_output_type(operation):
   return None
 
 def find_operation(api, key_op):
+  """
+  Find an operation in api that matches key_op. This method first attempts to find a match
+  by using the operation name (nickname). Failing that, it attempts to match up HTTP methods.
+
+  Args:
+    api - A Swagger API description (dictionary)
+    key_op - A Swagger operation description (dictionary)
+
+  Returns:
+    An operation that matches key_op, or None if nothing found
+  """
   operations = api['operations']
   for op in operations:
     if op['nickname'] == key_op['nickname']:
@@ -122,6 +158,19 @@ def find_operation(api, key_op):
   return None
 
 def is_related_operation(operation, ops):
+  """
+  Check whether the specified operation should be considered for API comparison. If no
+  operations have been declared (i.e. ops is empty), all operations are considered for
+  API comparison. Otherwise, only those operations that have been declared will be
+  considered for comparison.
+
+  Args:
+    operation - Name of the operation that should be tested
+    ops - List of declared operations
+
+  Returns:
+    True if the operation should be considered for API comparison, and False otherwise
+  """
   if not ops:
     return True
   else:
