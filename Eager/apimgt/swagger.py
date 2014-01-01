@@ -1,4 +1,4 @@
-from apimgt.typechecker import PrimitiveType, TypeCheckerException, Field, ContainerType, ComplexType, is_output_compatible, is_input_compatible
+from apimgt.typechecker import *
 
 def is_api_compatible(old_spec, new_spec, ops=[]):
   old_api = old_spec['apis'][0]
