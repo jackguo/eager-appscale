@@ -149,3 +149,9 @@ class TestSwagger(TestCase):
     status, message = swagger.is_api_compatible(api1, api2)
     self.assertTrue(status)
 
+  def test_swagger_validation(self):
+    api = self.load_file('27.json')
+    status, message = swagger.validate_swagger_description(api)
+    self.assertFalse(status)
+    self.assertEquals(4, len(message.split('|')))
+

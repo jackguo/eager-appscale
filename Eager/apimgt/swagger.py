@@ -1,6 +1,69 @@
 from apimgt.typechecker import *
 
-def is_api_compatible(old_spec, new_spec, ops=[]):
+def validate_swagger_description(spec):
+  errors = []
+  if not spec.get('swaggerVersion'):
+    errors.append("Missing 'swaggerVersion'")
+  if not spec.get('apiName'):
+    errors.append("Missing 'apiName'")
+  if not spec.get('apiVersion'):
+    errors.append("Missing 'apiVersion'")
+  if not spec.get('basePath'):
+    errors.append("Missing 'basePath'")
+  if not spec.get('resourcePath'):
+    errors.append("Missing 'resourcePath'")
+
+  if not spec.get('apis'):
+    errors.append("Missing 'apis'")
+  elif not isinstance(spec['apis'], list):
+    errors.append("Invalid 'apis' section")
+  else:
+    api = spec['apis'][0]
+    if not api.get('operations'):
+      errors.append("Missing 'operations' in API")
+    elif not isinstance(api['operations'], list):
+      errors.append("Invalid 'operations' section")
+    else:
+      for op in api['operations']:
+        if not op.get('nickname'):
+          errors.append("Missing 'nickname' in operation")
+        if not op.get('method'):
+          errors.append("Missing 'method' in operation")
+        if op.get('type') and not is_valid_type(op['type'], spec):
+          errors.append("Undefined data type: {0}".format(op['type']))
+
+        params = op.get('parameters')
+        if params:
+          for param in params:
+            if not param.get('name'):
+              errors.append("Missing 'name' in parameter")
+            if not param.get('paramType'):
+              errors.append("Missing 'paramType' in parameter")
+            elif param['paramType'] not in ('form', 'body', 'query', 'header'):
+              errors.append("Invalid 'paramType' value: {0}".format(param['paramType']))
+            elif param['paramType'] == 'body' and not param.get('required'):
+              errors.append("'required' must be set to true for 'body' parameters")
+            if not param.get('dataType'):
+              errors.append("Missing 'dataType' in parameter")
+            elif not is_valid_type(param['dataType'], spec):
+              errors.append("Undefined data type: {0}".format(param['dataType']))
+
+  if errors:
+    return False, '|'.join(errors)
+  else:
+    return True, None
+
+def is_valid_type(type_name, spec):
+  if type_name in PrimitiveType.PRIMITIVES:
+    return True
+  models = spec.get('models')
+  if models:
+    for key,model in models.items():
+      if model['id'] == type_name:
+        return True
+  return False
+
+def is_api_compatible(old_spec, new_spec, ops=list()):
   old_api = old_spec['apis'][0]
   new_api = new_spec['apis'][0]
 
