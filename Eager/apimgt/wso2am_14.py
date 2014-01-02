@@ -57,8 +57,9 @@ class WSO2APIManager14Adaptor(APIManagerAdaptor):
         dep_name = dependent.name
         dep_version = dependent.version
         dep_operations = []
-        for op in dependent.operations:
-          dep_operations.append(op)
+        if hasattr(dependent, 'operations'):
+          for op in dependent.operations:
+            dep_operations.append(op)
         d = DependencyInfo(dep_name, dep_version, dep_operations)
         dependents.append(d)
     return ValidationInfo(result.specification, dependents)
