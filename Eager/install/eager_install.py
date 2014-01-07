@@ -109,7 +109,7 @@ def setup_api_manager(inputs):
       output_file.flush()
       output_file.close()
 
-    print 'Writing eager.conf file'
+    print 'Writing eager.yaml file'
     conf = { 'api_manager' : {} }
     conf['api_manager']['provider'] = 'wso2am1.4'
     conf['api_manager']['host'] = 'localhost'
