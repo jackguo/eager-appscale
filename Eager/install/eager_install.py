@@ -116,7 +116,7 @@ def setup_api_manager(inputs):
     conf['api_manager']['port'] = 9443
     conf['api_manager']['user'] = inputs[AM_USER]
     conf['api_manager']['password'] = inputs[AM_PASS]
-    eager_conf = open('/root/appscale/Eager/eager.conf', 'w')
+    eager_conf = open('/root/appscale/Eager/eager.yaml', 'w')
     yaml.dump(conf, eager_conf, default_flow_style=False)
     eager_conf.flush()
     eager_conf.close()
