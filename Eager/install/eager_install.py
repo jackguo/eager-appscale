@@ -128,6 +128,14 @@ def setup_api_manager(inputs):
 
 if __name__ == '__main__':
   inputs = None
+  print 'Welcome to EAGER installation for AppScale.'
+  print """
+This program will help you install EAGER along with MySQL and WSO2 API Manager
+(v1.4). You will be asked to specify a root password for MySQL. If MySQL is not
+already installed, it will be installed and configured with the specified root
+password. If MySQL is already installed, you should enter the root password for
+the existing MySQL set up.
+"""
   while not inputs:
     inputs = get_user_input()
     print
