@@ -27,8 +27,12 @@ class PolicyEngine:
         try:
           execfile(policy_file, globals_map)
         except EagerPolicyAssertionException as ex:
-          errors.append('{0}: {1}'.format(os.path.splitext(policy_file)[0], ex.message))
+          errors.append('[{0}] {1}'.format(self.__get_policy_name(policy_file), ex.message))
       if errors:
         return False, '|'.join(errors)
     return True, None
+
+  def __get_policy_name(self, policy_file):
+    base_name = os.path.basename(policy_file)
+    return os.path.splitext(base_name)[0]
 
