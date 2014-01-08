@@ -2,6 +2,7 @@ import json
 import os
 import sys
 from apimgt import swagger
+from policy import policy_engine
 from utils import utils
 
 __author__ = 'hiranya'
@@ -20,6 +21,7 @@ class Eager:
   REASON_ALIVE = 'Service alive'
   REASON_API_VALIDATION_SUCCESS = 'API validated successfully'
   REASON_API_VALIDATION_FAILED = 'API validation failed'
+  REASON_API_POLICY_VIOLATION = 'API violates one or more policies'
   REASON_BAD_API_METADATA = 'API contains wrong or invalid metadata'
   REASON_AMBIGUOUS_API_NAME = 'API name is too similar to some names already in use'
   REASON_API_PUBLISH_SUCCESS = 'API published successfully'
@@ -36,6 +38,7 @@ class Eager:
     parent_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
     config_file = os.path.join(parent_dir, self.CONFIG_FILE)
     self.adaptor = utils.get_adaptor(config_file)
+    self.policy_engine = policy_engine.PolicyEngine()
 
   def ping(self, secret):
     if self.secret != secret:
@@ -64,6 +67,11 @@ class Eager:
     if dependencies and not self.adaptor.validate_api_dependencies(name, version, dependencies):
       detail = { 'detail' : 'One or more declared dependencies do not exist' }
       return self.__generate_response(False, self.REASON_BAD_API_DEPENDENCIES, detail)
+
+    p_chk_success, p_chk_errors = self.policy_engine.run_policy_enforcement(name, version, dependencies)
+    if not p_chk_success:
+      detail = { 'detail' : p_chk_errors }
+      return self.__generate_response(False, self.REASON_API_POLICY_VIOLATION, detail)
 
     if self.adaptor.is_api_available(name, version):
       passed, reason, message = self.__invoke_api_validations(name, version, specification)
