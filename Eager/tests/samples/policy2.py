@@ -1,0 +1,1 @@
+assert_dependency(api, 'Foo', '1.0')
