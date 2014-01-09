@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 from policy.assertions import *
 from policy.models import API, Policy
@@ -32,3 +33,22 @@ class PolicyEngine:
       if errors:
         return False, '|'.join(errors)
     return True, None
+
+  def add_policy(self, name, content):
+    regex = re.compile("^[a-zA-Z0-9_]+$")
+    if not regex.match(name):
+      return False, 'Invalid policy name: Only letters, digits and underscores are allowed'
+    file_path = os.path.join(self.policy_store_dir, name + '.py')
+    if os.path.exists(file_path):
+      return False, 'Policy {0} already exists'.format(name)
+    file_handle = open(file_path, 'w')
+    file_handle.write(content)
+    file_handle.flush()
+    file_handle.close()
+    try:
+      new_policy = Policy(file_path)
+      self.active_policies.append(new_policy)
+      return True, None
+    except Exception as ex:
+      return False, 'Error while parsing policy: {0}'.format(ex.message)
+
