@@ -24,6 +24,7 @@ class PolicyEngine:
       globals_map = globals().copy()
       globals_map['api'] = api
       globals_map['assert_dependency'] = assert_dependency
+      globals_map['assert_dependency_in_range'] = assert_dependency_in_range
       errors = []
       for policy in self.active_policies:
         try:
