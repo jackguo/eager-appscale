@@ -1,4 +1,5 @@
 import os
+from policy.assertions import assert_dependency, EagerPolicyAssertionException
 from policy.models import API, Policy
 
 try:
@@ -39,3 +40,33 @@ class TestModels(TestCase):
     self.assertEquals('policy2', p.name)
     self.assertEquals(None, p.description)
     self.assertEquals(full_path, p.policy_file)
+
+  def test_assert_dependency_1(self):
+    api = API('foo', '1.0', [])
+    try:
+      assert_dependency(api, 'bar', '1.0')
+      self.fail('Assertion did not throw exception')
+    except EagerPolicyAssertionException as ex:
+      pass
+
+  def test_assert_dependency_2(self):
+    api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.0'}])
+    try:
+      assert_dependency(api, 'bar', '1.0')
+    except EagerPolicyAssertionException as ex:
+      self.fail('Assertion threw exception')
+
+  def test_assert_dependency_3(self):
+    api = API('foo', '1.0', [])
+    try:
+      assert_dependency(api, 'bar')
+      self.fail('Assertion did not throw exception')
+    except EagerPolicyAssertionException as ex:
+      pass
+
+  def test_assert_dependency_4(self):
+    api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.0'}])
+    try:
+      assert_dependency(api, 'bar')
+    except EagerPolicyAssertionException as ex:
+      self.fail('Assertion threw exception')
