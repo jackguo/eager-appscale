@@ -12,6 +12,13 @@ def assert_dependency(api, dep_name, dep_version=None):
         return
   raise EagerPolicyAssertionException('Required dependency {0}-v{1} not used'.format(dep_name, dep_version))
 
+def assert_not_dependency(api, dep_name, dep_version=None):
+  try:
+    assert_dependency(api, dep_name, dep_version)
+  except EagerPolicyAssertionException as ex:
+    return
+  raise EagerPolicyAssertionException('Prohibited dependency {0}-v{1} in use'.format(dep_name, dep_version))
+
 def assert_dependency_in_range(api, dep_name, dep_version_lower=None,
                                        dep_version_higher=None, dep_ex_lower=False,
                                        dep_ex_higher=False):
