@@ -52,3 +52,14 @@ class PolicyEngine:
     except Exception as ex:
       return False, 'Error while parsing policy: {0}'.format(ex.message)
 
+  def remove_policy(self, name):
+    file_path = os.path.join(self.policy_store_dir, name + '.py')
+    if os.path.exists(file_path):
+      os.remove(file_path)
+      for p in self.active_policies:
+        if p.name == name:
+          self.active_policies.remove(p)
+          break
+      return True
+    else:
+      return False
