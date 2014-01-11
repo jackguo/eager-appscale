@@ -92,7 +92,7 @@ class TestModels(TestCase):
   def test_assert_dependency_in_range_1(self):
     api = API('foo', '1.0', [])
     try:
-      assert_dependency_in_range(api, 'bar', dep_version_lower='1.0', dep_version_higher='2.0')
+      assert_dependency_in_range(api, 'bar', lower='1.0', upper='2.0')
       self.fail('Assertion did not throw exception')
     except EagerPolicyAssertionException as ex:
       pass
@@ -100,14 +100,14 @@ class TestModels(TestCase):
   def test_assert_dependency_in_range_2(self):
     api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.5'}])
     try:
-      assert_dependency_in_range(api, 'bar', dep_version_lower='1.0', dep_version_higher='2.0')
+      assert_dependency_in_range(api, 'bar', lower='1.0', upper='2.0')
     except EagerPolicyAssertionException as ex:
       self.fail('Assertion threw exception')
 
   def test_assert_dependency_in_range_3(self):
     api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.5'}])
     try:
-      assert_dependency_in_range(api, 'bar', dep_version_lower='2.0', dep_version_higher='3.0')
+      assert_dependency_in_range(api, 'bar', lower='2.0', upper='3.0')
       self.fail('Assertion did not throw exception')
     except EagerPolicyAssertionException as ex:
       pass
@@ -115,7 +115,7 @@ class TestModels(TestCase):
   def test_assert_dependency_in_range_4(self):
     api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.5'}])
     try:
-      assert_dependency_in_range(api, 'bar', dep_version_lower='1.5', dep_version_higher='3.0', dep_ex_lower=True)
+      assert_dependency_in_range(api, 'bar', lower='1.5', upper='3.0', exclude_lower=True)
       self.fail('Assertion did not throw exception')
     except EagerPolicyAssertionException as ex:
       pass
@@ -123,7 +123,7 @@ class TestModels(TestCase):
   def test_assert_dependency_in_range_5(self):
     api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.5'}])
     try:
-      assert_dependency_in_range(api, 'bar', dep_version_lower='1.0', dep_version_higher='1.5', dep_ex_higher=True)
+      assert_dependency_in_range(api, 'bar', lower='1.0', upper='1.5', exclude_upper=True)
       self.fail('Assertion did not throw exception')
     except EagerPolicyAssertionException as ex:
       pass
@@ -131,7 +131,7 @@ class TestModels(TestCase):
   def test_assert_dependency_in_range_6(self):
     api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.0'}])
     try:
-      assert_dependency_in_range(api, 'bar', dep_version_lower='1.5')
+      assert_dependency_in_range(api, 'bar', lower='1.5')
       self.fail('Assertion did not throw exception')
     except EagerPolicyAssertionException as ex:
       pass
@@ -139,7 +139,7 @@ class TestModels(TestCase):
   def test_assert_dependency_in_range_7(self):
     api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.5'}])
     try:
-      assert_dependency_in_range(api, 'bar', dep_version_higher='1.0')
+      assert_dependency_in_range(api, 'bar', upper='1.0')
       self.fail('Assertion did not throw exception')
     except EagerPolicyAssertionException as ex:
       pass
@@ -160,22 +160,22 @@ class TestModels(TestCase):
   def test_assert_dependency_in_range_9(self):
     api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.0'}])
     try:
-      assert_dependency_in_range(api, 'bar', dep_version_lower='1.0')
+      assert_dependency_in_range(api, 'bar', lower='1.0')
     except EagerPolicyAssertionException as ex:
       self.fail('Assertion threw exception')
 
   def test_assert_dependency_in_range_10(self):
     api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.0'}])
     try:
-      assert_dependency_in_range(api, 'bar', dep_version_higher='1.0')
+      assert_dependency_in_range(api, 'bar', upper='1.0')
     except EagerPolicyAssertionException as ex:
       self.fail('Assertion threw exception')
 
   def test_assert_dependency_in_range_11(self):
     api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.5'}])
     try:
-      assert_dependency_in_range(api, 'bar', dep_version_lower='1.0', dep_version_higher='2.0',
-        dep_ex_higher=True, dep_ex_lower=True)
+      assert_dependency_in_range(api, 'bar', lower='1.0', upper='2.0',
+        exclude_upper=True, exclude_lower=True)
     except EagerPolicyAssertionException as ex:
       self.fail('Assertion threw exception')
 

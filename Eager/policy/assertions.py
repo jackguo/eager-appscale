@@ -3,62 +3,62 @@ from pkg_resources import parse_version
 class EagerPolicyAssertionException(Exception):
   pass
 
-def assert_dependency(api, dep_name, dep_version=None):
-  if is_api_equal(api.name, api.version, dep_name, dep_version):
+def assert_dependency(api, name, version=None):
+  if is_api_equal(api.name, api.version, name, version):
     return
   if api.dependencies:
     for dependency in api.dependencies:
-      if is_api_equal(dependency['name'], dependency['version'], dep_name, dep_version):
+      if is_api_equal(dependency['name'], dependency['version'], name, version):
         return
-  raise EagerPolicyAssertionException('Required dependency {0}-v{1} not used'.format(dep_name, dep_version))
+  raise EagerPolicyAssertionException("Required dependency '{0}' not used".format(
+    get_dependency_string(name, version)))
 
-def assert_not_dependency(api, dep_name, dep_version=None):
+def assert_not_dependency(api, name, version=None):
   try:
-    assert_dependency(api, dep_name, dep_version)
-  except EagerPolicyAssertionException as ex:
+    assert_dependency(api, name, version)
+  except EagerPolicyAssertionException:
     return
-  raise EagerPolicyAssertionException('Prohibited dependency {0}-v{1} in use'.format(dep_name, dep_version))
+  raise EagerPolicyAssertionException("Prohibited dependency '{0}' in use".format(
+    get_dependency_string(name, version)))
 
-def assert_dependency_in_range(api, dep_name, dep_version_lower=None,
-                                       dep_version_higher=None, dep_ex_lower=False,
-                                       dep_ex_higher=False):
-  if dep_version_lower is None and dep_version_higher is None:
-    assert_dependency(api, dep_name)
+def assert_dependency_in_range(api, name, lower=None, upper=None,
+                               exclude_lower=False, exclude_upper=False):
+  if lower is None and upper is None:
+    assert_dependency(api, name)
   elif not api.dependencies:
-    raise EagerPolicyAssertionException('Required dependency {0} not used'.format(dep_name))
+    raise EagerPolicyAssertionException("Required dependency '{0}' not used".format(name))
 
   dep_found = False
   for dependency in api.dependencies:
-    if dep_name == dependency['name']:
+    if name == dependency['name']:
       dep_found = True
       match_found = True
       version = dependency['version']
-      if dep_version_lower is not None:
-        comp = compare_version(dep_version_lower, version)
-        if dep_ex_lower and comp >= 0:
+      if lower is not None:
+        comp = compare_version(lower, version)
+        if exclude_lower and comp >= 0:
           match_found = False
-        elif not dep_ex_lower and comp > 0:
+        elif not exclude_lower and comp > 0:
           match_found = False
 
       if not match_found:
         continue
 
-      if dep_version_higher is not None:
-        comp = compare_version(dep_version_higher, version)
-        if dep_ex_higher and comp <= 0:
+      if upper is not None:
+        comp = compare_version(upper, version)
+        if exclude_upper and comp <= 0:
           match_found = False
-        elif not dep_ex_higher and comp < 0:
+        elif not exclude_upper and comp < 0:
           match_found = False
 
       if match_found:
         return
   if dep_found:
-    range_str = get_version_range_string(dep_version_lower, dep_version_higher, dep_ex_lower, dep_ex_higher)
-    raise EagerPolicyAssertionException('Version of required dependency {0} is not in ' \
-                                        'the range {1}'.format(dep_name, range_str))
+    range_str = get_version_range_string(lower, upper, exclude_lower, exclude_upper)
+    raise EagerPolicyAssertionException("Version of required dependency '{0}' is not in " \
+                                        "the range {1}".format(name, range_str))
   else:
-    raise EagerPolicyAssertionException('Required dependency {0} not used'.format(dep_name))
-
+    raise EagerPolicyAssertionException("Required dependency '{0}' not used".format(name))
 
 def is_api_equal(name1, version1, name2, version2):
   if version2 is not None:
@@ -94,4 +94,10 @@ def get_version_range_string(version_lower, version_higher, ex_lower, ex_higher)
   else:
     output += '*)'
   return output
+
+def get_dependency_string(name, version):
+  if version:
+    return "{0}-v{1}".format(name, version)
+  else:
+    return name
 
