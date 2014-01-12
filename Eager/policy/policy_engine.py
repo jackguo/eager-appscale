@@ -3,6 +3,7 @@ import re
 import sys
 from policy.assertions import *
 from policy.models import API, Policy
+from utils import utils
 
 class PolicyEngine:
 
@@ -16,7 +17,11 @@ class PolicyEngine:
       for policy_file in os.listdir(self.policy_store_dir):
         if policy_file.endswith('.py'):
           full_path = os.path.join(self.policy_store_dir, policy_file)
-          self.active_policies.append(Policy(full_path))
+          try:
+            policy = Policy(full_path)
+            self.active_policies.append(policy)
+          except Exception as ex:
+            utils.log("Error while loading policy '{0}': {1}".format(policy_file, str(ex)))
 
   def run_policy_enforcement(self, name, version, dependencies):
     if self.active_policies:
@@ -24,6 +29,7 @@ class PolicyEngine:
       globals_map = globals().copy()
       globals_map['api'] = api
       globals_map['assert_dependency'] = assert_dependency
+      globals_map['assert_not_dependency'] = assert_not_dependency
       globals_map['assert_dependency_in_range'] = assert_dependency_in_range
       errors = []
       for policy in self.active_policies:
@@ -51,6 +57,7 @@ class PolicyEngine:
       self.active_policies.append(new_policy)
       return True, None
     except Exception as ex:
+      os.remove(file_path)
       return False, 'Error while parsing policy: {0}'.format(ex.message)
 
   def remove_policy(self, name):
