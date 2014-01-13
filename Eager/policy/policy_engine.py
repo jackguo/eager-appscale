@@ -34,7 +34,7 @@ class PolicyEngine:
       errors = []
       for policy in self.active_policies:
         try:
-          execfile(policy.policy_file, globals_map)
+          execfile(policy.policy_file, globals_map, {})
         except EagerPolicyAssertionException as ex:
           errors.append('[{0}] {1}'.format(policy.name, ex.message))
       if errors:
