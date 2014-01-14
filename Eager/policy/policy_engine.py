@@ -31,6 +31,8 @@ class PolicyEngine:
       globals_map['assert_dependency'] = assert_dependency
       globals_map['assert_not_dependency'] = assert_not_dependency
       globals_map['assert_dependency_in_range'] = assert_dependency_in_range
+      globals_map['assert_true'] = assert_true
+      globals_map['assert_false'] = assert_false
       errors = []
       for policy in self.active_policies:
         try:

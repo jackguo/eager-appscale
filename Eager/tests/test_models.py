@@ -208,3 +208,27 @@ class TestModels(TestCase):
       self.fail('Assertion did not throw exception')
     except EagerPolicyAssertionException as ex:
       pass
+
+  def test_assert_true(self):
+    try:
+      assert_true(True)
+    except EagerPolicyAssertionException as ex:
+      self.fail('Assertion threw exception')
+
+    try:
+      assert_true(False)
+      self.fail('Assertion did not throw exception')
+    except EagerPolicyAssertionException as ex:
+      pass
+
+  def test_assert_true(self):
+    try:
+      assert_false(False)
+    except EagerPolicyAssertionException as ex:
+      self.fail('Assertion threw exception')
+
+    try:
+      assert_false(True)
+      self.fail('Assertion did not throw exception')
+    except EagerPolicyAssertionException as ex:
+      pass
