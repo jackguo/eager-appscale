@@ -37,15 +37,21 @@ class Policy:
     base_name = os.path.basename(self.policy_file)
     return os.path.splitext(base_name)[0]
 
-  def __get_policy_ast(self):
+  def __get_policy_content(self):
     file_handle = open(self.policy_file, 'r')
     source_code = file_handle.read()
     file_handle.close()
+    return source_code
+
+  def __get_policy_ast(self, source_code=None):
+    if not source_code:
+      source_code = self.__get_policy_content()
     return ast.parse(source_code, mode='exec')
 
   def evaluate(self, api, errors):
+    source_code = self.__get_policy_content()
     try:
-      validate_policy_content(self.__get_policy_ast())
+      validate_policy_content(self.__get_policy_ast(source_code))
     except Exception as ex:
       utils.log('[{0}] Unexpected policy exception: {1}'.format(self.name, ex))
       return
@@ -58,7 +64,7 @@ class Policy:
     globals_map['assert_true'] = assert_true
     globals_map['assert_false'] = assert_false
     try:
-      execfile(self.policy_file, globals_map, {})
+      exec(source_code, globals_map, {})
     except EagerPolicyAssertionException as ex:
       errors.append('[{0}] {1}'.format(self.name, ex))
     except Exception as ex:
