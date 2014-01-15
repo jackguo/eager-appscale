@@ -1,5 +1,6 @@
 import os
 from policy.models import API, Policy
+from policy.policy_language import EagerPolicyLanguageException
 
 try:
   from unittest import TestCase
@@ -39,3 +40,12 @@ class TestModels(TestCase):
     self.assertEquals('policy2', p.name)
     self.assertEquals(None, p.description)
     self.assertEquals(full_path, p.policy_file)
+
+  def test_policy_parsing_with_invalid_syntax(self):
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    full_path = os.path.join(current_dir, 'samples', 'policy3.py')
+    try:
+      p = Policy(full_path)
+      self.fail('Invalid policy did not throw exception')
+    except EagerPolicyLanguageException as ex:
+      pass

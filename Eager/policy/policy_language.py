@@ -26,7 +26,8 @@ class EagerPolicyParser(ast.NodeVisitor):
     if isinstance(node, _ast.Global):
       raise EagerPolicyLanguageException('Keyword global is not allowed')
     elif isinstance(node, _ast.Call):
-      self.called_functions.append(node.func.id)
+      if isinstance(node.func, _ast.Name):
+        self.called_functions.append(node.func.id)
     elif isinstance(node, _ast.Import):
       for name in node.names:
         if name.name not in self.MODULE_WHITE_LIST:
@@ -40,11 +41,10 @@ class EagerPolicyParser(ast.NodeVisitor):
     #print node
     self.generic_visit(node)
 
-def validate_policy(content):
-  try:
-    tree = ast.parse(content, mode='exec')
-    policy_parser = EagerPolicyParser()
-    policy_parser.parse_policy(tree)
-    return True, None
-  except Exception as ex:
-    return False, ex
+def validate_policy_content(code_ast):
+  policy_parser = EagerPolicyParser()
+  policy_parser.parse_policy(code_ast)
+
+def validate_policy(code_str):
+  code_ast = ast.parse(code_str, mode='exec')
+  validate_policy_content(code_ast)

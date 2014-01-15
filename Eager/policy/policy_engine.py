@@ -35,10 +35,7 @@ class PolicyEngine:
       globals_map['assert_false'] = assert_false
       errors = []
       for policy in self.active_policies:
-        try:
-          execfile(policy.policy_file, globals_map, {})
-        except EagerPolicyAssertionException as ex:
-          errors.append('[{0}] {1}'.format(policy.name, ex))
+        policy.evaluate(api, errors)
       if errors:
         return False, '|'.join(errors)
     return True, None

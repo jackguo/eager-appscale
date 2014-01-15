@@ -6,42 +6,56 @@ except ImportError:
   from unittest.case import TestCase
 
 class TestPolicyLanguage(TestCase):
-
   def test_parser_1(self):
     source = """assert_dependency(api, 'Foo', '1.0')"""
-    status, message = validate_policy(source)
-    self.assertTrue(status)
+    try:
+      validate_policy(source)
+    except Exception as ex:
+      self.fail("Unexpected error")
 
   def test_parser_2(self):
     source = """assert_dependency(api, 'Foo', '1.0')
 open('foo.txt','r')"""
-    status, message = validate_policy(source)
-    self.assertFalse(status)
+    try:
+      validate_policy(source)
+      self.fail("Invalid function did not throw exception")
+    except Exception as ex:
+      pass
 
   def test_parser_3(self):
     source = """class Foo:
   pass"""
-    status, message = validate_policy(source)
-    self.assertFalse(status)
+    try:
+      validate_policy(source)
+      self.fail("Class definition did not throw exception")
+    except Exception as ex:
+      pass
 
   def test_parser_4(self):
     source = """def foo():
  pass
 
 foo()"""
-    status, message = validate_policy(source)
-    self.assertTrue(status)
+    try:
+      validate_policy(source)
+    except Exception as ex:
+      self.fail("Unexpected error")
 
   def test_parser_5(self):
     source = """def foo(val):
  pass
 
 foo(bar())"""
-    status, message = validate_policy(source)
-    self.assertFalse(status)
+    try:
+      validate_policy(source)
+      self.fail("Invalid function did not throw exception")
+    except Exception as ex:
+      pass
 
   def test_parser_6(self):
     source = """if api.owner == 'alice':
   assert_not_dependency(api, 'Foo', '1.0')"""
-    status, message = validate_policy(source)
-    self.assertTrue(status)
+    try:
+      validate_policy(source)
+    except Exception as ex:
+      self.fail("Unexpected error")
