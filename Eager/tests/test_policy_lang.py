@@ -39,11 +39,12 @@ foo()"""
     try:
       validate_policy(source)
     except Exception as ex:
+      print ex
       self.fail("Unexpected error")
 
   def test_parser_5(self):
     source = """def foo(val):
- pass
+pass
 
 foo(bar())"""
     try:
@@ -59,3 +60,37 @@ foo(bar())"""
       validate_policy(source)
     except Exception as ex:
       self.fail("Unexpected error")
+
+  def test_parser_7(self):
+    source = """from re import compile
+compile('^foo')"""
+    try:
+      validate_policy(source)
+    except Exception as ex:
+      print ex
+      self.fail("Unexpected error")
+
+  def test_parser_8(self):
+    source = """import re
+re.compile('^foo')"""
+    try:
+      validate_policy(source)
+    except Exception as ex:
+      print ex
+      self.fail("Unexpected error")
+
+  def test_parser_9(self):
+    source = """import os"""
+    try:
+      validate_policy(source)
+      self.fail("Invalid module did not throw exception")
+    except Exception as ex:
+      pass
+
+  def test_parser_10(self):
+    source = """from os import *"""
+    try:
+      validate_policy(source)
+      self.fail("Invalid module did not throw exception")
+    except Exception as ex:
+      pass

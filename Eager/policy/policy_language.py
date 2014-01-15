@@ -32,6 +32,11 @@ class EagerPolicyParser(ast.NodeVisitor):
       for name in node.names:
         if name.name not in self.MODULE_WHITE_LIST:
           raise EagerPolicyLanguageException('Module {0} is not supported'.format(name.name))
+    elif isinstance(node, _ast.ImportFrom):
+      if node.module not in self.MODULE_WHITE_LIST:
+        raise EagerPolicyLanguageException('Module {0} is not supported'.format(node.module))
+      for name in node.names:
+        self.defined_functions.append(name.name)
     elif isinstance(node, _ast.ClassDef):
       raise EagerPolicyLanguageException('Class definitions are not allowed')
     elif isinstance(node, _ast.FunctionDef):
