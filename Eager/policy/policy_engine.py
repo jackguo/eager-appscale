@@ -1,7 +1,6 @@
 import os
 import re
 import sys
-from policy.assertions import *
 from policy.models import API, Policy
 from utils import utils
 
@@ -26,13 +25,6 @@ class PolicyEngine:
   def run_policy_enforcement(self, name, version, dependencies):
     if self.active_policies:
       api = API(name, version, dependencies)
-      globals_map = globals().copy()
-      globals_map['api'] = api
-      globals_map['assert_dependency'] = assert_dependency
-      globals_map['assert_not_dependency'] = assert_not_dependency
-      globals_map['assert_dependency_in_range'] = assert_dependency_in_range
-      globals_map['assert_true'] = assert_true
-      globals_map['assert_false'] = assert_false
       errors = []
       for policy in self.active_policies:
         policy.evaluate(api, errors)
