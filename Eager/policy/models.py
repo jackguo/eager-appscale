@@ -6,8 +6,8 @@ from utils import utils
 class API(tuple):
   __slots__ = []
 
-  def __new__(cls, name, version, dependencies):
-    return tuple.__new__(cls, (name, version, dependencies))
+  def __new__(cls, name, version, dependencies, username):
+    return tuple.__new__(cls, (name, version, dependencies, username))
 
   @property
   def name(self):
@@ -20,6 +20,10 @@ class API(tuple):
   @property
   def dependencies(self):
     return tuple.__getitem__(self, 2)
+
+  @property
+  def username(self):
+    return tuple.__getitem__(self, 3)
 
   def __getitem__(self, item):
     raise TypeError

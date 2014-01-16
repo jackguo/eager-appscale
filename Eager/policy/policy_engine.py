@@ -22,9 +22,9 @@ class PolicyEngine:
           except Exception as ex:
             utils.log("Error while loading policy '{0}': {1}".format(policy_file, str(ex)))
 
-  def run_policy_enforcement(self, name, version, dependencies):
+  def run_policy_enforcement(self, name, version, dependencies, username):
     if self.active_policies:
-      api = API(name, version, dependencies)
+      api = API(name, version, dependencies, username)
       errors = []
       for policy in self.active_policies:
         policy.evaluate(api, errors)

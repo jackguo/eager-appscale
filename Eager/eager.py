@@ -54,6 +54,7 @@ class Eager:
     version = api['version']
     specification = api['specification']
     dependencies = api['dependencies']
+    username = api['username']
 
     if not self.__is_api_name_valid(name):
       detail = { 'detail' : 'API name contains invalid characters' }
@@ -68,7 +69,8 @@ class Eager:
       detail = { 'detail' : 'One or more declared dependencies do not exist' }
       return self.__generate_response(False, self.REASON_BAD_API_DEPENDENCIES, detail)
 
-    p_chk_success, p_chk_errors = self.policy_engine.run_policy_enforcement(name, version, dependencies)
+    p_chk_success, p_chk_errors = self.policy_engine.run_policy_enforcement(name, version,
+      dependencies, username)
     if not p_chk_success:
       detail = { 'detail' : p_chk_errors }
       return self.__generate_response(False, self.REASON_API_POLICY_VIOLATION, detail)

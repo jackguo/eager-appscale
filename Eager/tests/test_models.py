@@ -10,7 +10,7 @@ except ImportError:
 class TestModels(TestCase):
 
   def test_api_immutability(self):
-    api = API('Foo', '1.0', [])
+    api = API('Foo', '1.0', [], 'admin')
     self.assertEquals('Foo', api.name)
     self.assertEquals('1.0', api.version)
     try:
