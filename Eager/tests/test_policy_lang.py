@@ -94,3 +94,11 @@ re.compile('^foo')"""
       self.fail("Invalid module did not throw exception")
     except Exception as ex:
       pass
+
+  def test_parser_11(self):
+    source = """import __builtin__"""
+    try:
+      validate_policy(source)
+      self.fail("Invalid module did not throw exception")
+    except Exception as ex:
+      pass

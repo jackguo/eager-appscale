@@ -5,9 +5,22 @@ class EagerPolicyLanguageException(Exception):
   pass
 
 class EagerPolicyParser(ast.NodeVisitor):
+
+  # Disallowed built-in functions:
+  #   basestring(), classmethod(), compile(), dir(), eval(), execfile(), file()
+  #   globals(), help(), input(), locals(), open(), print(), property(), raw_input()
+  #   reload(), staticmethod()
+
   FUNCTION_WHITE_LIST = (
     'assert_dependency', 'assert_dependency_in_range', 'assert_not_dependency',
-    'assert_true', 'assert_false', 'len', 'range', 'pow', 'all', 'any'
+    'assert_true', 'assert_false',
+    'abs', 'all', 'any', 'bin', 'bool', 'bytearray', 'callable', 'chr', 'cmp',
+    'complex', 'delattr', 'dict', 'divmod', 'enumerate', 'filter', 'float', 'format',
+    'frozenset', 'getattr', 'hasattr', 'hash', 'hex', 'id', 'int', 'isinstance',
+    'issubclass', 'iter', 'len', 'list', 'long', 'map', 'max', 'memoryview', 'min',
+    'next', 'object', 'oct', 'ord', 'pow', 'range', 'reduce', 'repr', 'reversed',
+    'round', 'set', 'setattr', 'slice', 'sorted', 'str', 'sum', 'super', 'tuple',
+    'type', 'unichr', 'unicode', 'vars', 'xrange', 'zip'
   )
 
   MODULE_WHITE_LIST = (

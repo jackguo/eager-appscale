@@ -25,6 +25,24 @@ class TestModels(TestCase):
     except AttributeError:
       pass
 
+    try:
+      delattr(api, 'name')
+      self.fail('name attribute not immutable')
+    except AttributeError as ex:
+      pass
+
+    try:
+      setattr(api, 'name', 'Bar')
+      self.fail('name attribute not immutable')
+    except AttributeError as ex:
+      pass
+
+    try:
+      setattr(api, 'newattr', 'Bar')
+      self.fail('api object not immutable')
+    except AttributeError as ex:
+      pass
+
   def test_policy_parsing_with_description(self):
     current_dir = os.path.dirname(os.path.abspath(__file__))
     full_path = os.path.join(current_dir, 'samples', 'policy1.py')
