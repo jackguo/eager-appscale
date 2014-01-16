@@ -14,13 +14,19 @@ class EagerPolicyParser(ast.NodeVisitor):
     're'
   )
 
-  def parse_policy(self, code):
+  def parse(self, source_code):
     self.defined_functions = []
     self.called_functions = []
-    self.visit(code)
+    self.visit(self.__source_to_ast(source_code))
     for f in self.called_functions:
       if f not in self.defined_functions and f not in self.FUNCTION_WHITE_LIST:
         raise EagerPolicyLanguageException('Call to undefined function {0}'.format(f))
+
+  def get_description(self, source_code):
+    return ast.get_docstring(self.__source_to_ast(source_code))
+
+  def __source_to_ast(self, source_code):
+    return ast.parse(source_code, mode='exec')
 
   def visit(self, node):
     if isinstance(node, _ast.Global):
@@ -46,10 +52,10 @@ class EagerPolicyParser(ast.NodeVisitor):
     #print node
     self.generic_visit(node)
 
-def validate_policy_content(code_ast):
-  policy_parser = EagerPolicyParser()
-  policy_parser.parse_policy(code_ast)
-
 def validate_policy(code_str):
-  code_ast = ast.parse(code_str, mode='exec')
-  validate_policy_content(code_ast)
+  policy_parser = EagerPolicyParser()
+  policy_parser.parse(code_str)
+
+def get_policy_description(code_str):
+  policy_parser = EagerPolicyParser()
+  return policy_parser.get_description(code_str)

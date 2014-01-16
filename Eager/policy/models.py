@@ -1,7 +1,6 @@
-import ast
 import os
 from policy.assertions import *
-from policy.policy_language import validate_policy_content
+from policy.policy_language import validate_policy, get_policy_description
 from utils import utils
 
 class API(tuple):
@@ -29,9 +28,9 @@ class Policy:
   def __init__(self, policy_file):
     self.policy_file = policy_file
     self.name = self.__get_policy_name()
-    code = self.__get_policy_ast()
-    self.description = ast.get_docstring(code)
-    validate_policy_content(code)
+    source_code = self.__get_policy_content()
+    self.description = get_policy_description(source_code)
+    validate_policy(source_code)
 
   def __get_policy_name(self):
     base_name = os.path.basename(self.policy_file)
@@ -43,15 +42,10 @@ class Policy:
     file_handle.close()
     return source_code
 
-  def __get_policy_ast(self, source_code=None):
-    if not source_code:
-      source_code = self.__get_policy_content()
-    return ast.parse(source_code, mode='exec')
-
   def evaluate(self, api, errors):
     source_code = self.__get_policy_content()
     try:
-      validate_policy_content(self.__get_policy_ast(source_code))
+      validate_policy(source_code)
     except Exception as ex:
       utils.log('[{0}] Unexpected policy exception: {1}'.format(self.name, ex))
       return
