@@ -165,14 +165,29 @@ class TestAssertions(TestCase):
       self.fail('Assertion threw exception')
 
     try:
+      assert_true(1)
+    except EagerPolicyAssertionException as ex:
+      self.fail('Assertion threw exception')
+
+    try:
+      assert_true('not null')
+    except EagerPolicyAssertionException as ex:
+      self.fail('Assertion threw exception')
+
+    try:
       assert_true(False)
       self.fail('Assertion did not throw exception')
     except EagerPolicyAssertionException as ex:
       pass
 
-  def test_assert_true(self):
+  def test_assert_false(self):
     try:
       assert_false(False)
+    except EagerPolicyAssertionException as ex:
+      self.fail('Assertion threw exception')
+
+    try:
+      assert_false(0)
     except EagerPolicyAssertionException as ex:
       self.fail('Assertion threw exception')
 
@@ -199,3 +214,15 @@ class TestAssertions(TestCase):
 
     self.assertTrue(compare_version('2.0.0-alpha', '2.0.0-beta') < 0)
     self.assertTrue(compare_version('2.0.0-beta', '2.0.0-alpha') > 0)
+
+  def test_none_assertions(self):
+    try:
+      assert_true(None)
+      self.fail("None was asserted True")
+    except EagerPolicyAssertionException as ex:
+      pass
+
+    try:
+      assert_false(None)
+    except EagerPolicyAssertionException as ex:
+      self.fail("None was not asserted False")

@@ -61,11 +61,11 @@ def assert_dependency_in_range(api, name, lower=None, upper=None,
     raise EagerPolicyAssertionException("Required dependency '{0}' not used".format(name))
 
 def assert_true(condition, msg=None):
-  if condition is False:
+  if bool(condition) is False:
     raise EagerPolicyAssertionException(msg or "Condition was expected to be true, but evaluated to false")
 
 def assert_false(condition, msg=None):
-  if condition is True:
+  if bool(condition) is True:
     raise EagerPolicyAssertionException(msg or "Condition was expected to be false, but evaluated to true")
 
 def is_api_equal(name1, version1, name2, version2):
