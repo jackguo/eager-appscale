@@ -65,9 +65,11 @@ class Eager:
       detail = { 'detail' : spec_errors }
       return self.__generate_response(False, self.REASON_BAD_API_SPEC, detail)
 
-    if dependencies and not self.adaptor.validate_api_dependencies(name, version, dependencies):
-      detail = { 'detail' : 'One or more declared dependencies do not exist' }
-      return self.__generate_response(False, self.REASON_BAD_API_DEPENDENCIES, detail)
+    if dependencies:
+      dep_invalid = self.adaptor.validate_api_dependencies(name, version, dependencies)
+      if dep_invalid:
+        detail = { 'detail' : dep_invalid }
+        return self.__generate_response(False, self.REASON_BAD_API_DEPENDENCIES, detail)
 
     p_chk_success, p_chk_errors = self.policy_engine.run_policy_enforcement(name, version,
       dependencies, username)

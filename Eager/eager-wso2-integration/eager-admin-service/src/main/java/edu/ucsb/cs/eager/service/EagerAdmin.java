@@ -21,10 +21,7 @@ package edu.ucsb.cs.eager.service;
 
 import edu.ucsb.cs.eager.dao.EagerDependencyMgtDAO;
 import edu.ucsb.cs.eager.internal.EagerAPIManagementComponent;
-import edu.ucsb.cs.eager.models.APIInfo;
-import edu.ucsb.cs.eager.models.DependencyInfo;
-import edu.ucsb.cs.eager.models.EagerException;
-import edu.ucsb.cs.eager.models.ValidationInfo;
+import edu.ucsb.cs.eager.models.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIManagementException;
@@ -73,7 +70,7 @@ public class EagerAdmin {
         }
     }
 
-    public boolean validateDependencies(APIInfo api,
+    public String validateDependencies(APIInfo api,
                                            DependencyInfo[] dependencies) throws EagerException {
         String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
         for (DependencyInfo dependency : dependencies) {
@@ -81,10 +78,19 @@ public class EagerAdmin {
                     dependency.getVersion());
             APIInfo dependencyApi = new APIInfo(apiId);
             if (!isAPIAvailable(dependencyApi)) {
-                return false;
+                return "Dependency " + toPrintableName(dependency) + " does not exist";
             }
         }
-        return true;
+
+        DependencyGraph graph = new DependencyGraph(api.getName(), api.getVersion(), dependencies);
+        if (graph.hasCycle()) {
+            return "Cyclic dependency detected";
+        }
+        return null;
+    }
+
+    private String toPrintableName(DependencyInfo api) {
+        return api.getName() + "-v" + api.getVersion();
     }
 
     /**

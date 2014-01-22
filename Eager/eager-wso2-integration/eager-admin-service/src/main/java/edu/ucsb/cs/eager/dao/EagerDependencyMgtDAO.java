@@ -76,7 +76,7 @@ public class EagerDependencyMgtDAO {
         }
     }
 
-    public DependencyInfo[] getDependencies(APIInfo api) throws EagerException {
+    public DependencyInfo[] getDependencies(String name, String version) throws EagerException {
         String selectQuery = "SELECT" +
                 " DEP.EAGER_DEPENDENCY_NAME AS DEPENDENCY_NAME," +
                 " DEP.EAGER_DEPENDENCY_VERSION AS DEPENDENCY_VERSION," +
@@ -94,8 +94,8 @@ public class EagerDependencyMgtDAO {
         try {
             conn = APIMgtDBUtil.getConnection();
             ps = conn.prepareStatement(selectQuery);
-            ps.setString(1, api.getName());
-            ps.setString(2, api.getVersion());
+            ps.setString(1, name);
+            ps.setString(2, version);
             rs = ps.executeQuery();
             List<DependencyInfo> dependencies = new ArrayList<DependencyInfo>();
             while (rs.next()) {
