@@ -74,4 +74,26 @@ public class DependencyGraphTest extends TestCase {
         assertEquals(2, graph.getEdges());
         assertFalse(graph.hasCycle());
     }
+
+    public void testGraph7() throws Exception {
+        DependencyGraph graph = new DependencyGraph();
+        graph.createEdge("A", "1.0", "B", "1.0");
+        graph.createEdge("A", "1.0", "C", "1.0");
+        graph.createEdge("B", "1.0", "D", "1.0");
+        graph.createEdge("C", "1.0", "D", "1.0");
+        assertEquals(4, graph.getVertices());
+        assertEquals(4, graph.getEdges());
+        assertFalse(graph.hasCycle());
+    }
+
+    public void testGraph8() throws Exception {
+        DependencyGraph graph = new DependencyGraph();
+        graph.createEdge("A", "1.0", "B", "1.0");
+        graph.createEdge("B", "1.0", "C", "1.0");
+        graph.createEdge("C", "1.0", "D", "1.0");
+        graph.createEdge("D", "1.0", "A", "1.0");
+        assertEquals(4, graph.getVertices());
+        assertEquals(4, graph.getEdges());
+        assertTrue(graph.hasCycle());
+    }
 }
