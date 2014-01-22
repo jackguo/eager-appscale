@@ -39,33 +39,4 @@ public class LRUCache<K,V> extends LinkedHashMap<K,V> {
         return super.size() > maxEntries;
     }
 
-    @Override
-    public V get(Object key) {
-        try {
-            lock.readLock().lock();
-            return super.get(key);
-        } finally {
-            lock.readLock().unlock();
-        }
-    }
-
-    @Override
-    public V put(K key, V value) {
-        try {
-            lock.writeLock().lock();
-            return super.put(key, value);
-        } finally {
-            lock.writeLock().unlock();
-        }
-    }
-
-    @Override
-    public V remove(Object key) {
-        try {
-            lock.writeLock().lock();
-            return super.remove(key);
-        } finally {
-            lock.writeLock().unlock();
-        }
-    }
 }
