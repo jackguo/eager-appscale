@@ -48,7 +48,7 @@
                             org.wso2.carbon.apimgt.impl.*, org.wso2.carbon.governance.api.*, org.wso2.carbon.registry.ws.client.*, org.wso2.carbon.apimgt.api.model.*, org.wso2.carbon.apimgt.api.*, *;resolution:=optional
                         </Import-Package>
                         <Export-Package>
-                            edu.ucsb.cs.eager.service.*, edu.ucsb.cs.eager.models.*
+                            edu.ucsb.cs.eager.service.*, edu.ucsb.cs.eager.models.*, edu.ucsb.cs.eager.dao.*
                         </Export-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>

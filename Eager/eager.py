@@ -171,8 +171,10 @@ class Eager:
       ops = dependent.operations
       for op in ops:
         operations.add(op)
+    # Don't give the original spec object to the Swagger module, since Swagger module
+    # modifies the spec object.
     api_compatible, errors = swagger.is_api_compatible(validation_info.specification,
-      specification, list(operations))
+      specification.copy(), list(operations))
     if api_compatible:
       return True, 'api validated successfully'
     else:

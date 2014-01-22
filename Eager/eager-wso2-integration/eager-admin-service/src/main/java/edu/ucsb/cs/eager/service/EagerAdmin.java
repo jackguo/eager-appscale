@@ -19,6 +19,7 @@
 
 package edu.ucsb.cs.eager.service;
 
+import edu.ucsb.cs.eager.dao.EagerDependencyMgtDAO;
 import edu.ucsb.cs.eager.internal.EagerAPIManagementComponent;
 import edu.ucsb.cs.eager.models.APIInfo;
 import edu.ucsb.cs.eager.models.DependencyInfo;
@@ -31,12 +32,7 @@ import org.wso2.carbon.apimgt.api.APIProvider;
 import org.wso2.carbon.apimgt.api.model.*;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerFactory;
-import org.wso2.carbon.apimgt.impl.utils.APIMgtDBUtil;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 
 public class EagerAdmin {
@@ -44,6 +40,8 @@ public class EagerAdmin {
     private static final Log log = LogFactory.getLog(EagerAdmin.class);
 
     private static final String EAGER_DOC_NAME = "EagerSpec";
+
+    private EagerDependencyMgtDAO dao = new EagerDependencyMgtDAO();
 
     public boolean isAPIAvailable(APIInfo api) throws EagerException {
         try {
@@ -97,64 +95,7 @@ public class EagerAdmin {
      * @return a boolean value indicating success or failure
      */
     public boolean recordDependencies(APIInfo api, DependencyInfo[] dependencies) throws EagerException {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        String deleteQuery = "DELETE FROM EAGER_API_DEPENDENCY WHERE " +
-                "EAGER_DEPENDENT_NAME=? AND EAGER_DEPENDENT_VERSION=?";
-        String insertQuery = "INSERT INTO EAGER_API_DEPENDENCY (EAGER_DEPENDENCY_NAME, " +
-                "EAGER_DEPENDENCY_VERSION, EAGER_DEPENDENT_NAME, EAGER_DEPENDENT_VERSION, " +
-                "EAGER_DEPENDENCY_OPERATIONS) VALUES (?,?,?,?,?)";
-        try {
-            conn = APIMgtDBUtil.getConnection();
-
-            ps = conn.prepareStatement(deleteQuery);
-            ps.setString(1, api.getName());
-            ps.setString(2, api.getVersion());
-            ps.executeUpdate();
-            ps.close();
-
-            ps = conn.prepareStatement(insertQuery);
-            for (DependencyInfo dependency : dependencies) {
-                ps.setString(1, dependency.getName());
-                ps.setString(2, dependency.getVersion());
-                ps.setString(3, api.getName());
-                ps.setString(4, api.getVersion());
-                ps.setString(5, getOperationsListAsString(dependency));
-                ps.addBatch();
-            }
-            ps.executeBatch();
-            ps.clearBatch();
-            return true;
-        } catch (SQLException e) {
-            handleException("Error while recording API dependency", e);
-            return false;
-        } finally {
-            APIMgtDBUtil.closeAllConnections(ps, conn, null);
-        }
-    }
-
-    private String getOperationsListAsString(DependencyInfo dependency) {
-        String ops = "";
-        String[] operations = dependency.getOperations();
-        if (operations != null) {
-            for (int i = 0; i < operations.length; i++) {
-                if (i > 0) {
-                    ops += ",";
-                }
-                ops += operations[i];
-            }
-        }
-        return ops;
-    }
-
-    private String[] getOperationsListFromString(String operations) {
-        if (operations != null) {
-            operations = operations.trim();
-            if (!"".equals(operations)) {
-                return operations.split(",");
-            }
-        }
-        return new String[] { };
+        return dao.recordDependencies(api, dependencies);
     }
 
     /**
@@ -164,52 +105,19 @@ public class EagerAdmin {
      * @return A ValidationInfo object carrying the specification of the API and its dependents
      */
     public ValidationInfo getValidationInfo(APIInfo api) throws EagerException {
-        String selectQuery = "SELECT" +
-                " DEP.EAGER_DEPENDENCY_NAME AS DEPENDENCY_NAME," +
-                " DEP.EAGER_DEPENDENCY_VERSION AS DEPENDENCY_VERSION," +
-                " DEP.EAGER_DEPENDENT_NAME AS DEPENDENT_NAME," +
-                " DEP.EAGER_DEPENDENT_VERSION AS DEPENDENT_VERSION," +
-                " DEP.EAGER_DEPENDENCY_OPERATIONS AS OPERATIONS " +
-                "FROM" +
-                " EAGER_API_DEPENDENCY DEP " +
-                "WHERE" +
-                " DEP.EAGER_DEPENDENCY_NAME=?" +
-                " AND DEP.EAGER_DEPENDENCY_VERSION=?";
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
         try {
             String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
             APIProvider provider = getAPIProvider(eagerAdmin);
             APIIdentifier apiId = new APIIdentifier(eagerAdmin, api.getName(), api.getVersion());
             String specification = provider.getDocumentationContent(apiId, EAGER_DOC_NAME);
 
-            conn = APIMgtDBUtil.getConnection();
-            ps = conn.prepareStatement(selectQuery);
-            ps.setString(1, api.getName());
-            ps.setString(2, api.getVersion());
-            rs = ps.executeQuery();
-            List<DependencyInfo> dependencies = new ArrayList<DependencyInfo>();
-            while (rs.next()) {
-                DependencyInfo dependency = new DependencyInfo();
-                dependency.setName(rs.getString("DEPENDENT_NAME"));
-                dependency.setVersion(rs.getString("DEPENDENT_VERSION"));
-                dependency.setOperations(getOperationsListFromString(rs.getString("OPERATIONS")));
-                dependencies.add(dependency);
-            }
-
             ValidationInfo info = new ValidationInfo();
             info.setSpecification(specification);
-            info.setDependents(dependencies.toArray(new DependencyInfo[dependencies.size()]));
+            info.setDependents(dao.getDependents(api));
             return info;
         } catch (APIManagementException e) {
             handleException("Error while obtaining API validation information", e);
             return null;
-        } catch (SQLException e) {
-            handleException("Error while obtaining API dependency information", e);
-            return null;
-        } finally {
-            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
         }
     }
 
