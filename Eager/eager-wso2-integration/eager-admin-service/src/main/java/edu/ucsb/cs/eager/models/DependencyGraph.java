@@ -19,6 +19,7 @@
 
 package edu.ucsb.cs.eager.models;
 
+import edu.ucsb.cs.eager.dao.CachedEagerDependencyMgtDAO;
 import edu.ucsb.cs.eager.dao.EagerDependencyMgtDAO;
 
 import java.util.HashSet;
@@ -29,7 +30,7 @@ public class DependencyGraph {
     private Set<Vertex> vertices = new HashSet<Vertex>();
     private Set<Edge> edges = new HashSet<Edge>();
 
-    private static final EagerDependencyMgtDAO dao = new EagerDependencyMgtDAO();
+    private static final EagerDependencyMgtDAO dao = new CachedEagerDependencyMgtDAO();
     private String rootName;
     private String rootVersion;
 

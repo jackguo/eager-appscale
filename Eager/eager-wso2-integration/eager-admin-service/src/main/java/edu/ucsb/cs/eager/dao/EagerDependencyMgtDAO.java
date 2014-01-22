@@ -37,8 +37,6 @@ public class EagerDependencyMgtDAO {
 
     private static final Log log = LogFactory.getLog(EagerDependencyMgtDAO.class);
 
-    private LRUCache<String,DependencyInfo[]> cache = new LRUCache<String, DependencyInfo[]>(1000);
-
     public DependencyInfo[] getDependents(APIInfo api) throws EagerException {
         String selectQuery = "SELECT" +
                 " DEP.EAGER_DEPENDENCY_NAME AS DEPENDENCY_NAME," +
@@ -79,12 +77,6 @@ public class EagerDependencyMgtDAO {
     }
 
     public DependencyInfo[] getDependencies(String name, String version) throws EagerException {
-        String key = name + ":" + version;
-        DependencyInfo[] result = cache.get(key);
-        if (result != null) {
-            return result;
-        }
-
         String selectQuery = "SELECT" +
                 " DEP.EAGER_DEPENDENCY_NAME AS DEPENDENCY_NAME," +
                 " DEP.EAGER_DEPENDENCY_VERSION AS DEPENDENCY_VERSION," +
@@ -114,9 +106,7 @@ public class EagerDependencyMgtDAO {
                 dependencies.add(dependency);
             }
 
-            result = dependencies.toArray(new DependencyInfo[dependencies.size()]);
-            cache.put(key, result);
-            return result;
+            return dependencies.toArray(new DependencyInfo[dependencies.size()]);
         } catch (SQLException e) {
             handleException("Error while obtaining API dependency information", e);
             return null;
@@ -126,7 +116,6 @@ public class EagerDependencyMgtDAO {
     }
 
     public boolean recordDependencies(APIInfo api, DependencyInfo[] dependencies) throws EagerException {
-        cache.remove(api.getName() + ":" + api.getVersion());
         Connection conn = null;
         PreparedStatement ps = null;
         String deleteQuery = "DELETE FROM EAGER_API_DEPENDENCY WHERE " +
