@@ -105,6 +105,7 @@ public class DependencyGraph {
     }
 
     public boolean hasCycle() {
+        // Based on http://www.cs.berkeley.edu/~kamil/teaching/sp03/041403.pdf
         for (Vertex v : vertices) {
             if (v.color == WHITE) {
                 if (visit(v)) {
