@@ -1,3 +1,4 @@
+import copy
 from apimgt.typechecker import *
 
 def validate_swagger_description(spec):
@@ -65,7 +66,7 @@ def is_valid_type(type_name, spec):
 
 def is_api_compatible(old_spec, new_spec, ops=list()):
   old_api = old_spec['apis'][0]
-  new_api = new_spec['apis'][0]
+  new_api = copy.deepcopy(new_spec['apis'][0])
 
   errors = []
 
