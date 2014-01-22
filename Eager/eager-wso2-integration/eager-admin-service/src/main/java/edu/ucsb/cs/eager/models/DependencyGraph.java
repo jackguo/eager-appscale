@@ -21,9 +21,7 @@ package edu.ucsb.cs.eager.models;
 
 import edu.ucsb.cs.eager.dao.EagerDependencyMgtDAO;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 public class DependencyGraph {
@@ -31,8 +29,7 @@ public class DependencyGraph {
     private Set<Vertex> vertices = new HashSet<Vertex>();
     private Set<Edge> edges = new HashSet<Edge>();
 
-    private EagerDependencyMgtDAO dao = new EagerDependencyMgtDAO();
-    private Map<String,DependencyInfo[]> cache = new HashMap<String, DependencyInfo[]>();
+    private static final EagerDependencyMgtDAO dao = new EagerDependencyMgtDAO();
     private String rootName;
     private String rootVersion;
 
@@ -49,7 +46,6 @@ public class DependencyGraph {
         this.rootName = rootName;
         this.rootVersion = rootVersion;
         buildRecursively(rootName, rootVersion, dependencies, true);
-        cache.clear();
     }
 
     private void buildRecursively(String rootName, String rootVersion,
@@ -67,14 +63,7 @@ public class DependencyGraph {
     }
 
     private DependencyInfo[] getDependencies(String name, String version) throws EagerException {
-        String key = name + ":" + version;
-        if (cache.containsKey(key)) {
-            return cache.get(key);
-        } else {
-            DependencyInfo[] result = dao.getDependencies(name, version);
-            cache.put(key, result);
-            return result;
-        }
+        return dao.getDependencies(name, version);
     }
 
     public void createEdge(String dependentName, String dependentVersion,
