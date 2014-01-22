@@ -21,13 +21,10 @@ package edu.ucsb.cs.eager.dao;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class LRUCache<K,V> extends LinkedHashMap<K,V> {
 
     private final int maxEntries;
-    private ReadWriteLock lock = new ReentrantReadWriteLock();
 
     public LRUCache(final int maxEntries) {
         super(maxEntries + 1, 1.0f, true);
