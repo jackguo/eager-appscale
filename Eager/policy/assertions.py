@@ -34,7 +34,7 @@ def assert_dependency_in_range(api, name, lower=None, upper=None,
       match_found = True
       version = dependency['version']
       if lower is not None:
-        comp = compare_version(lower, version)
+        comp = compare_versions(lower, version)
         if exclude_lower and comp >= 0:
           match_found = False
         elif not exclude_lower and comp > 0:
@@ -44,7 +44,7 @@ def assert_dependency_in_range(api, name, lower=None, upper=None,
         continue
 
       if upper is not None:
-        comp = compare_version(upper, version)
+        comp = compare_versions(upper, version)
         if exclude_upper and comp <= 0:
           match_found = False
         elif not exclude_upper and comp < 0:
@@ -73,7 +73,7 @@ def is_api_equal(name1, version1, name2, version2):
   else:
     return name1 == name2
 
-def compare_version(version1, version2):
+def compare_versions(version1, version2):
   v1 = parse_version(version1)
   v2 = parse_version(version2)
   if v1 > v2:

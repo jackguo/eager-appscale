@@ -61,6 +61,7 @@ class Policy:
     globals_map['assert_dependency_in_range'] = assert_dependency_in_range
     globals_map['assert_true'] = assert_true
     globals_map['assert_false'] = assert_false
+    globals_map['compare_versions'] = compare_versions
     try:
       exec(source_code, globals_map, {})
     except EagerPolicyAssertionException as ex:

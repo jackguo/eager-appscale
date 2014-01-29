@@ -236,22 +236,22 @@ class TestAssertions(TestCase):
       pass
 
   def test_version_comparison(self):
-    self.assertTrue(compare_version('1.0', '1.0') is 0)
-    self.assertTrue(compare_version('2.0', '1.0') > 0)
-    self.assertTrue(compare_version('1.0', '2.0') < 0)
+    self.assertTrue(compare_versions('1.0', '1.0') is 0)
+    self.assertTrue(compare_versions('2.0', '1.0') > 0)
+    self.assertTrue(compare_versions('1.0', '2.0') < 0)
 
-    self.assertTrue(compare_version('1.0.0', '1.0.0') is 0)
-    self.assertTrue(compare_version('2.0.0', '1.0.0') > 0)
-    self.assertTrue(compare_version('1.0.0', '2.0.0') < 0)
+    self.assertTrue(compare_versions('1.0.0', '1.0.0') is 0)
+    self.assertTrue(compare_versions('2.0.0', '1.0.0') > 0)
+    self.assertTrue(compare_versions('1.0.0', '2.0.0') < 0)
 
-    self.assertTrue(compare_version('2.2', '2.1') > 0)
-    self.assertTrue(compare_version('2.2', '2.3') < 0)
+    self.assertTrue(compare_versions('2.2', '2.1') > 0)
+    self.assertTrue(compare_versions('2.2', '2.3') < 0)
 
-    self.assertTrue(compare_version('1.0-rc1', '1.0-rc2') < 0)
-    self.assertTrue(compare_version('1.0', '1.0-rc1') > 0)
+    self.assertTrue(compare_versions('1.0-rc1', '1.0-rc2') < 0)
+    self.assertTrue(compare_versions('1.0', '1.0-rc1') > 0)
 
-    self.assertTrue(compare_version('2.0.0-alpha', '2.0.0-beta') < 0)
-    self.assertTrue(compare_version('2.0.0-beta', '2.0.0-alpha') > 0)
+    self.assertTrue(compare_versions('2.0.0-alpha', '2.0.0-beta') < 0)
+    self.assertTrue(compare_versions('2.0.0-beta', '2.0.0-alpha') > 0)
 
   def test_none_assertions(self):
     try:
