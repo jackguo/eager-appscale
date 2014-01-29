@@ -14,12 +14,11 @@ def assert_dependency(api, name, version=None):
     get_dependency_string(name, version)))
 
 def assert_not_dependency(api, name, version=None):
-  try:
-    assert_dependency(api, name, version)
-  except EagerPolicyAssertionException:
-    return
-  raise EagerPolicyAssertionException("Prohibited dependency '{0}' in use".format(
-    get_dependency_string(name, version)))
+  if api.dependencies:
+    for dependency in api.dependencies:
+      if is_api_equal(dependency['name'], dependency['version'], name, version):
+        raise EagerPolicyAssertionException("Prohibited dependency '{0}' in use".format(
+          get_dependency_string(name, version)))
 
 def assert_dependency_in_range(api, name, lower=None, upper=None,
                                exclude_lower=False, exclude_upper=False):

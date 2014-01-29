@@ -158,6 +158,21 @@ class TestAssertions(TestCase):
     except EagerPolicyAssertionException as ex:
       pass
 
+  def test_assert_not_dependency_5(self):
+    api = API('foo', '1.0', [{'name' : 'foo', 'version' : '1.0'}], 'admin')
+    try:
+      assert_not_dependency(api, 'foo')
+      self.fail('Assertion did not throw exception')
+    except EagerPolicyAssertionException as ex:
+      pass
+
+  def test_assert_not_dependency_6(self):
+    api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.0'}], 'admin')
+    try:
+      assert_not_dependency(api, 'foo')
+    except EagerPolicyAssertionException as ex:
+      self.fail('Assertion threw exception')
+
   def test_assert_true(self):
     try:
       assert_true(True)
