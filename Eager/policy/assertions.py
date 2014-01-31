@@ -3,9 +3,8 @@ from pkg_resources import parse_version
 class EagerPolicyAssertionException(Exception):
   pass
 
+
 def assert_dependency(api, name, version=None):
-  if is_api_equal(api.name, api.version, name, version):
-    return
   if api.dependencies:
     for dependency in api.dependencies:
       if is_api_equal(dependency['name'], dependency['version'], name, version):
@@ -14,11 +13,12 @@ def assert_dependency(api, name, version=None):
     get_dependency_string(name, version)))
 
 def assert_not_dependency(api, name, version=None):
-  if api.dependencies:
-    for dependency in api.dependencies:
-      if is_api_equal(dependency['name'], dependency['version'], name, version):
-        raise EagerPolicyAssertionException("Prohibited dependency '{0}' in use".format(
-          get_dependency_string(name, version)))
+  try:
+    assert_dependency(api, name, version)
+  except EagerPolicyAssertionException:
+    return
+  raise EagerPolicyAssertionException("Prohibited dependency '{0}' in use".format(
+    get_dependency_string(name, version)))
 
 def assert_dependency_in_range(api, name, lower=None, upper=None,
                                exclude_lower=False, exclude_upper=False):
@@ -54,24 +54,30 @@ def assert_dependency_in_range(api, name, lower=None, upper=None,
         return
   if dep_found:
     range_str = get_version_range_string(lower, upper, exclude_lower, exclude_upper)
-    raise EagerPolicyAssertionException("Version of required dependency '{0}' is not in " \
+    raise EagerPolicyAssertionException("Version of required dependency '{0}' is not in "\
                                         "the range {1}".format(name, range_str))
   else:
     raise EagerPolicyAssertionException("Required dependency '{0}' not used".format(name))
 
+
 def assert_true(condition, msg=None):
   if bool(condition) is False:
-    raise EagerPolicyAssertionException(msg or "Condition was expected to be true, but evaluated to false")
+    raise EagerPolicyAssertionException(
+      msg or "Condition was expected to be true, but evaluated to false")
+
 
 def assert_false(condition, msg=None):
   if bool(condition) is True:
-    raise EagerPolicyAssertionException(msg or "Condition was expected to be false, but evaluated to true")
+    raise EagerPolicyAssertionException(
+      msg or "Condition was expected to be false, but evaluated to true")
+
 
 def is_api_equal(name1, version1, name2, version2):
   if version2 is not None:
     return name1 == name2 and version1 == version2
   else:
     return name1 == name2
+
 
 def compare_versions(version1, version2):
   v1 = parse_version(version1)
@@ -82,6 +88,7 @@ def compare_versions(version1, version2):
     return -1
   else:
     return 0
+
 
 def get_version_range_string(version_lower, version_higher, ex_lower, ex_higher):
   output = ''
@@ -101,6 +108,7 @@ def get_version_range_string(version_lower, version_higher, ex_lower, ex_higher)
   else:
     output += '*)'
   return output
+
 
 def get_dependency_string(name, version):
   if version:
