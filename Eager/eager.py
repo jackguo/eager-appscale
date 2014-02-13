@@ -170,9 +170,13 @@ class Eager:
   def __check_dependencies(self, specification, validation_info):
     operations = set()
     for dependent in validation_info.dependents:
-      ops = dependent.operations
-      for op in ops:
-        operations.add(op)
+      if dependent.operations:
+        operations.update(dependent.operations)
+      else:
+        # If any dependent has an empty operation list, we need to test
+        # all operations for compatibility.
+        operations.clear()
+        break
 
     api_compatible, errors = swagger.is_api_compatible(validation_info.specification,
       specification, list(operations))
