@@ -53,6 +53,7 @@ class Eager:
     name = app['name']
     version = app['version']
     dependencies = app['dependencies']
+    api_list = app['api_list']
     owner = app['owner']
 
     utils.log(str(app))
@@ -61,26 +62,29 @@ class Eager:
       if dep_invalid:
         detail = { 'detail' : dep_invalid }
         return self.__generate_response(False, self.REASON_BAD_APP_DEPENDENCIES, detail)
+
+    pre_validation_errors = []
+    for api in api_list:
+      api_name = api['name']
+      api_spec = api['specification']
+      if not self.__is_api_name_valid(api_name):
+        pre_validation_errors.append('Invalid characters in API name: {0}'.format(api_name))
+      spec_valid, spec_errors = swagger.validate_swagger_description(api_spec)
+      if not spec_valid:
+        pre_validation_errors.append(spec_errors)
+
+    if pre_validation_errors:
+      detail = { 'detail' : '|'.join(pre_validation_errors) }
+      return self.__generate_response(False, self.REASON_BAD_API_METADATA, detail)
+
     return self.__generate_response(True, self.REASON_API_VALIDATION_SUCCESS)
 
   def validate_api_for_deployment(self, secret, api):
-    if self.secret != secret:
-      return self.__generate_response(False, self.REASON_BAD_SECRET)
-
     name = api['name']
     version = api['version']
     specification = api['specification']
     dependencies = api['dependencies']
     username = api['username']
-
-    if not self.__is_api_name_valid(name):
-      detail = { 'detail' : 'API name contains invalid characters' }
-      return self.__generate_response(False, self.REASON_BAD_API_METADATA, detail)
-
-    spec_valid, spec_errors = swagger.validate_swagger_description(specification)
-    if not spec_valid:
-      detail = { 'detail' : spec_errors }
-      return self.__generate_response(False, self.REASON_BAD_API_SPEC, detail)
 
     p_chk_success, p_chk_errors = self.policy_engine.run_policy_enforcement(name, version,
       dependencies, username)
