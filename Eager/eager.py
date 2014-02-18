@@ -83,7 +83,7 @@ class Eager:
       api_name = api['name']
       api_version = api['version']
       api_spec = api['specification']
-      if self.adaptor.is_api_available(name, version):
+      if self.adaptor.is_api_available(api_name, api_version):
         passed, message = self.__invoke_api_validations(api_name, api_version, api_spec)
       else:
         passed, message = self.__handle_new_api(api_name, api_version, api_spec)
