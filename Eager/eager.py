@@ -55,7 +55,6 @@ class Eager:
     api_list_without_specs = self.__remove_specs(api_list)
     owner = app['owner']
 
-    utils.log(str(app))
     if dependencies:
       dep_invalid = self.adaptor.validate_application_dependencies(name, version,
         api_list_without_specs, dependencies)
