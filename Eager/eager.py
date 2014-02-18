@@ -27,7 +27,7 @@ class Eager:
   REASON_API_PUBLISH_SUCCESS = 'API published successfully'
   REASON_API_ALREADY_PUBLISHED = 'API already published'
   REASON_API_SPEC_UPDATE_FAILED = 'Failed to update API specification'
-  REASON_BAD_APP_DEPENDENCIES = 'Bad application dependencies'
+  REASON_BAD_DEPENDENCIES = 'Bad dependencies'
   REASON_DEPENDENCY_RECORDING_FAILED = 'Failed to record API dependencies'
   REASON_BAD_API_SPEC = 'Bad API specification'
 
@@ -61,7 +61,7 @@ class Eager:
       dep_invalid = self.adaptor.validate_application_dependencies(name, version, dependencies)
       if dep_invalid:
         detail = { 'detail' : dep_invalid }
-        return self.__generate_response(False, self.REASON_BAD_APP_DEPENDENCIES, detail)
+        return self.__generate_response(False, self.REASON_BAD_DEPENDENCIES, detail)
 
     pre_validation_errors = []
     for api in api_list:
