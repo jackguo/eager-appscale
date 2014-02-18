@@ -27,7 +27,7 @@ class Eager:
   REASON_API_PUBLISH_SUCCESS = 'API published successfully'
   REASON_API_ALREADY_PUBLISHED = 'API already published'
   REASON_API_SPEC_UPDATE_FAILED = 'Failed to update API specification'
-  REASON_BAD_API_DEPENDENCIES = 'Bad API dependencies'
+  REASON_BAD_APP_DEPENDENCIES = 'Bad application dependencies'
   REASON_DEPENDENCY_RECORDING_FAILED = 'Failed to record API dependencies'
   REASON_BAD_API_SPEC = 'Bad API specification'
 
@@ -45,6 +45,23 @@ class Eager:
       return self.__generate_response(False, self.REASON_BAD_SECRET)
     else:
       return self.__generate_response(True, self.REASON_ALIVE)
+
+  def validate_application_for_deployment(self, secret, app):
+    if self.secret != secret:
+      return self.__generate_response(False, self.REASON_BAD_SECRET)
+
+    name = app['name']
+    version = app['version']
+    dependencies = app['dependencies']
+    owner = app['owner']
+
+    utils.log(str(app))
+    if dependencies:
+      dep_invalid = self.adaptor.validate_application_dependencies(name, version, dependencies)
+      if dep_invalid:
+        detail = { 'detail' : dep_invalid }
+        return self.__generate_response(False, self.REASON_BAD_APP_DEPENDENCIES, detail)
+    return self.__generate_response(True, self.REASON_API_VALIDATION_SUCCESS)
 
   def validate_api_for_deployment(self, secret, api):
     if self.secret != secret:
@@ -64,12 +81,6 @@ class Eager:
     if not spec_valid:
       detail = { 'detail' : spec_errors }
       return self.__generate_response(False, self.REASON_BAD_API_SPEC, detail)
-
-    if dependencies:
-      dep_invalid = self.adaptor.validate_api_dependencies(name, version, dependencies)
-      if dep_invalid:
-        detail = { 'detail' : dep_invalid }
-        return self.__generate_response(False, self.REASON_BAD_API_DEPENDENCIES, detail)
 
     p_chk_success, p_chk_errors = self.policy_engine.run_policy_enforcement(name, version,
       dependencies, username)
