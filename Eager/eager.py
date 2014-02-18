@@ -23,10 +23,8 @@ class Eager:
   REASON_API_VALIDATION_FAILED = 'API validation failed'
   REASON_API_POLICY_VIOLATION = 'API violates one or more policies'
   REASON_BAD_API_METADATA = 'API contains wrong or invalid metadata'
-  REASON_AMBIGUOUS_API_NAME = 'API name is too similar to some names already in use'
   REASON_API_PUBLISH_SUCCESS = 'API published successfully'
   REASON_API_ALREADY_PUBLISHED = 'API already published'
-  REASON_API_SPEC_UPDATE_FAILED = 'Failed to update API specification'
   REASON_BAD_DEPENDENCIES = 'Bad dependencies'
   REASON_DEPENDENCY_RECORDING_FAILED = 'Failed to record API dependencies'
   REASON_BAD_API_SPEC = 'Bad API specification'
@@ -54,11 +52,13 @@ class Eager:
     version = app['version']
     dependencies = app['dependencies']
     api_list = app['api_list']
+    api_list_without_specs = self.__remove_specs(api_list)
     owner = app['owner']
 
     utils.log(str(app))
     if dependencies:
-      dep_invalid = self.adaptor.validate_application_dependencies(name, version, dependencies)
+      dep_invalid = self.adaptor.validate_application_dependencies(name, version,
+        api_list_without_specs, dependencies)
       if dep_invalid:
         detail = { 'detail' : dep_invalid }
         return self.__generate_response(False, self.REASON_BAD_DEPENDENCIES, detail)
@@ -77,33 +77,25 @@ class Eager:
       detail = { 'detail' : '|'.join(pre_validation_errors) }
       return self.__generate_response(False, self.REASON_BAD_API_METADATA, detail)
 
-    return self.__generate_response(True, self.REASON_API_VALIDATION_SUCCESS)
+    # TODO: Run policy engine
 
-  def validate_api_for_deployment(self, secret, api):
-    name = api['name']
-    version = api['version']
-    specification = api['specification']
-    dependencies = api['dependencies']
-    username = api['username']
-
-    p_chk_success, p_chk_errors = self.policy_engine.run_policy_enforcement(name, version,
-      dependencies, username)
-    if not p_chk_success:
-      detail = { 'detail' : p_chk_errors }
-      return self.__generate_response(False, self.REASON_API_POLICY_VIOLATION, detail)
-
-    if self.adaptor.is_api_available(name, version):
-      passed, reason, message = self.__invoke_api_validations(name, version, specification)
-    else:
-      passed, reason, message = self.__handle_new_api(name, version, specification)
-
-    if not passed:
-      if message:
-        return self.__generate_response(False, reason, { 'detail' : message })
+    post_validation_errors = []
+    for api in api_list:
+      api_name = api['name']
+      api_version = api['version']
+      api_spec = api['specification']
+      if self.adaptor.is_api_available(name, version):
+        passed, message = self.__invoke_api_validations(api_name, api_version, api_spec)
       else:
-        return self.__generate_response(False, reason)
+        passed, message = self.__handle_new_api(api_name, api_version, api_spec)
+      if not passed:
+        post_validation_errors.append(message)
 
-    if not self.adaptor.record_api_dependencies(name, version, dependencies):
+    if post_validation_errors:
+      detail = { 'detail' : '|'.join(post_validation_errors)}
+      return self.__generate_response(False, self.REASON_API_VALIDATION_FAILED, detail)
+
+    if not self.adaptor.record_application_dependencies(name, version, api_list_without_specs, dependencies):
       utils.log("Failed to record dependencies for {0}-v{1}".format(name, version))
       return self.__generate_response(False, self.REASON_DEPENDENCY_RECORDING_FAILED)
 
@@ -153,13 +145,13 @@ class Eager:
     if val_status:
       if self.adaptor.update_api_specification(name, version, json.dumps(specification)):
         utils.log("API specification updated successfully for {0}-v{1}".format(name, version))
-        return True, self.REASON_API_VALIDATION_SUCCESS, None
+        return True, None
       else:
         utils.log("Failed to update API specification for {0}-v{1}".format(name, version))
-        return False, self.REASON_API_SPEC_UPDATE_FAILED, None
+        return False, 'Failed to update API specification'
     else:
       utils.log("API dependency validation failed for {0}-v{1}: {2}".format(name, version, val_message))
-      return False, self.REASON_API_VALIDATION_FAILED, val_message
+      return False, val_message
 
   def __handle_new_api(self, name, version, specification):
     utils.log("API {0}-v{1} does not exist yet. Skipping dependency validation".format(
@@ -170,7 +162,7 @@ class Eager:
       for api_info in api_list:
         if api_info.name != name:
           message = 'API name is too similar to: {0}'.format(api_info.name)
-          return False, self.REASON_AMBIGUOUS_API_NAME, message
+          return False, 'API name is too similar to some names already in use'
       utils.log("Context {0} is available for use".format(context))
     else:
       utils.log("Context {0} is not taken by any other API".format(context))
@@ -180,7 +172,7 @@ class Eager:
     else:
       utils.log("API {0}-v{1} is already registered".format(name, version))
 
-    return True, self.REASON_API_VALIDATION_SUCCESS, None
+    return True, None
 
   def __check_dependencies(self, specification, validation_info):
     operations = set()
@@ -199,3 +191,13 @@ class Eager:
       return True, 'api validated successfully'
     else:
       return False, errors
+
+  def __remove_specs(self, api_list):
+    result = []
+    for api in api_list:
+      result_api = {
+        'name' : api['name'],
+        'version' : api['version']
+      }
+      result.append(result_api)
+    return result

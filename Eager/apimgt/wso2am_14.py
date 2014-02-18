@@ -59,10 +59,26 @@ class WSO2APIManager14Adaptor(APIManagerAdaptor):
         dependents.append(d)
     return ValidationInfo(result.specification, dependents)
 
-  def validate_application_dependencies(self, name, version, dependencies):
-    api = { 'name' : name, 'version' : version }
-    return self.client.service.validateDependencies(api=api, dependencies=dependencies)
+  def validate_application_dependencies(self, name, version, enclosedAPIs, dependencies):
+    if dependencies:
+      app = {
+        'name' : name,
+        'version' : version,
+        'enclosedAPIs' : enclosedAPIs,
+        'dependencies' : dependencies
+      }
+      return self.client.service.validateDependencies(app=app)
+    else:
+      return None
 
-  def record_application_dependencies(self, name, version, dependencies):
-    api = { 'name' : name, 'version' : version }
-    return self.client.service.recordDependencies(api=api, dependencies=dependencies)
+  def record_application_dependencies(self, name, version, enclosedAPIs, dependencies):
+    if enclosedAPIs or dependencies:
+      app = {
+        'name' : name,
+        'version' : version,
+        'enclosedAPIs' : enclosedAPIs,
+        'dependencies' : dependencies
+      }
+      return self.client.service.recordDependencies(app=app)
+    else:
+      return True
