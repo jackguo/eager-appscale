@@ -76,7 +76,11 @@ class Eager:
       detail = { 'detail' : '|'.join(pre_validation_errors) }
       return self.__generate_response(False, self.REASON_BAD_API_METADATA, detail)
 
-    # TODO: Run policy engine
+    passed, message = self.policy_engine.run_policy_enforcement(name, version, dependencies,
+      api_list_without_specs, owner)
+    if not passed:
+      detail = { 'detail' : message }
+      return self.__generate_response(False, self.REASON_API_POLICY_VIOLATION, detail)
 
     post_validation_errors = []
     for api in api_list:

@@ -12,7 +12,7 @@ class EagerPolicyParser(ast.NodeVisitor):
   #   reload(), staticmethod()
 
   FUNCTION_WHITE_LIST = (
-    'assert_dependency', 'assert_dependency_in_range', 'assert_not_dependency',
+    'assert_app_dependency', 'assert_app_dependency_in_range', 'assert_not_app_dependency',
     'assert_true', 'assert_false',
     'abs', 'all', 'any', 'bin', 'bool', 'bytearray', 'callable', 'chr', 'cmp',
     'complex', 'delattr', 'dict', 'divmod', 'enumerate', 'filter', 'float', 'format',

@@ -2,4 +2,4 @@
 This is a comment.
 """
 
-assert_dependency(api, 'Foo', '1.0')
+assert_app_dependency(app, 'Foo', '1.0')

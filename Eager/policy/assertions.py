@@ -4,31 +4,31 @@ class EagerPolicyAssertionException(Exception):
   pass
 
 
-def assert_dependency(api, name, version=None):
-  if api.dependencies:
-    for dependency in api.dependencies:
+def assert_app_dependency(app, name, version=None):
+  if app.dependencies:
+    for dependency in app.dependencies:
       if is_api_equal(dependency['name'], dependency['version'], name, version):
         return
   raise EagerPolicyAssertionException("Required dependency '{0}' not used".format(
     get_dependency_string(name, version)))
 
-def assert_not_dependency(api, name, version=None):
+def assert_not_app_dependency(app, name, version=None):
   try:
-    assert_dependency(api, name, version)
+    assert_app_dependency(app, name, version)
   except EagerPolicyAssertionException:
     return
   raise EagerPolicyAssertionException("Prohibited dependency '{0}' in use".format(
     get_dependency_string(name, version)))
 
-def assert_dependency_in_range(api, name, lower=None, upper=None,
+def assert_app_dependency_in_range(app, name, lower=None, upper=None,
                                exclude_lower=False, exclude_upper=False):
   if lower is None and upper is None:
-    assert_dependency(api, name)
-  elif not api.dependencies:
+    assert_app_dependency(app, name)
+  elif not app.dependencies:
     raise EagerPolicyAssertionException("Required dependency '{0}' not used".format(name))
 
   dep_found = False
-  for dependency in api.dependencies:
+  for dependency in app.dependencies:
     if name == dependency['name']:
       dep_found = True
       match_found = True

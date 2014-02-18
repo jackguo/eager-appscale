@@ -1,5 +1,5 @@
 from policy.assertions import *
-from policy.models import API
+from policy.models import Application
 
 try:
   from unittest import TestCase
@@ -9,190 +9,190 @@ except ImportError:
 class TestAssertions(TestCase):
 
   def test_assert_dependency_1(self):
-    api = API('foo', '1.0', [], 'admin')
+    app = Application('foo', '1.0', [], [], 'admin')
     try:
-      assert_dependency(api, 'bar', '1.0')
+      assert_app_dependency(app, 'bar', '1.0')
       self.fail('Assertion did not throw exception')
     except EagerPolicyAssertionException as ex:
       pass
 
   def test_assert_dependency_2(self):
-    api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.0'}], 'admin')
+    app = Application('foo', '1.0', [{'name' : 'bar', 'version' : '1.0'}], [], 'admin')
     try:
-      assert_dependency(api, 'bar', '1.0')
+      assert_app_dependency(app, 'bar', '1.0')
     except EagerPolicyAssertionException as ex:
       self.fail('Assertion threw exception')
 
   def test_assert_dependency_3(self):
-    api = API('foo', '1.0', [], 'admin')
+    app = Application('foo', '1.0', [], [], 'admin')
     try:
-      assert_dependency(api, 'bar')
+      assert_app_dependency(app, 'bar')
       self.fail('Assertion did not throw exception')
     except EagerPolicyAssertionException as ex:
       pass
 
   def test_assert_dependency_4(self):
-    api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.0'}], 'admin')
+    app = Application('foo', '1.0', [{'name' : 'bar', 'version' : '1.0'}], [], 'admin')
     try:
-      assert_dependency(api, 'bar')
+      assert_app_dependency(app, 'bar')
     except EagerPolicyAssertionException as ex:
       self.fail('Assertion threw exception')
 
   def test_assert_dependency_in_range_1(self):
-    api = API('foo', '1.0', [], 'admin')
+    app = Application('foo', '1.0', [], [], 'admin')
     try:
-      assert_dependency_in_range(api, 'bar', lower='1.0', upper='2.0')
+      assert_app_dependency_in_range(app, 'bar', lower='1.0', upper='2.0')
       self.fail('Assertion did not throw exception')
     except EagerPolicyAssertionException as ex:
       pass
 
   def test_assert_dependency_in_range_2(self):
-    api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.5'}], 'admin')
+    app = Application('foo', '1.0', [{'name' : 'bar', 'version' : '1.5'}], [], 'admin')
     try:
-      assert_dependency_in_range(api, 'bar', lower='1.0', upper='2.0')
+      assert_app_dependency_in_range(app, 'bar', lower='1.0', upper='2.0')
     except EagerPolicyAssertionException as ex:
       self.fail('Assertion threw exception')
 
   def test_assert_dependency_in_range_3(self):
-    api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.5'}], 'admin')
+    app = Application('foo', '1.0', [{'name' : 'bar', 'version' : '1.5'}], [], 'admin')
     try:
-      assert_dependency_in_range(api, 'bar', lower='2.0', upper='3.0')
+      assert_app_dependency_in_range(app, 'bar', lower='2.0', upper='3.0')
       self.fail('Assertion did not throw exception')
     except EagerPolicyAssertionException as ex:
       pass
 
   def test_assert_dependency_in_range_4(self):
-    api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.5'}], 'admin')
+    app = Application('foo', '1.0', [{'name' : 'bar', 'version' : '1.5'}], [], 'admin')
     try:
-      assert_dependency_in_range(api, 'bar', lower='1.5', upper='3.0', exclude_lower=True)
+      assert_app_dependency_in_range(app, 'bar', lower='1.5', upper='3.0', exclude_lower=True)
       self.fail('Assertion did not throw exception')
     except EagerPolicyAssertionException as ex:
       pass
 
   def test_assert_dependency_in_range_5(self):
-    api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.5'}], 'admin')
+    app = Application('foo', '1.0', [{'name' : 'bar', 'version' : '1.5'}], [], 'admin')
     try:
-      assert_dependency_in_range(api, 'bar', lower='1.0', upper='1.5', exclude_upper=True)
+      assert_app_dependency_in_range(app, 'bar', lower='1.0', upper='1.5', exclude_upper=True)
       self.fail('Assertion did not throw exception')
     except EagerPolicyAssertionException as ex:
       pass
 
   def test_assert_dependency_in_range_6(self):
-    api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.0'}], 'admin')
+    app = Application('foo', '1.0', [{'name' : 'bar', 'version' : '1.0'}], [], 'admin')
     try:
-      assert_dependency_in_range(api, 'bar', lower='1.5')
+      assert_app_dependency_in_range(app, 'bar', lower='1.5')
       self.fail('Assertion did not throw exception')
     except EagerPolicyAssertionException as ex:
       pass
 
   def test_assert_dependency_in_range_7(self):
-    api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.5'}], 'admin')
+    app = Application('foo', '1.0', [{'name' : 'bar', 'version' : '1.5'}], [], 'admin')
     try:
-      assert_dependency_in_range(api, 'bar', upper='1.0')
+      assert_app_dependency_in_range(app, 'bar', upper='1.0')
       self.fail('Assertion did not throw exception')
     except EagerPolicyAssertionException as ex:
       pass
 
   def test_assert_dependency_in_range_8(self):
-    api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.5'}], 'admin')
+    app = Application('foo', '1.0', [{'name' : 'bar', 'version' : '1.5'}], [], 'admin')
     try:
-      assert_dependency_in_range(api, 'bar')
+      assert_app_dependency_in_range(app, 'bar')
     except EagerPolicyAssertionException as ex:
       self.fail('Assertion threw exception')
 
     try:
-      assert_dependency_in_range(api, 'baz')
+      assert_app_dependency_in_range(app, 'baz')
       self.fail('Assertion did not throw exception')
     except EagerPolicyAssertionException as ex:
       pass
 
   def test_assert_dependency_in_range_9(self):
-    api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.0'}], 'admin')
+    app = Application('foo', '1.0', [{'name' : 'bar', 'version' : '1.0'}], [], 'admin')
     try:
-      assert_dependency_in_range(api, 'bar', lower='1.0')
+      assert_app_dependency_in_range(app, 'bar', lower='1.0')
     except EagerPolicyAssertionException as ex:
       self.fail('Assertion threw exception')
 
   def test_assert_dependency_in_range_10(self):
-    api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.0'}], 'admin')
+    app = Application('foo', '1.0', [{'name' : 'bar', 'version' : '1.0'}], [], 'admin')
     try:
-      assert_dependency_in_range(api, 'bar', upper='1.0')
+      assert_app_dependency_in_range(app, 'bar', upper='1.0')
     except EagerPolicyAssertionException as ex:
       self.fail('Assertion threw exception')
 
   def test_assert_dependency_in_range_11(self):
-    api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.5'}], 'admin')
+    app = Application('foo', '1.0', [{'name' : 'bar', 'version' : '1.5'}], [], 'admin')
     try:
-      assert_dependency_in_range(api, 'bar', lower='1.0', upper='2.0',
+      assert_app_dependency_in_range(app, 'bar', lower='1.0', upper='2.0',
         exclude_upper=True, exclude_lower=True)
     except EagerPolicyAssertionException as ex:
       self.fail('Assertion threw exception')
 
   def test_assert_dependency_in_range_12(self):
-    api = API('foo', '2.0', [{'name' : 'foo', 'version' : '1.0'}], 'admin')
+    app = Application('foo', '2.0', [{'name' : 'foo', 'version' : '1.0'}], [], 'admin')
     try:
-      assert_dependency_in_range(api, 'foo', upper='1.0')
+      assert_app_dependency_in_range(app, 'foo', upper='1.0')
     except EagerPolicyAssertionException as ex:
       self.fail('Assertion threw exception')
 
   def test_assert_dependency_in_range_13(self):
-    api = API('foo', '2.0', [{'name' : 'foo', 'version' : '1.5'}], 'admin')
+    app = Application('foo', '2.0', [{'name' : 'foo', 'version' : '1.5'}], [], 'admin')
     try:
-      assert_dependency_in_range(api, 'foo', upper='1.0')
+      assert_app_dependency_in_range(app, 'foo', upper='1.0')
       self.fail('Assertion did not throw exception')
     except EagerPolicyAssertionException as ex:
       pass
 
   def test_assert_dependency_in_range_14(self):
-    api = API('foo', '2.0', [{'name' : 'bar', 'version' : '1.0'}], 'admin')
+    app = Application('foo', '2.0', [{'name' : 'bar', 'version' : '1.0'}], [], 'admin')
     try:
-      assert_dependency_in_range(api, 'foo', upper='1.0')
+      assert_app_dependency_in_range(app, 'foo', upper='1.0')
       self.fail('Assertion did not throw exception')
     except EagerPolicyAssertionException as ex:
       pass
 
   def test_assert_not_dependency_1(self):
-    api = API('foo', '1.0', [], 'admin')
+    app = Application('foo', '1.0', [], [], 'admin')
     try:
-      assert_not_dependency(api, 'bar', '1.0')
+      assert_not_app_dependency(app, 'bar', '1.0')
     except EagerPolicyAssertionException as ex:
       self.fail('Assertion threw exception')
 
   def test_assert_not_dependency_2(self):
-    api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.0'}], 'admin')
+    app = Application('foo', '1.0', [{'name' : 'bar', 'version' : '1.0'}], [], 'admin')
     try:
-      assert_not_dependency(api, 'bar', '1.0')
+      assert_not_app_dependency(app, 'bar', '1.0')
       self.fail('Assertion did not throw exception')
     except EagerPolicyAssertionException as ex:
       pass
 
   def test_assert_not_dependency_3(self):
-    api = API('foo', '1.0', [], 'admin')
+    app = Application('foo', '1.0', [], [], 'admin')
     try:
-      assert_not_dependency(api, 'bar')
+      assert_not_app_dependency(app, 'bar')
     except EagerPolicyAssertionException as ex:
       self.fail('Assertion threw exception')
 
   def test_assert_not_dependency_4(self):
-    api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.0'}], 'admin')
+    app = Application('foo', '1.0', [{'name' : 'bar', 'version' : '1.0'}], [], 'admin')
     try:
-      assert_not_dependency(api, 'bar')
+      assert_not_app_dependency(app, 'bar')
       self.fail('Assertion did not throw exception')
     except EagerPolicyAssertionException as ex:
       pass
 
   def test_assert_not_dependency_5(self):
-    api = API('foo', '1.0', [{'name' : 'foo', 'version' : '1.0'}], 'admin')
+    app = Application('foo', '1.0', [{'name' : 'foo', 'version' : '1.0'}], [], 'admin')
     try:
-      assert_not_dependency(api, 'foo')
+      assert_not_app_dependency(app, 'foo')
       self.fail('Assertion did not throw exception')
     except EagerPolicyAssertionException as ex:
       pass
 
   def test_assert_not_dependency_6(self):
-    api = API('foo', '1.0', [{'name' : 'bar', 'version' : '1.0'}], 'admin')
+    app = Application('foo', '1.0', [{'name' : 'bar', 'version' : '1.0'}], [], 'admin')
     try:
-      assert_not_dependency(api, 'foo')
+      assert_not_app_dependency(app, 'foo')
     except EagerPolicyAssertionException as ex:
       self.fail('Assertion threw exception')
 

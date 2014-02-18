@@ -7,14 +7,14 @@ except ImportError:
 
 class TestPolicyLanguage(TestCase):
   def test_parser_1(self):
-    source = """assert_dependency(api, 'Foo', '1.0')"""
+    source = """assert_app_dependency(api, 'Foo', '1.0')"""
     try:
       validate_policy(source)
     except Exception as ex:
       self.fail("Unexpected error")
 
   def test_parser_2(self):
-    source = """assert_dependency(api, 'Foo', '1.0')
+    source = """assert_app_dependency(api, 'Foo', '1.0')
 open('foo.txt','r')"""
     try:
       validate_policy(source)
@@ -55,7 +55,7 @@ foo(bar())"""
 
   def test_parser_6(self):
     source = """if api.owner == 'alice':
-  assert_not_dependency(api, 'Foo', '1.0')"""
+  assert_not_app_dependency(api, 'Foo', '1.0')"""
     try:
       validate_policy(source)
     except Exception as ex:

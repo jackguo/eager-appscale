@@ -1,5 +1,5 @@
 import os
-from policy.models import API, Policy
+from policy.models import Application, Policy, API
 from policy.policy_language import EagerPolicyLanguageException
 
 try:
@@ -10,7 +10,7 @@ except ImportError:
 class TestModels(TestCase):
 
   def test_api_immutability(self):
-    api = API('Foo', '1.0', [], 'admin')
+    api = API('Foo', '1.0')
     self.assertEquals('Foo', api.name)
     self.assertEquals('1.0', api.version)
     try:
@@ -39,6 +39,40 @@ class TestModels(TestCase):
 
     try:
       setattr(api, 'newattr', 'Bar')
+      self.fail('api object not immutable')
+    except AttributeError as ex:
+      pass
+
+  def test_app_immutability(self):
+    app = Application('Foo', '1.0', [], [], 'admin')
+    self.assertEquals('Foo', app.name)
+    self.assertEquals('1.0', app.version)
+    try:
+      app.name = 'Bar'
+      self.fail('name attribute not immutable')
+    except AttributeError:
+      pass
+
+    try:
+      app.version = '2.0'
+      self.fail('version attribute not immutable')
+    except AttributeError:
+      pass
+
+    try:
+      delattr(app, 'name')
+      self.fail('name attribute not immutable')
+    except AttributeError as ex:
+      pass
+
+    try:
+      setattr(app, 'name', 'Bar')
+      self.fail('name attribute not immutable')
+    except AttributeError as ex:
+      pass
+
+    try:
+      setattr(app, 'newattr', 'Bar')
       self.fail('api object not immutable')
     except AttributeError as ex:
       pass

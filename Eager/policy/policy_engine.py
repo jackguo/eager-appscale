@@ -1,7 +1,7 @@
 import os
 import re
 import sys
-from policy.models import API, Policy
+from policy.models import Policy, Application, API
 from utils import utils
 
 class PolicyEngine:
@@ -22,12 +22,15 @@ class PolicyEngine:
           except Exception as ex:
             utils.log("Error while loading policy '{0}': {1}".format(policy_file, str(ex)))
 
-  def run_policy_enforcement(self, name, version, dependencies, username):
+  def run_policy_enforcement(self, name, version, dependencies, api_list, owner):
     if self.active_policies:
-      api = API(name, version, dependencies, username)
+      immutable_api_list = []
+      for api in api_list:
+        immutable_api_list.append(API(api['name'], api['version']))
+      app = Application(name, version, dependencies, immutable_api_list, owner)
       errors = []
       for policy in self.active_policies:
-        policy.evaluate(api, errors)
+        policy.evaluate(app, errors)
       if errors:
         return False, '|'.join(errors)
     return True, None

@@ -6,8 +6,22 @@ from utils import utils
 class API(tuple):
   __slots__ = []
 
-  def __new__(cls, name, version, dependencies, username):
-    return tuple.__new__(cls, (name, version, dependencies, username))
+  def __new__(cls, name, version):
+    return tuple.__new__(cls, (name, version))
+
+  @property
+  def name(self):
+    return tuple.__getitem__(self, 0)
+
+  @property
+  def version(self):
+    return tuple.__getitem__(self, 1)
+
+class Application(tuple):
+  __slots__ = []
+
+  def __new__(cls, name, version, dependencies, api_list, owner):
+    return tuple.__new__(cls, (name, version, dependencies, api_list, owner))
 
   @property
   def name(self):
@@ -22,8 +36,12 @@ class API(tuple):
     return tuple.__getitem__(self, 2)
 
   @property
-  def username(self):
+  def api_list(self):
     return tuple.__getitem__(self, 3)
+
+  @property
+  def owner(self):
+    return tuple.__getitem__(self, 4)
 
   def __getitem__(self, item):
     raise TypeError
@@ -46,7 +64,7 @@ class Policy:
     file_handle.close()
     return source_code
 
-  def evaluate(self, api, errors):
+  def evaluate(self, app, errors):
     source_code = self.__get_policy_content()
     try:
       validate_policy(source_code)
@@ -55,10 +73,10 @@ class Policy:
       return
 
     globals_map = globals().copy()
-    globals_map['api'] = api
-    globals_map['assert_dependency'] = assert_dependency
-    globals_map['assert_not_dependency'] = assert_not_dependency
-    globals_map['assert_dependency_in_range'] = assert_dependency_in_range
+    globals_map['app'] = app
+    globals_map['assert_app_dependency'] = assert_app_dependency
+    globals_map['assert_not_app_dependency'] = assert_not_app_dependency
+    globals_map['assert_app_dependency_in_range'] = assert_app_dependency_in_range
     globals_map['assert_true'] = assert_true
     globals_map['assert_false'] = assert_false
     globals_map['compare_versions'] = compare_versions
