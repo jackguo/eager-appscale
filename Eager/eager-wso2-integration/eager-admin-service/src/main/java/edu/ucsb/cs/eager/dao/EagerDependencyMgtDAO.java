@@ -20,6 +20,7 @@
 package edu.ucsb.cs.eager.dao;
 
 import edu.ucsb.cs.eager.models.APIInfo;
+import edu.ucsb.cs.eager.models.ApplicationInfo;
 import edu.ucsb.cs.eager.models.DependencyInfo;
 import edu.ucsb.cs.eager.models.EagerException;
 import org.apache.commons.logging.Log;
@@ -115,11 +116,12 @@ public class EagerDependencyMgtDAO {
         }
     }
 
-    public boolean recordDependencies(APIInfo api, DependencyInfo[] dependencies) throws EagerException {
+    public boolean recordDependencies(ApplicationInfo app) throws EagerException {
         Connection conn = null;
         PreparedStatement ps = null;
         String deleteQuery = "DELETE FROM EAGER_API_DEPENDENCY WHERE " +
-                "EAGER_DEPENDENT_NAME=? AND EAGER_DEPENDENT_VERSION=?";
+                "(EAGER_DEPENDENT_NAME=? AND EAGER_DEPENDENT_VERSION=?) OR " +
+                "(EAGER_DEPENDENCY_NAME=? AND EAGER_DEPENDENCY_VERSION=?)";
         String insertQuery = "INSERT INTO EAGER_API_DEPENDENCY (EAGER_DEPENDENCY_NAME, " +
                 "EAGER_DEPENDENCY_VERSION, EAGER_DEPENDENT_NAME, EAGER_DEPENDENT_VERSION, " +
                 "EAGER_DEPENDENCY_OPERATIONS) VALUES (?,?,?,?,?)";
@@ -127,18 +129,28 @@ public class EagerDependencyMgtDAO {
             conn = APIMgtDBUtil.getConnection();
 
             ps = conn.prepareStatement(deleteQuery);
-            ps.setString(1, api.getName());
-            ps.setString(2, api.getVersion());
+            ps.setString(1, app.getName());
+            ps.setString(2, app.getVersion());
+            ps.setString(3, app.getName());
+            ps.setString(4, app.getVersion());
             ps.executeUpdate();
             ps.close();
 
             ps = conn.prepareStatement(insertQuery);
-            for (DependencyInfo dependency : dependencies) {
+            for (DependencyInfo dependency : app.getDependencies()) {
                 ps.setString(1, dependency.getName());
                 ps.setString(2, dependency.getVersion());
-                ps.setString(3, api.getName());
-                ps.setString(4, api.getVersion());
+                ps.setString(3, app.getName());
+                ps.setString(4, app.getVersion());
                 ps.setString(5, getOperationsListAsString(dependency));
+                ps.addBatch();
+            }
+            for (APIInfo enclosedAPI : app.getEnclosedAPIs()) {
+                ps.setString(1, app.getName());
+                ps.setString(2, app.getVersion());
+                ps.setString(3, enclosedAPI.getName());
+                ps.setString(4, enclosedAPI.getVersion());
+                ps.setString(5, "");
                 ps.addBatch();
             }
             ps.executeBatch();

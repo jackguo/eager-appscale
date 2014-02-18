@@ -70,10 +70,9 @@ public class EagerAdmin {
         }
     }
 
-    public String validateDependencies(APIInfo api,
-                                           DependencyInfo[] dependencies) throws EagerException {
+    public String validateDependencies(ApplicationInfo app) throws EagerException {
         String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
-        for (DependencyInfo dependency : dependencies) {
+        for (DependencyInfo dependency : app.getDependencies()) {
             APIIdentifier apiId = new APIIdentifier(eagerAdmin, dependency.getName(),
                     dependency.getVersion());
             APIInfo dependencyApi = new APIInfo(apiId);
@@ -82,7 +81,7 @@ public class EagerAdmin {
             }
         }
 
-        DependencyGraph graph = new DependencyGraph(api.getName(), api.getVersion(), dependencies);
+        DependencyGraph graph = new DependencyGraph(app.getName(), app.getVersion(), app.getDependencies());
         if (graph.hasCycle()) {
             return "Cyclic dependency detected";
         }
@@ -94,14 +93,13 @@ public class EagerAdmin {
     }
 
     /**
-     * Record the dependencies of an API
+     * Record the dependencies of an application
      *
-     * @param api Dependent API
-     * @param dependencies An array of DependencyInfo objects, one per dependency
+     * @param app Dependent application
      * @return a boolean value indicating success or failure
      */
-    public boolean recordDependencies(APIInfo api, DependencyInfo[] dependencies) throws EagerException {
-        return dao.recordDependencies(api, dependencies);
+    public boolean recordDependencies(ApplicationInfo app) throws EagerException {
+        return dao.recordDependencies(app);
     }
 
     /**

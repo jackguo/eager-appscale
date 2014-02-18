@@ -20,6 +20,7 @@
 package edu.ucsb.cs.eager.dao;
 
 import edu.ucsb.cs.eager.models.APIInfo;
+import edu.ucsb.cs.eager.models.ApplicationInfo;
 import edu.ucsb.cs.eager.models.DependencyInfo;
 import edu.ucsb.cs.eager.models.EagerException;
 
@@ -41,10 +42,10 @@ public class CachedEagerDependencyMgtDAO extends EagerDependencyMgtDAO {
     }
 
     @Override
-    public boolean recordDependencies(APIInfo api, DependencyInfo[] dependencies) throws EagerException {
-        String key = getCacheKey(api.getName(), api.getVersion());
+    public boolean recordDependencies(ApplicationInfo app) throws EagerException {
+        String key = getCacheKey(app.getName(), app.getVersion());
         cache.remove(key);
-        return super.recordDependencies(api, dependencies);
+        return super.recordDependencies(app);
     }
 
     private String getCacheKey(String name, String version) {
