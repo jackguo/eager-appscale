@@ -35,11 +35,6 @@ class WSO2APIManager14Adaptor(APIManagerAdaptor):
     api = { 'name' : name, 'version' : version }
     return self.client.service.createAPI(api=api, specification=specification)
 
-
-  def get_dependency_validation_info(self, name, version):
-    api = { 'name' : name, 'version' : version }
-    return self.client.service.getValidationInfo(api=api)
-
   def publish_api(self, name, version, url):
     api = { 'name' : name, 'version' : version }
     return self.client.service.publishAPI(api=api, url=url)
