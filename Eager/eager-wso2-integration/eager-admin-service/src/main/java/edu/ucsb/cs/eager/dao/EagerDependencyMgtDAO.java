@@ -118,55 +118,71 @@ public class EagerDependencyMgtDAO {
 
     public boolean recordDependencies(ApplicationInfo app) throws EagerException {
         Connection conn = null;
-        PreparedStatement ps = null;
-        String deleteQuery = "DELETE FROM EAGER_API_DEPENDENCY WHERE " +
-                "(EAGER_DEPENDENT_NAME=? AND EAGER_DEPENDENT_VERSION=?) OR " +
-                "(EAGER_DEPENDENCY_NAME=? AND EAGER_DEPENDENCY_VERSION=?)";
-        String insertQuery = "INSERT INTO EAGER_API_DEPENDENCY (EAGER_DEPENDENCY_NAME, " +
-                "EAGER_DEPENDENCY_VERSION, EAGER_DEPENDENT_NAME, EAGER_DEPENDENT_VERSION, " +
-                "EAGER_DEPENDENCY_OPERATIONS) VALUES (?,?,?,?,?)";
         try {
             conn = APIMgtDBUtil.getConnection();
-
-            ps = conn.prepareStatement(deleteQuery);
-            ps.setString(1, app.getName());
-            ps.setString(2, app.getVersion());
-            ps.setString(3, app.getName());
-            ps.setString(4, app.getVersion());
-            ps.executeUpdate();
-            ps.close();
-
-            if (app.getDependencies() != null || app.getEnclosedAPIs() != null) {
-                ps = conn.prepareStatement(insertQuery);
-                if (app.getDependencies() != null) {
-                    for (DependencyInfo dependency : app.getDependencies()) {
-                        ps.setString(1, dependency.getName());
-                        ps.setString(2, dependency.getVersion());
-                        ps.setString(3, app.getName());
-                        ps.setString(4, app.getVersion());
-                        ps.setString(5, getOperationsListAsString(dependency));
-                        ps.addBatch();
-                    }
-                }
-                if (app.getEnclosedAPIs() != null) {
-                    for (APIInfo enclosedAPI : app.getEnclosedAPIs()) {
-                        ps.setString(1, app.getName());
-                        ps.setString(2, app.getVersion());
-                        ps.setString(3, enclosedAPI.getName());
-                        ps.setString(4, enclosedAPI.getVersion());
-                        ps.setString(5, "");
-                        ps.addBatch();
-                    }
-                }
-                ps.executeBatch();
-                ps.clearBatch();
-            }
+            deleteExistingDependencies(conn, app);
+            saveDependencies(conn, app);
+            conn.commit();
             return true;
         } catch (SQLException e) {
             handleException("Error while recording API dependency", e);
             return false;
         } finally {
-            APIMgtDBUtil.closeAllConnections(ps, conn, null);
+            APIMgtDBUtil.closeAllConnections(null, conn, null);
+        }
+    }
+
+    private void deleteExistingDependencies(Connection conn, ApplicationInfo app) throws SQLException {
+        String deleteQuery = "DELETE FROM EAGER_API_DEPENDENCY WHERE " +
+                "(EAGER_DEPENDENT_NAME=? AND EAGER_DEPENDENT_VERSION=?) OR " +
+                "(EAGER_DEPENDENCY_NAME=? AND EAGER_DEPENDENCY_VERSION=?)";
+        PreparedStatement psDelete = null;
+        try {
+            psDelete = conn.prepareStatement(deleteQuery);
+            psDelete.setString(1, app.getName());
+            psDelete.setString(2, app.getVersion());
+            psDelete.setString(3, app.getName());
+            psDelete.setString(4, app.getVersion());
+            psDelete.executeUpdate();
+        } finally {
+            APIMgtDBUtil.closeAllConnections(psDelete, null, null);
+        }
+    }
+
+    private void saveDependencies(Connection conn, ApplicationInfo app) throws SQLException {
+        if (app.getDependencies() == null && app.getEnclosedAPIs() == null) {
+            return;
+        }
+        String insertQuery = "INSERT INTO EAGER_API_DEPENDENCY (EAGER_DEPENDENCY_NAME, " +
+                "EAGER_DEPENDENCY_VERSION, EAGER_DEPENDENT_NAME, EAGER_DEPENDENT_VERSION, " +
+                "EAGER_DEPENDENCY_OPERATIONS) VALUES (?,?,?,?,?)";
+        PreparedStatement psInsert = null;
+        try {
+            psInsert = conn.prepareStatement(insertQuery);
+            if (app.getDependencies() != null) {
+                for (DependencyInfo dependency : app.getDependencies()) {
+                    psInsert.setString(1, dependency.getName());
+                    psInsert.setString(2, dependency.getVersion());
+                    psInsert.setString(3, app.getName());
+                    psInsert.setString(4, app.getVersion());
+                    psInsert.setString(5, getOperationsListAsString(dependency));
+                    psInsert.addBatch();
+                }
+            }
+            if (app.getEnclosedAPIs() != null) {
+                for (APIInfo enclosedAPI : app.getEnclosedAPIs()) {
+                    psInsert.setString(1, app.getName());
+                    psInsert.setString(2, app.getVersion());
+                    psInsert.setString(3, enclosedAPI.getName());
+                    psInsert.setString(4, enclosedAPI.getVersion());
+                    psInsert.setString(5, "");
+                    psInsert.addBatch();
+                }
+            }
+            psInsert.executeBatch();
+            psInsert.clearBatch();
+        } finally {
+            APIMgtDBUtil.closeAllConnections(psInsert, null, null);
         }
     }
 
