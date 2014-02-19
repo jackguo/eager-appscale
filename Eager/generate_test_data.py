@@ -59,8 +59,18 @@ def get_dependencies(api_id, max_api_id):
           'version' : '1.0'
         }
         dependencies.append(dep)
-
   return dependencies
+
+def add_application(eager_client, secret, app):
+  response = eager_client.validate_application_for_deployment(secret, app)
+  if response['success']:
+    print 'Application {0} validated successfully'.format(app['name'])
+    for api in app['api_list']:
+      pub_response = eager_client.publish_api(secret, api, 'http://192.168.33.101:8080')
+      if not pub_response['success']:
+        print 'Failed to publish API {0}: {1}'.format(api['name'], pub_response['reason'])
+  else:
+    print 'Failed to validate application {0}: {1}'.format(app['name'], response['reason'])
 
 if __name__ == '__main__':
   MAX_API_COUNT = 1
@@ -94,13 +104,5 @@ if __name__ == '__main__':
     }
     api_id -= len(api_list)
     app_count += 1
-    response = eager.validate_application_for_deployment(secret, app)
-    if response['success']:
-      print 'Application {0} validated successfully'.format(app['name'])
-      for api in api_list:
-        pub_response = eager.publish_api(secret, api, 'http://192.168.33.101:8080')
-        if not pub_response['success']:
-          print 'Failed to publish API {0}: {1}'.format(api['name'], pub_response['reason'])
-    else:
-      print 'Failed to validate application {0}: {1}'.format(app['name'], response['reason'])
+    add_application(eager, secret, app)
     print
