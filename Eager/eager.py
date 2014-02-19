@@ -27,7 +27,6 @@ class Eager:
   REASON_API_ALREADY_PUBLISHED = 'API already published'
   REASON_BAD_DEPENDENCIES = 'Bad dependencies'
   REASON_DEPENDENCY_RECORDING_FAILED = 'Failed to record API dependencies'
-  REASON_BAD_API_SPEC = 'Bad API specification'
 
   CONFIG_FILE = 'eager.yaml'
 
@@ -164,8 +163,7 @@ class Eager:
     if api_list:
       for api_info in api_list:
         if api_info.name != name:
-          message = 'API name is too similar to: {0}'.format(api_info.name)
-          return False, 'API name is too similar to some names already in use'
+          return False, 'API name is too similar to: {0}'.format(api_info.name)
       utils.log("Context {0} is available for use".format(context))
     else:
       utils.log("Context {0} is not taken by any other API".format(context))
