@@ -136,29 +136,31 @@ public class EagerDependencyMgtDAO {
             ps.executeUpdate();
             ps.close();
 
-            ps = conn.prepareStatement(insertQuery);
-            if (app.getDependencies() != null) {
-                for (DependencyInfo dependency : app.getDependencies()) {
-                    ps.setString(1, dependency.getName());
-                    ps.setString(2, dependency.getVersion());
-                    ps.setString(3, app.getName());
-                    ps.setString(4, app.getVersion());
-                    ps.setString(5, getOperationsListAsString(dependency));
-                    ps.addBatch();
+            if (app.getDependencies() != null || app.getEnclosedAPIs() != null) {
+                ps = conn.prepareStatement(insertQuery);
+                if (app.getDependencies() != null) {
+                    for (DependencyInfo dependency : app.getDependencies()) {
+                        ps.setString(1, dependency.getName());
+                        ps.setString(2, dependency.getVersion());
+                        ps.setString(3, app.getName());
+                        ps.setString(4, app.getVersion());
+                        ps.setString(5, getOperationsListAsString(dependency));
+                        ps.addBatch();
+                    }
                 }
-            }
-            if (app.getEnclosedAPIs() != null) {
-                for (APIInfo enclosedAPI : app.getEnclosedAPIs()) {
-                    ps.setString(1, app.getName());
-                    ps.setString(2, app.getVersion());
-                    ps.setString(3, enclosedAPI.getName());
-                    ps.setString(4, enclosedAPI.getVersion());
-                    ps.setString(5, "");
-                    ps.addBatch();
+                if (app.getEnclosedAPIs() != null) {
+                    for (APIInfo enclosedAPI : app.getEnclosedAPIs()) {
+                        ps.setString(1, app.getName());
+                        ps.setString(2, app.getVersion());
+                        ps.setString(3, enclosedAPI.getName());
+                        ps.setString(4, enclosedAPI.getVersion());
+                        ps.setString(5, "");
+                        ps.addBatch();
+                    }
                 }
+                ps.executeBatch();
+                ps.clearBatch();
             }
-            ps.executeBatch();
-            ps.clearBatch();
             return true;
         } catch (SQLException e) {
             handleException("Error while recording API dependency", e);
