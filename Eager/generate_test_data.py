@@ -77,7 +77,6 @@ if __name__ == '__main__':
   if len(sys.argv) > 1:
     MAX_API_COUNT = int(sys.argv[1])
     print 'Generating test data for {0} sample APIs'.format(MAX_API_COUNT)
-    exit(1)
 
   secret = utils.get_secret()
   eager = Eager()
