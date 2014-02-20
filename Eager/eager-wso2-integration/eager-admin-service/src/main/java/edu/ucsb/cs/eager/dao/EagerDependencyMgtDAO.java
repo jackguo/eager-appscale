@@ -25,6 +25,7 @@ import edu.ucsb.cs.eager.models.DependencyInfo;
 import edu.ucsb.cs.eager.models.EagerException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.apimgt.api.model.APIIdentifier;
 import org.wso2.carbon.apimgt.impl.utils.APIMgtDBUtil;
 
 import java.sql.Connection;
@@ -71,6 +72,40 @@ public class EagerDependencyMgtDAO {
             return dependencies.toArray(new DependencyInfo[dependencies.size()]);
         } catch (SQLException e) {
             handleException("Error while obtaining API dependency information", e);
+            return null;
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+        }
+    }
+
+    public APIInfo[] getAPIsWithContext(String context) throws EagerException {
+        String selectQuery = "SELECT" +
+                " API.API_PROVIDER AS PROVIDER," +
+                " API.API_NAME AS NAME," +
+                " API.API_VERSION AS VERSION " +
+                "FROM" +
+                " AM_API API " +
+                "WHERE" +
+                " API.CONTEXT=?";
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            ps = conn.prepareStatement(selectQuery);
+            ps.setString(1, context);
+            rs = ps.executeQuery();
+            List<APIInfo> result = new ArrayList<APIInfo>();
+            while (rs.next()) {
+                APIIdentifier apiId = new APIIdentifier(rs.getString("PROVIDER"),
+                        rs.getString("NAME"), rs.getString("VERSION"));
+                APIInfo api = new APIInfo(apiId);
+                result.add(api);
+            }
+
+            return result.toArray(new APIInfo[result.size()]);
+        } catch (SQLException e) {
+            handleException("Error while obtaining API metadata", e);
             return null;
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, conn, rs);

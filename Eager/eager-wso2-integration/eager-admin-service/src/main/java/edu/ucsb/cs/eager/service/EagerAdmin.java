@@ -53,7 +53,7 @@ public class EagerAdmin {
     }
 
     public APIInfo[] getAPIsWithContext(String context) throws EagerException {
-        String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
+        /*String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
         try {
             APIProvider provider = getAPIProvider(eagerAdmin);
             List<API> apiList = provider.getAllAPIs();
@@ -67,7 +67,8 @@ public class EagerAdmin {
         } catch (APIManagementException e) {
             handleException("Error while retrieving APIs", e);
             return null;
-        }
+        }*/
+        return dao.getAPIsWithContext(context);
     }
 
     public String validateDependencies(ApplicationInfo app) throws EagerException {
