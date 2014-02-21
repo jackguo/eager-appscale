@@ -21,6 +21,7 @@ class PolicyEngine:
             self.active_policies.append(policy)
           except Exception as ex:
             utils.log("Error while loading policy '{0}': {1}".format(policy_file, str(ex)))
+    utils.log("Initialized policy engine with {0} policies".format(len(self.active_policies)))
 
   def run_policy_enforcement(self, name, version, dependencies, api_list, owner):
     if self.active_policies:
