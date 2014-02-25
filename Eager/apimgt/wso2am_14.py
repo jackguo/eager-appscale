@@ -72,13 +72,10 @@ class WSO2APIManager14Adaptor(APIManagerAdaptor):
       return None
 
   def record_application_dependencies(self, name, version, enclosedAPIs, dependencies):
-    if enclosedAPIs or dependencies:
-      app = {
-        'name' : name,
-        'version' : version,
-        'enclosedAPIs' : enclosedAPIs,
-        'dependencies' : dependencies
-      }
-      return self.client.service.recordDependencies(app=app)
-    else:
-      return True
+    app = {
+      'name' : name,
+      'version' : version,
+      'enclosedAPIs' : enclosedAPIs,
+      'dependencies' : dependencies
+    }
+    return self.client.service.recordDependencies(app=app)
