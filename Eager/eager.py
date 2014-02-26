@@ -23,8 +23,8 @@ class Eager:
   REASON_API_VALIDATION_FAILED = 'API validation failed'
   REASON_API_POLICY_VIOLATION = 'API violates one or more policies'
   REASON_BAD_API_METADATA = 'API contains wrong or invalid metadata'
-  REASON_API_PUBLISH_SUCCESS = 'API published successfully'
-  REASON_API_ALREADY_PUBLISHED = 'API already published'
+  REASON_API_PUBLISH_SUCCESS = 'APIs published successfully'
+  REASON_API_PUBLISH_FAILED = 'Failed to publish one or more APIs'
   REASON_BAD_DEPENDENCIES = 'Bad dependencies'
   REASON_DEPENDENCY_RECORDING_FAILED = 'Failed to record API dependencies'
 
@@ -103,18 +103,22 @@ class Eager:
 
     return self.__generate_response(True, self.REASON_API_VALIDATION_SUCCESS)
 
-  def publish_api(self, secret, api, url):
+  def publish_api_list(self, secret, api_list, url):
     if self.secret != secret:
       return self.__generate_response(False, self.REASON_BAD_SECRET)
 
-    name = api['name']
-    version = api['version']
-    if self.adaptor.publish_api(name, version, url):
-      utils.log("API {0}-v{1} published successfully".format(name, version))
+    temp_api_list = []
+    for api in api_list:
+      temp_api_list.append({ 'name' : api['name'], 'version' : api['version'] })
+
+    success, message = self.adaptor.publish_api_list(temp_api_list, url)
+    if success:
+      utils.log("{0} APIs published successfully".format(len(api_list)))
       return self.__generate_response(True, self.REASON_API_PUBLISH_SUCCESS)
     else:
-      utils.log("API {0}-v{1} is already published".format(name, version))
-      return self.__generate_response(True, self.REASON_API_ALREADY_PUBLISHED)
+      utils.log("Failed to publish one or more APIs: {0}".format(message))
+      detail = { 'detail' : message }
+      return self.__generate_response(False, self.REASON_API_PUBLISH_FAILED, detail)
 
   def __is_api_name_valid(self, name):
     for char in "'/ &+@%\"<>":

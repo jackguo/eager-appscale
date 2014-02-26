@@ -196,50 +196,53 @@ public class EagerAdmin {
     }
 
     /**
-     * Publish the specified API to the API Store and Gateway.
+     * Publish the specified API list to the API Store and Gateway.
      *
-     * @param api API to be publishes
-     * @param url Backend URL to which API should forward traffic
-     * @return true if the operation is successful, and false if the API is already in a
-     * published state
-     * @throws EagerException If the specified API does not exist or if some other
+     * @param apiList List of APIs to be published
+     * @param url Backend URL to which APIs should forward traffic
+     * @return true if the operation is successful -- Never returns false. Throws an exception
+     * to indicate failure
+     * @throws EagerException If any of the APIs does not exist or if some other
      * runtime error occurs
      */
-    public boolean publishAPI(APIInfo api, String url) throws EagerException {
-        if (!isAPIAvailable(api)) {
-            throw new EagerException("API " + api.getName() + "-v" +
-                    api.getVersion() + " does not exist");
+    public boolean publishAPIs(APIInfo[] apiList, String url) throws EagerException {
+        for (APIInfo api : apiList) {
+            if (!isAPIAvailable(api)) {
+                throw new EagerException("API " + api.getName() + "-v" +
+                        api.getVersion() + " does not exist");
+            }
         }
 
-        try {
-            String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
-            APIProvider provider = getAPIProvider(eagerAdmin);
-            APIIdentifier apiId = new APIIdentifier(eagerAdmin, api.getName(), api.getVersion());
-            API existingAPI = provider.getAPI(apiId);
-            if (existingAPI.getStatus() != APIStatus.PUBLISHED) {
-                existingAPI.setUrl(url);
-                String[] methods = new String[] {
-                        "GET", "POST", "PUT", "DELETE", "OPTIONS"
-                };
-                Set<URITemplate> templates = new HashSet<URITemplate>();
-                for (String method : methods) {
-                    URITemplate template = new URITemplate();
-                    template.setHTTPVerb(method);
-                    template.setUriTemplate("/*");
-                    template.setAuthType(APIConstants.AUTH_APPLICATION_OR_USER_LEVEL_TOKEN);
-                    template.setResourceURI(url);
-                    templates.add(template);
+        for (APIInfo api : apiList) {
+            try {
+                String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
+                APIProvider provider = getAPIProvider(eagerAdmin);
+                APIIdentifier apiId = new APIIdentifier(eagerAdmin, api.getName(), api.getVersion());
+                API existingAPI = provider.getAPI(apiId);
+                if (existingAPI.getStatus() != APIStatus.PUBLISHED) {
+                    existingAPI.setUrl(url);
+                    String[] methods = new String[] {
+                            "GET", "POST", "PUT", "DELETE", "OPTIONS"
+                    };
+                    Set<URITemplate> templates = new HashSet<URITemplate>();
+                    for (String method : methods) {
+                        URITemplate template = new URITemplate();
+                        template.setHTTPVerb(method);
+                        template.setUriTemplate("/*");
+                        template.setAuthType(APIConstants.AUTH_APPLICATION_OR_USER_LEVEL_TOKEN);
+                        template.setResourceURI(url);
+                        templates.add(template);
+                    }
+                    existingAPI.setUriTemplates(templates);
+                    existingAPI.setLastUpdated(new Date());
+                    provider.updateAPI(existingAPI);
+                    provider.changeAPIStatus(existingAPI, APIStatus.PUBLISHED, eagerAdmin, true);
                 }
-                existingAPI.setUriTemplates(templates);
-                existingAPI.setLastUpdated(new Date());
-                provider.updateAPI(existingAPI);
-                provider.changeAPIStatus(existingAPI, APIStatus.PUBLISHED, eagerAdmin, true);
-                return true;
+            } catch (APIManagementException e) {
+                handleException("Error while publishing API", e);
             }
-        } catch (APIManagementException e) {
-            handleException("Error while publishing API", e);
         }
-        return false;
+        return true;
     }
 
     private APIProvider getAPIProvider(String providerName) throws APIManagementException {

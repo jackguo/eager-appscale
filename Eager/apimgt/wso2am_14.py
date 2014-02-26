@@ -35,9 +35,12 @@ class WSO2APIManager14Adaptor(APIManagerAdaptor):
     api = { 'name' : name, 'version' : version }
     return self.client.service.createAPI(api=api, specification=specification)
 
-  def publish_api(self, name, version, url):
-    api = { 'name' : name, 'version' : version }
-    return self.client.service.publishAPI(api=api, url=url)
+  def publish_api_list(self, api_list, url):
+    try:
+      result = self.client.service.publishAPIs(apiList=api_list, url=url)
+      return result, None
+    except Exception as ex:
+      return False, str(ex)
 
   def update_api_specification(self, name, version, specification):
     api = { 'name' : name, 'version' : version }

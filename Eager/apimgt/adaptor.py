@@ -33,7 +33,7 @@ class APIManagerAdaptor(object):
   def create_api(self, name, version, specification):
     raise NotImplementedError
 
-  def publish_api(self, name, version, url):
+  def publish_api_list(self, api_list, url):
     raise NotImplementedError
 
   def update_api_specification(self, name, version, specification):
