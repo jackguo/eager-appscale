@@ -53,7 +53,7 @@ def add_mashup_set(lines, eager, secret, spec):
   count = 1
   for k,v in mashups.items():
     api_name = k.lower()
-    for char in "'/ &+@%\"<>":
+    for char in "'/ &+*@%\"<>":
       api_name = api_name.replace(char, '')
     api_name = 'm{0}_{1}'.format(count, api_name)
     spec['apiName'] = api_name
