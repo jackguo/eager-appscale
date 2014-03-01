@@ -4888,7 +4888,7 @@
 2601 Dynamic Geometry /api/dynamic-geometry
 2602 DynDNS /api/dyndns
 2603 Dynmark /api/dynmark
-2604 E*TRADE /api/e*trade
+2604 E*TRADE /api/etrade
 2605 E-additives /api/e-additives
 2606 E-Cash /api/e-cash
 2607 e-conomic /api/e-conomic
