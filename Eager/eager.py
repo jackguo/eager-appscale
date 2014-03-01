@@ -113,7 +113,10 @@ class Eager:
 
     success, message = self.adaptor.publish_api_list(temp_api_list, url)
     if success:
-      utils.log("{0} APIs published successfully".format(len(api_list)))
+      if len(api_list) == 1:
+        utils.log("API published successfully")
+      else:
+        utils.log("{0} APIs published successfully".format(len(api_list)))
       return self.__generate_response(True, self.REASON_API_PUBLISH_SUCCESS)
     else:
       utils.log("Failed to publish one or more APIs: {0}".format(message))
