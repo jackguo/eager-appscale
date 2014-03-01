@@ -65,10 +65,10 @@ def add_application(eager_client, secret, app):
   response = eager_client.validate_application_for_deployment(secret, app)
   if response['success']:
     print 'Application {0} validated successfully'.format(app['name'])
-    for api in app['api_list']:
-      pub_response = eager_client.publish_api(secret, api, 'http://192.168.33.101:8080')
-      if not pub_response['success']:
-        print 'Failed to publish API {0}: {1}'.format(api['name'], pub_response['reason'])
+    pub_response = eager_client.publish_api_list(secret, app['api_list'], 'http://192.168.33.101:8080')
+    if not pub_response['success']:
+      api = app['api_list'][0]
+      print 'Failed to publish API {0}: {1}'.format(api['name'], pub_response['reason'])
   else:
     print 'Failed to validate application {0}: {1}'.format(app['name'], response['reason'])
 
