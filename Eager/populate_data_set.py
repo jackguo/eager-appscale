@@ -51,9 +51,10 @@ def add_mashup_set(lines, eager, secret, spec):
   print 'Found {0} APIs with dependencies'.format(len(mashups))
 
   count = 1
-  for k,v in mashups.items():
+  for k in sorted(mashups.keys()):
+    v = mashups[k]
     api_name = k.lower()
-    for char in "'/ &+*@%\"<>":
+    for char in "'/ &+*@%\"<>!,":
       api_name = api_name.replace(char, '')
     api_name = 'm{0}_{1}'.format(count, api_name)
     spec['apiName'] = api_name

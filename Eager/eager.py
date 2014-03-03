@@ -124,7 +124,7 @@ class Eager:
       return self.__generate_response(False, self.REASON_API_PUBLISH_FAILED, detail)
 
   def __is_api_name_valid(self, name):
-    for char in "'/ &+*@%\"<>":
+    for char in "'/ &+*@%\"<>!,":
       if char in name:
         return False
     return True
