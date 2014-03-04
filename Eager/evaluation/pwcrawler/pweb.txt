@@ -7566,7 +7566,7 @@
 3454 FreeAgent /api/freeagent
 3455 Freebase /api/freebase
   --> Airplane Specifications, Photos, and Videos
-  --> ASK KEN� - Visual Knowledge Browser
+  --> ASK KEN - Visual Knowledge Browser
   --> Autorifi
   --> BioVenturist
   --> Black Swan Events
@@ -8632,7 +8632,7 @@
   --> Facebook Spectrum
   --> Find a Car
   --> flickstr
-  --> Google Analytics + Olark = Understand your Chat Conversion
+  --> Google AnalyticsPlusOlarkEqualsUnderstand your Chat Conversion
   --> Google Analytics and Box.net
   --> Google Analytics Counter
   --> Gwannon.com
@@ -10217,7 +10217,7 @@
   --> Get Directions
   --> GetParking
   --> gFeedMap
-  --> Ghidul Turistic al Municipiului Bălţi
+  --> Ghidul Turistic al Municipiului BAlAfi
   --> Ghost Logs
   --> Gigpig
   --> gigul8r
@@ -24529,7 +24529,7 @@
   --> Pickemfirst
   --> Yahoo Fantasy Tools
 10854 Yahoo Geo Location /api/yahoo-geo-location
-  --> Can I Leave? — Weather Forecast in real-time
+  --> Can I Leave? Weather Forecast in real-time
   --> Local Geonius 
 10855 Yahoo Geocoding /api/yahoo-geocoding
   --> 100 Most Powerful Celebrities
@@ -24968,7 +24968,7 @@
   --> Avatar Portraits
   --> Beds and Bedroom News
   --> Big Picture Small World
-  --> Can I Leave? — Weather Forecast in real-time
+  --> Can I Leave? Weather Forecast in real-time
   --> Delicious Search Exploder
   --> FKScan
   --> Forumsquare
@@ -25279,7 +25279,7 @@
   --> ZabboWabbo
 10890 Yahoo Weather /api/yahoo-weather
   --> Automagical.ly
-  --> Can I Leave? — Weather Forecast in real-time
+  --> Can I Leave? Weather Forecast in real-time
   --> Geo Location Atlas
   --> Local streamer
   --> Mood Music

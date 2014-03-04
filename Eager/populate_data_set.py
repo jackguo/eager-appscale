@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import string
 
 import sys
 from eager import Eager
@@ -53,10 +54,7 @@ def add_mashup_set(lines, eager, secret, spec):
   count = 1
   for k in sorted(mashups.keys()):
     v = mashups[k]
-    api_name = k.lower()
-    for char in "'/ &+*@%\"<>!,#;^(){}|~":
-      api_name = api_name.replace(char, '')
-    api_name = 'm{0}_{1}'.format(count, api_name)
+    api_name = 'm{0}_{1}'.format(count, cleanup_string(k))
     spec['apiName'] = api_name
     api = {
       'name' : api_name,
@@ -74,6 +72,9 @@ def add_mashup_set(lines, eager, secret, spec):
     add_application(eager, secret, app)
     count += 1
 
+def cleanup_string(s):
+  s = string.translate(s.lower(), None, "'/ &+*@%\"<>!,#;^(){}|~=")
+  return ''.join([i if ord(i) < 128 else '' for i in s])
 
 if __name__ == '__main__':
   secret = utils.get_secret()
@@ -88,4 +89,3 @@ if __name__ == '__main__':
 
   add_api_set(lines, eager, secret, spec)
   add_mashup_set(lines, eager, secret, spec)
-
