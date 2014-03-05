@@ -36,8 +36,6 @@ public class EagerAdmin {
 
     private static final Log log = LogFactory.getLog(EagerAdmin.class);
 
-    private static final String EAGER_DOC_NAME = "EagerSpec";
-
     private EagerDependencyMgtDAO dao = new EagerDependencyMgtDAO();
 
     public boolean isAPIAvailable(APIInfo api) throws EagerException {
@@ -110,20 +108,10 @@ public class EagerAdmin {
      * @return A ValidationInfo object carrying the specification of the API and its dependents
      */
     public ValidationInfo getValidationInfo(APIInfo api) throws EagerException {
-        try {
-            String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
-            APIProvider provider = getAPIProvider(eagerAdmin);
-            APIIdentifier apiId = new APIIdentifier(eagerAdmin, api.getName(), api.getVersion());
-            String specification = provider.getDocumentationContent(apiId, EAGER_DOC_NAME);
-
-            ValidationInfo info = new ValidationInfo();
-            info.setSpecification(specification);
-            info.setDependents(dao.getDependents(api));
-            return info;
-        } catch (APIManagementException e) {
-            handleException("Error while obtaining API validation information", e);
-            return null;
-        }
+        ValidationInfo info = new ValidationInfo();
+        info.setSpecification(dao.getAPISpec(api));
+        info.setDependents(dao.getDependents(api));
+        return info;
     }
 
     public boolean createAPI(APIInfo api, String specification) throws EagerException {
@@ -159,12 +147,7 @@ public class EagerAdmin {
             provider.addAPI(newAPI);
             log.info("Registered API: " + api.getName() + "-v" + api.getVersion());
 
-            Documentation doc = new Documentation(DocumentationType.OTHER, EAGER_DOC_NAME);
-            doc.setSourceType(Documentation.DocumentSourceType.INLINE);
-            doc.setLastUpdated(new Date());
-            doc.setOtherTypeName(EAGER_DOC_NAME);
-            provider.addDocumentation(apiId, doc);
-            provider.addDocumentationContent(apiId, EAGER_DOC_NAME, specification);
+            dao.saveAPISpec(api, specification);
             return true;
         } catch (APIManagementException e) {
             handleException("Error while creating new API", e);
@@ -177,22 +160,8 @@ public class EagerAdmin {
             return false;
         }
 
-        try {
-            String eagerAdmin = EagerAPIManagementComponent.getEagerAdmin();
-            APIProvider provider = getAPIProvider(eagerAdmin);
-            APIIdentifier apiId = new APIIdentifier(eagerAdmin, api.getName(), api.getVersion());
-
-            Documentation doc = new Documentation(DocumentationType.OTHER, EAGER_DOC_NAME);
-            doc.setSourceType(Documentation.DocumentSourceType.INLINE);
-            doc.setLastUpdated(new Date());
-            doc.setOtherTypeName(EAGER_DOC_NAME);
-            provider.updateDocumentation(apiId, doc);
-            provider.addDocumentationContent(apiId, EAGER_DOC_NAME, specification);
-            return true;
-        } catch (APIManagementException e) {
-            handleException("Error while updating API specification", e);
-            return false;
-        }
+        dao.updateAPISpec(api, specification);
+        return true;
     }
 
     /**

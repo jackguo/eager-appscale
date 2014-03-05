@@ -167,6 +167,75 @@ public class EagerDependencyMgtDAO {
         }
     }
 
+    public void saveAPISpec(APIInfo api, String specification) throws EagerException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        String insertQuery = "INSERT INTO EAGER_API_SPEC (EAGER_API_NAME, EAGER_API_VERSION, " +
+                "EAGER_API_SPEC_TEXT) VALUES (?,?,?)";
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            ps = conn.prepareStatement(insertQuery);
+            ps.setString(1, api.getName());
+            ps.setString(2, api.getVersion());
+            ps.setString(3, specification);
+            ps.executeUpdate();
+            conn.commit();
+        } catch (SQLException e) {
+            handleException("Error while recording API specification", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, null);
+        }
+    }
+
+    public void updateAPISpec(APIInfo api, String specification) throws EagerException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        String updateQuery = "UPDATE EAGER_API_SPEC SET EAGER_API_SPEC_TEXT=? WHERE " +
+                "EAGER_API_NAME=? AND EAGER_API_VERSION=?";
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            ps = conn.prepareStatement(updateQuery);
+            ps.setString(1, specification);
+            ps.setString(2, api.getName());
+            ps.setString(3, api.getVersion());
+            ps.executeUpdate();
+            conn.commit();
+        } catch (SQLException e) {
+            handleException("Error while recording API specification", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, null);
+        }
+    }
+
+    public String getAPISpec(APIInfo api) throws EagerException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        String selectQuery = "SELECT" +
+                " SPEC.EAGER_API_NAME AS API_NAME," +
+                " SPEC.EAGER_API_VERSION AS API_VERSION," +
+                " SPEC.EAGER_API_SPEC_TEXT AS API_SPEC_TEXT " +
+                "FROM" +
+                " EAGER_API_SPEC SPEC " +
+                "WHERE" +
+                " SPEC.EAGER_API_NAME=? AND SPEC.EAGER_API_VERSION=?";
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            ps = conn.prepareStatement(selectQuery);
+            ps.setString(1, api.getName());
+            ps.setString(2, api.getVersion());
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString("API_SPEC_TEXT");
+            }
+        } catch (SQLException e) {
+            handleException("Error while recording API specification", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+        }
+        return null;
+    }
+
     private void deleteExistingDependencies(Connection conn, ApplicationInfo app) throws SQLException {
         String deleteQuery = "DELETE FROM EAGER_API_DEPENDENCY WHERE " +
                 "(EAGER_DEPENDENT_NAME=? AND EAGER_DEPENDENT_VERSION=?) OR " +
