@@ -1,0 +1,83 @@
+\documentclass[conference]{acm_proc_article-sp}
+
+\usepackage{listings}
+\usepackage{amssymb}
+\usepackage{pifont}
+\usepackage{url}
+\usepackage{flushend}
+\newcommand{\xmark}{\ding{55}}%
+\usepackage[lined,boxed]{algorithm2e}
+\newcommand{\ignore}[1]{}
+
+\usepackage{graphicx}
+\DeclareGraphicsExtensions{.png}
+\graphicspath{{./figures/}}
+
+\begin{document}
+
+\title{EAGER: Enforced API Governance Engine for REST}
+\author{Hiranya Jayathilaka, Chandra Krintz, Rich Wolski \\
+       \affaddr{Department of Computer Science}\\
+       \affaddr{University of California, Santa Barbara}\\
+       \affaddr{Santa Barbara, CA, USA}\\
+       \email{\{hiranya,ckrintz,rich\}@cs.ucsb.edu}
+}
+\maketitle
+
+\begin{abstract}
+\input{abstract}
+\end{abstract}
+
+%A category including the fourth, optional field follows...
+\category{D.2.2}{Software Engineering}{Design Tools and Techniques}[Modules and interfaces]
+\category{D.2.7}{Software Engineering}{Distribution, Maintenance, and Enhancement}[Portability]
+
+\terms{Experimentation, Languages, Management}
+
+\keywords{Web services, Web APIs, API Governance} % NOT required for Proceedings
+
+\section{Introduction}
+\label{sec:intro}
+\input{intro}
+
+\section{Background}
+\subsection{API Governance}
+\subsection{Cloud Computing and Web APIs}
+%\label{sec:bg}
+%\input{background}
+
+\section{Design}
+\subsection{API Deployment Coordinator}
+\subsection{Metadata Manager}
+\subsection{Policy Engine and Language}
+\subsection{API Discovery Portal}
+\subsection{API Gateway}
+
+\section{Prototype Implementation}
+
+\section{Experimental Results}
+%\label{sec:results}
+%\input{results}
+
+%\section{Analysis and Discussion}
+%\label{sec:disc}
+%\input{discussion}
+
+\section{Future Work}
+%\label{sec:future}
+%\input{future}
+
+\section{Related Work}
+%\label{sec:related}
+%\input{related}
+
+\section{Conclusions}
+%\label{sec:conc}
+%\input{conc}
+
+\footnotesize
+\bibliographystyle{IEEEtran}
+\bibliography{eager}
+
+
+\end{document}

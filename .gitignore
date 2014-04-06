@@ -3,3 +3,8 @@
 *.pyc
 *.idea
 *.iws
+*.log
+*.synctex.gz
+*.blb
+*.pdf
+*.aux
