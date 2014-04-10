@@ -94,7 +94,7 @@ WS-Agreement~\cite{WSAgreement} in that it avoids the verbosity of XML,
 and it incorporates a developer-friendly Python programming language syntax for 
 specifying even the most complex policy statements in a simple and 
 intuitive manner. Moreover, we ensure that specifying the required policies 
-is the only additional activity that API provides should perform in
+is the only additional activity that API providers should perform in
 order to benefit from EAGER. All other API governance related verification and 
 enforcement work is carried out by the cloud platform automatically.
 
@@ -105,8 +105,9 @@ cloud platform that emulates Google App Engine. We show that the EAGER
 architecture can be easily implemented in extant clouds with
 minimal changes to the underlying platform technology. We further show that 
 EAGER API governance and policy enforcement impose a negligible 
-overhead on the API deployment process and policy enforcement
-is linear in the number of APIs.  Finally, we show that EAGER is able to
+overhead on the application deployment process, and the overhead
+is linear in the number of APIs present in the application being validated.  
+Finally, we show that EAGER is able to
 scale to tens of thousands of deployed web APIs and hundreds of user 
 defined governance policies.
 
