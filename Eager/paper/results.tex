@@ -110,3 +110,74 @@ all dependency related information via batch operations. That is, it sends all t
 Manager as a single batch. After validating and verifying the dependencies, Metadata Manager uses SQL batch operations to record
 them in the database. As a result, the number of web service calls and database queries that originate due to varying number of dependencies
 is fairly constant. This results in a reasonably constant overhead for all cases considered.
+
+\subsection{Impact of Number of Policies on EAGER Overghead}
+
+So far all our experiments were conducted without any active governance policies in the system. In this section we report how EAGER overhead
+varies with the number of policies deployed in the PaaS. 
+
+We understand that the overhead of policy validation is largely dependent
+on the actual content (Python code) that's contained in the policies. Since users are free to include any Python code they see fit (as long as it
+falls in the accepted subset) in a policy file, evaluating a given policy could take an arbitrary amount of time. Therefore, in this experiment, our
+goal is to evaluate the extra overhead incurred by simply having many policy files to execute. We intentionally keep the content of the policies
+small and trivial. We create a policy file that runs following assertions:
+\begin{enumerate}
+\item Application name must start with an upper case letter
+\item Application must be owned by a specific user (admin@test.com)
+\item All API names must start with upper case letters
+\end{enumerate}
+We create many copies of this initial policy file to vary the number of policies deployed. Then we evaluate the overhead of policy validation
+on two of our sample applications (guestbook-py and simple-jaxrs-app). 
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.45]{overhead_by_policies}
+\caption{EAGER Overhead vs. Number of Policies}
+\label{fig:overhead_by_policies}
+\end{figure}
+
+Figure~\ref{fig:overhead_by_policies} shows how the number of active policies impact the EAGER overhead. Interestingly, having many
+different policy files have very little influence on the EAGER overhead. This is because EAGER loads policy content into memory at system
+startup (or when a new policy is deployed), and executes them from memory each time an application is deployed. Since policy files are 
+typically small (at most a few kilobytes), this is a viable option. The overhead of validating the simple-jaxrs-app is higher than that of the
+guestbook-py application because, unlike guestbook-py, simple-jaxrs-app exports web APIs. This means the third assertion listed earlier
+needs to be executed for simple-jaxrs-app. In our test policy file this particular assertion has been implemented as a loop that iterates through 
+all APIs exported by the application which incurs some extra cost to execute.
+
+Above results indicate that EAGER scales well to hundreds of policies. That is, there is no significant overhead associated with simply having
+a large number of policy files. However, as mentioned earlier, the content of a policy can have a significant influence on the overhead
+ caused by EAGER.
+ 
+\subsection{Scalability}
+Next we evaluate how EAGER scales when a large number of APIs are deployed in the cloud. For this experiment, we populate the EAGER
+Metadata Manager with a varying number of APIs, and then attempt to deploy various sample applications on AppScale. We also create
+random dependencies among the mock APIs recorded in the Metadata Manager to make the setting more realistic.
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.45]{scalability}
+\caption{EAGER Overhead vs. Number of APIs in Metadata Manager}
+\label{fig:scalability}
+\end{figure}
+
+Figure~\ref{fig:scalability} shows that the deployment overhead of the guestbook-py application is not impacted by the growth of metadata
+in the cloud. Recall that guestbook-py does not export any APIs nor it declares any dependencies. Therefore the deployment process of
+the guestbook-py application has minimal interactions with the Metadata Manager. Based on this we may conclude that applications that
+do not export web APIs are not impacted by the accumulation of metadata in EAGER.
+
+Both simple-jaxrs-app and dep-jaxrs-app are
+somewhat affected by the volume of data stored in EAGER Metadata Manager. Since these applications export web APIs that must be 
+recorded and validated by the Metadata Manager, the explosion of metadata has an increasingly higher impact on them. The simple-jaxrs-app
+is affected more than dep-jaxrs-app because simple-jaxrs-app exports two APIs compared to the one API exported by dep-jaxrs-app. The growth
+in overhead is linear to the number of APIs deployed in the cloud which indicates a fairly good scalability trait. Also it is encouraging to see that
+even after deploying 10000 APIs, the overhead of simple-jaxrs-app has only been increased by about 0.5 seconds, which is very small compared
+to the total deployment time of the application.
+
+Another interesting attribute to notice in our results is the growing amount of variance in the overhead as the number of APIs in the cloud grows.
+We believe this is due to the increasing variability of database query performance and the data transfer performance as the size of the 
+database increases.
+
+Overall, we can conclude that EAGER scales well to 1000's of APIs. This is a very positive result, as today's popular API registries (e.g. ProgrammableWeb.com) 
+place the total number of open APIs in the Internet somewhere in the range of 10000-15000. If further scalability is required, we can benefit from the past and ongoing
+work from the database and big data communities and use a faster, and more scalable database engine (e.g. a NoSQL engine) to implement 
+EAGER rather than using a simple RDBMS.
