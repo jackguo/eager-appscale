@@ -60,12 +60,15 @@ metadata recorded in the API metadata manager (that is, on a clean database).
 
 Note that for the applications that do not export any web APIs, the overhead is negligibly small (around 0.1s). This is because EAGER
 doesn't have to validate or record any metadata in the Metadata Manager for such applications. This implies that EAGER will not affect 
-most existing AppScale apps, as long as their deployment time is concerned. For the applications that do 
-export web APIs, however, EAGER has to record API metadata in the Metadata Manager, and they must be validated and published to 
-the API gateway. As a result we see some extra overhead there. But even in these cases, the observed overhead is well under a second,
+the deployment time of most existing AppScale apps. For the applications that do 
+export web APIs, however, EAGER has to perform some additional work. As a result we see some extra overhead with such applications. 
+For applications that export web APIs, the recorded overhead figures include the time it takes to retrieve old API specifications from the
+Metadata Manager, the time it takes to compare the new API specifications with the old ones, the time it takes to update the API specifications
+and other metadata in the Metadata Manager and the time it takes to publish the updated APIs to the API gateway.
+But even with all these extra processing and communication activities, the observed overhead is well under a second,
 which is very small compared to the total application deployment time in AppScale (20+ seconds).
 
-The overhead difference between dep-jaxrs-app-v1 and dep-jaxrs-app-v2 suggests that the EAGER overhead increases with the number
+The overhead difference between dep-jaxrs-app and dep-jaxrs-app-v2 suggests that the EAGER overhead increases with the number
 of APIs exported by an application. In the next section we will further evaluate this property.
 
 \subsection{Impact of Number of APIs and Dependencies}
