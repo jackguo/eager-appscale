@@ -238,3 +238,10 @@ It is encouraging to see that the same property holds when the Metadata Manager 
 relationships among them. The largest overhead observed is under 1.2 seconds, which is significantly smaller than the total deployment overhead of AppScale.
 Also it is interesting to see that, whenever the dependency declaration was kept fixed, the overhead is slightly smaller. This is because our prototype caches
 the edges of the dependency tree that have been read, which makes immediate redeployments go faster.
+
+Overall our experimental results indicate that EAGER can be successfully implemented in today's PaaS clouds, with minimal modifications to the platform core.
+EAGER adds very little overhead to the application deployment process, too small to be noticed in most cases. Further, our results show that EAGER
+performance overhead increases linearly with the number of APIs exported by the applications, and the number of APIs already deployed in the cloud. 
+Interestingly, the number of deployed policies and declared dependencies
+have very little impact on the time taken by EAGER to perform its validations and governance checks. Finally, our results indicate that EAGER scales
+well to 1000's of APIs, and can handle an application deployment under 2 seconds, even with over 18000 APIs loaded to the Metadata Manager.
