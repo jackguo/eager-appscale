@@ -24,7 +24,7 @@ place during application deployment time, before an application has been checked
 the interactions that take place during deployment time, after an application has been successfully validated. Long-dashed arrows indicate
 interactions during runtime.
 
-EAGER is invoked whenever a developer attempts to deploy a new application, or a new version of an existing application, using the developer
+EAGER is invoked whenever a developer attempts to deploy a new application or a new version of an existing application, using the developer
 tools available on his/her workstation. In some cloud implementations these tools could be available as an online service accessed by the 
 developers via a web browser. In either case, the application deployment request is intercepted by the API Deployment Coordinator in the cloud, which
 then queries the Metadata Manager to perform the required governance checks. If a governance check fails, the Deployment Coordinator
@@ -42,12 +42,12 @@ components of the cloud such as application hosting, monitoring, and load balanc
 Following subsections further describe the design and responsibilities of EAGER components.
 
 \subsubsection{API Deployment Coordinator}
-API Deployment Coordinator intercepts all application deployment requests and determines whether they are suitable for deployment, based
+API Deployment Coordinator (ADC) intercepts all application deployment requests and determines whether they are suitable for deployment, based
 on a set of policies specified by the cloud or organizational administrators. It receives application deployment requests via a web service interface.
 Other components in the cloud and the developer's cloud management tools can use this service interface to remotely submit new applications for
 deployment in the cloud. 
 
-An application deployment request contains the name of the application, its version, names and versions of the APIs
+An application deployment request contains the name of the application, version number, names and versions of the APIs
 exported by the application, detailed API specifications and other API dependencies as declared by the developer. As far as application developers are
 concerned, the only things they should explicitly specify are the name and version of the application and the list of dependencies (i.e. APIs consumed
 by the application). All other metadata can be computed automatically either at the client side or at the server side by performing introspection on the
@@ -56,36 +56,87 @@ development environment that performs these metadata calculations, including the
 of an application.
 
 The API specifications used to describe the web APIs should describe the operations and the form (schema) of their inputs and outputs with sufficient 
-details. Any suitable standard API description language can be used for this purpose, as long as it clearly describes the schema of the requests and
+details. Any standard API description language can be used for this purpose, as long as it clearly describes the schema of the requests and
 responses, and we use the same language to describe all APIs deployed via EAGER. For describing REST interfaces, we can use Web Application
 Description Language (WADL), Swagger, RAML or any other language that provides similar functionality. Our research currently focuses on RESTful 
 services only, but our design can also be adapted to govern SOAP services in the cloud, in which case Web Services Description Language 
 (WSDL) can be used to create API specifications.
 
-When a new deployment request is received, API Deployment Coordinator inspects the enclosed application metadata to see if it encloses any web
-APIs. If the application exports at least one API, it makes a call to the Metadata Manager and pulls all the existing metadata related to that API. If
-the Metadata Manager cannot locate any data related to the APIs in question, API Deployment Coordinator assumes those APIs to be brand new
-APIs (i.e. no previous versions of those APIs have been deployed in the cloud), and proceeds to the next step of the governance check phase, which is policy
-validation. However, if any metadata regarding the APIs are found, then the API Deployment Coordinator is dealing with a potential API update. In this
-case, the Deployment Coordinator compares the old API specifications with the latest ones provided in the application deployment request to see if
+When a new deployment request is received, the ADC checks whether the application declares any API dependencies. If so, it
+queries the Metadata Manager to make sure that all the declared dependencies are already available in the cloud. 
+Then it inspects the enclosed application metadata to see if the current application exports any web
+APIs of its own. If the application exports at least one API, the ADC makes another call to the Metadata Manager and pulls all the existing 
+metadata related to that API. If
+the Metadata Manager cannot locate any data related to the APIs in question, ADC assumes those APIs to be brand new
+APIs (i.e. no previous versions of those APIs have been deployed in the cloud), and proceeds to the next step of the governance check, which is policy
+validation. However, if any metadata regarding the APIs are found, then the ADC is dealing with a potential API update. In this
+case, the ADC compares the old API specifications with the latest ones provided in the application deployment request to see if
 they are operation and type compatible.
 
-To perform this API compatibility verification, the API Deployment Coordinator checks to see whether the latest specification of an API contains all 
-the operations available in the old specification. If the latest API specification is missing at least one operation that it used to have, the Deployment Coordinator
+To perform this API compatibility verification, the ADC checks to see whether the latest specification of an API contains all 
+the operations available in the old specification. If the latest API specification is missing at least one operation that it used to have, the ADC
 reports this to the user and aborts the deployment, since this may break some applications that already depend on the missing operations. 
-If all the past operations are also present in the latest specification, the Deployment Coordinator performs a type check to make sure that 
+If all the past operations are also present in the latest specification, the ADC performs a type check to make sure that 
 all past and present operations are type compatible. This is done by performing recursive introspection on the input and output types declared in the
 API specifications. However, instead of looking for exact matches, EAGER looks for ``type compatibility'' based on the following rules inspired by Hoare
 logic and the rules of type inheritance from object oriented programming world:
 \begin{itemize}
-\item New version of an input type is compatible with the old version of an input type, if the new version contains either all or less attributes as the 
-old version, and any new attributes that are not present in the old version are optional.
-\item New version of an output type is compatible with the old version of an output type, if the new version contains either all or more attributes as the 
+\item New version of an input type is compatible with the old version of an input type, if the new version contains either all or less attributes than the 
+old version, and any new attributes that are unique to new version are optional.
+\item New version of an output type is compatible with the old version of an output type, if the new version contains either all or more attributes than the 
 old version.
 \end{itemize}
-In addition to the type checks, API Deployment Coordinator may also look for the compatibility among other parameters declared in the API specifications
+In addition to the type checks, ADC may also look for the compatibility among other parameters declared in the API specifications
 such as HTTP methods, mime types and URL patterns.
 
+There is a significant optimization possible when performing these API specification comparison. In addition to the API specifications,
+the Metadata Manager can report to the ADC, whether the APIs being validated are already being used by any other application. Metadata Manager
+can find out this information by analyzing the API dependency tree that it maintains. If no other application is using the API being validated, then EAGER
+can completely skip the API specification comparison phase, since in this case even a backwards incompatible API change will not break any 
+downstream application. 
+Based on how much metadata is available to perform this computation, EAGER can choose to do further optimizations too. For example, if
+the Metadata Manager keeps track of which operations of an API are being used by other applications, we can restrict the specification compatibility
+check to only compare the operations that are in active use, thus greatly narrowing down the scope of the specification validation check.
+
+Once the API specifications have been successfully compared and no errors have been found, the ADC initiates the policy validation phase. Policies
+are specified by cloud administrators or administrators of the organization (tenant) that the application developer is part of. Policies are specified using
+a subset of the Python programming language, which makes it easy to develop policy files and maintain them. We control the built-in Python functions and
+modules policy files may engage via a simple whitelisting method. Additionally, we define a set of assertion functions that policy writers can use to specify
+various checks that must be performed on the applications. Currently this assertion list includes:
+
+\begin{itemize}
+\item assert\_true(condition, optional\_error\_msg)
+\item assert\_false(condition, optional\_error\_msg)
+\item assert\_dependency()
+\item assert\_not\_dependency()
+\item assert\_dependency\_in\_range()
+\end{itemize}
+
+Using the above assertions and the regular Python syntax it is possible to implement even the most complex policies in a simple and intuitive manner.
+Using a real programming language for specifying policies naturally lends itself to using existing programming tools to edit and debug policy files. An example
+policy file that mandates all application names to begin with upper case letters and, all applications to take a dependency on an API called RootLogger-v1.0
+is shown below:
+
+Example Goes Here.
+
+In the above example \textit{app} is a special logical variable available to all policy files. This variable allows applications to access information pertaining
+to the current application deployment request. When dealing with multiple concurrent application deployments, different threads will handle policy validation
+for each application, and each thread will maintain a separate \textit{app} variable making the entire policy validation process thread safe.
+
+EAGER has no restrictions on how many policy files can be specified by the administrators. Applications are validated against each policy file. Failure of 
+any assertion in any policy file will cause the ADC to abort the application deployment.
+
+Ones an application have been checked against all applicable policies, ADC persists the latest application and API metadata into the Metadata Manager.
+This includes the specifications of the exported APIs (for future compatibility checks), and dependencies (to update the dependency tree). At this point, the ADC
+may report success to the user and proceed with rest of the application deployment. This involves three steps:
+
+\begin{enumerate}
+\item Deploy the application in the cloud application runtime (application server).
+\item Publish the APIs enclosed in the application and their specifications to API Discovery Portal.
+\item Publish the APIs enclosed in the application to an API Gateway server.
+\end{enumerate}
+
+Step 1 is required to complete the deployment of application in the cloud. The significance of step 2 and 3 is explained in the following subsections.
 
 \subsubsection{Metadata Manager}
 \subsubsection{API Discovery Portal}
