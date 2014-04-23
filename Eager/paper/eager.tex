@@ -50,7 +50,7 @@ store (e.g. LDAP) if needed.
 
 The Metadata Manager is exposed to other components (especially the API Deployment Coordinator) through a well defined web service interface.
 This interface allows other components to query existing API metadata and update them. In the proposed model, the stored metadata is updated 
-occasionally (only when a new application is deployed, or when a developer subscribes to a published API). Therefore the Metadata Manager
+occasionally (only when a new application is deployed or when a developer subscribes to a published API). Therefore the Metadata Manager
 does not need to support a very high write throughput. This allows the Metadata Manager to be implemented with strong transactional semantics,
 which reduces the development overhead of other components that rely on Metadata Manager. High availability can be achieved via
 simple replication methods. Since the write operations are rare, the replication overhead is amortized over time.
@@ -180,6 +180,7 @@ keys provided in them. The traffic interception is achieved by blocking direct a
 Gateway address as the API endpoint in the ADP. The first can be achieved via a simple firewall or router configuration that prevents the cloud app servers from 
 receiving any API traffic from a source other than the API Gateway.
 
-The API Gateway could be a single server or a cluster of servers behind a scalable load balancer. In addition to the API key validation, it may perform other
-functions as well, such as monitoring, traffic throttling (rate limiting), SLA enforcement and runtime policy validation. We intend to further evaluate these aspects
+The API Gateway could be a single server or a cluster of servers behind a scalable load balancer. Since most API metadata, especially the API keys do not change
+frequently, it can afford to cache such information locally for better runtime performance. In addition to the API key validation, it may perform other
+functions as well, such as monitoring, throttling (rate limiting), SLA enforcement and runtime policy validation. We intend to further evaluate these aspects
 in our future research.
