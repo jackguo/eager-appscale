@@ -52,7 +52,7 @@ The Metadata Manager is exposed to other components (especially the API Deployme
 This interface allows other components to query existing API metadata and update them. In the proposed model, the stored metadata is updated 
 occasionally (only when a new application is deployed or when a developer subscribes to a published API). Therefore the Metadata Manager
 does not need to support a very high write throughput. This allows the Metadata Manager to be implemented with strong transactional semantics,
-which reduces the development overhead of other components that rely on Metadata Manager. High availability can be achieved via
+which reduces the development overhead of other components that rely on Metadata Manager. Availability can be improved via
 simple replication methods. Since the write operations are rare, the replication overhead is amortized over time.
 
 \subsubsection{API Deployment Coordinator}
@@ -121,14 +121,14 @@ various checks that must be performed on the applications. Currently this assert
 \begin{itemize}
 \item assert\_true(condition, optional\_error\_msg)
 \item assert\_false(condition, optional\_error\_msg)
-\item assert\_dependency()
-\item assert\_not\_dependency()
-\item assert\_dependency\_in\_range()
+\item assert\_app\_dependency(app, dep\_name, dep\_version)
+\item assert\_not\_app\_dependency(app, dep\_name, dep\_version)
+\item assert\_app\_dependency\_in\_range(app, name, lower, upper, exclude\_lower, exclude\_upper)
 \end{itemize}
 
 Using the above assertions and the regular Python syntax it is possible to implement even the most complex policies in a simple and intuitive manner.
 Using a real programming language for specifying policies naturally lends itself to using existing programming tools to edit and debug policy files. An example
-policy file that mandates all application names to begin with upper case letters and, all applications to take a dependency on an API called RootLogger-v1.0
+policy file that mandates all application names to begin with upper case letters and, all applications to take a dependency on an API called Logger-v1.0
 is shown below:
 
 \begin{lstlisting}[language=Python, frame=single]
@@ -136,7 +136,7 @@ import re
 
 pattern = re.compile(`^[A-Z]')
 assert_true(pattern.match(app.name))
-assert_dependency(app,`RootLogger',`1.0')
+assert_app_dependency(app,`Logger',`1.0')
 \end{lstlisting}
 
 In the above example \textit{app} is a special logical variable available to all policy files. This variable allows applications to access information pertaining
@@ -156,7 +156,7 @@ may report success to the user and proceed with rest of the application deployme
 \item Publish the APIs enclosed in the application to an API Gateway server.
 \end{enumerate}
 
-Step 1 is required to complete the deployment of application in the cloud even without EAGER. The significance of step 2 and 3 is explained in the 
+Step 1 is required to complete the deployment of application in the cloud even without EAGER. The significance of steps 2 and 3 is explained in the 
 following subsections.
 
 \subsubsection{API Discovery Portal}
@@ -178,9 +178,10 @@ runtime in the cloud, so that it loads the API credentials from the dependency d
 API Gateway is another piece of the runtime governance puzzle that we intend to solve as a part of our future work. It intercepts all API calls and validates the API
 keys provided in them. The traffic interception is achieved by blocking direct access to the APIs in the application runtime (app servers), and publishing the API 
 Gateway address as the API endpoint in the ADP. The first can be achieved via a simple firewall or router configuration that prevents the cloud app servers from 
-receiving any API traffic from a source other than the API Gateway.
+receiving any API traffic from a source other than the API Gateway. Once an API call has been received and validated at the API Gateway, the message is
+routed to the actual application server in the cloud that hosts the API.
 
-The API Gateway could be a single server or a cluster of servers behind a scalable load balancer. Since most API metadata, especially the API keys do not change
-frequently, it can afford to cache such information locally for better runtime performance. In addition to the API key validation, it may perform other
+The API Gateway could be a single server or a cluster of servers behind a scalable load balancer. Since most API metadata, especially the API keys, do not change
+frequently, it can afford to cache such information locally for better runtime performance. In addition to API key validation, it may perform other
 functions as well, such as monitoring, throttling (rate limiting), SLA enforcement and runtime policy validation. We intend to further evaluate these aspects
 in our future research.
