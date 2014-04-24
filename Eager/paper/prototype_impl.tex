@@ -6,9 +6,9 @@ APIs in our system. If a developer is willing to manually specify the API specif
 language can also export web APIs, and EAGER will perform the required governance checks appropriately.
 
 \subsection{Developer Tools for EAGER}
-We provide two primary tools for implementing applications/APIs for EAGER-enabled web applications.
+We provide two primary tools for implementing applications/APIs for EAGER-enabled AppScale.
 \begin{enumerate}
-\item An Apache Maven archetype that is used to initialize a Java web application project for EAGER-enabled AppScale
+\item An Apache Maven archetype that is used to initialize a Java web application project
 \item A Java doclet that is used to auto-generate API specifications from web APIs implemented in Java
 \end{enumerate}
 
@@ -44,7 +44,7 @@ deployment tools to submit new deployment requests.
 The entire ADC component has been implemented in about 975 lines of Python code. It loads the policy files from a specific directory in 
 the server file system. In our experiments so far, we deployed new policies into the system by manually copying the policy files into this 
 directory in the cloud. We are currently in the process of creating a toolkit for deploying and managing policies remotely, without accessing 
-to the ADC's file system directly.
+the ADC's file system directly.
 
 \subsection{API Discovery Portal and API Gateway}
 We used WSO2 API Manager to implement the ADP and API Gateway. WSO2 API Manager is an open source API management solution that
@@ -53,5 +53,4 @@ we wished to implement in our ADP and API Gateway were provided by this tool out
 
 Our prototype starts an instance of the WSO2 API Manager when
 the AppScale cloud starts up, and from there onwards it is managed by AppScales's process coordination mechanism. The product exposes several
-administrative web services, that we call from the ADC to publish APIs to the ADP and API Gateway. WSO2 API Manager integrates with the EAGER
-Metadata Manager via JDBC (Java Database Connectivity).
+administrative web services, that we call from the ADC to publish APIs to the ADP and API Gateway. 
