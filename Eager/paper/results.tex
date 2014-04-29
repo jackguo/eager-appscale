@@ -9,9 +9,9 @@ AppScale. Table~\ref{tab:sample_apps} lists a number of sample applications alon
 These applications have been chosen to represent a wide range of programming languages, application sizes and business domains. The average
 deployment time and standard error values were computed over 3 readings.
 
-\begin{table*}[ht]
+\begin{table}[ht]
 \begin{center}
-\begin{tabular}{| l | p{6cm} | l | l | l | }
+\begin{tabular}{| p{1.5cm} | p{3cm} | p{0.5cm} | p{1.1cm} | p{0.6cm} | }
 \hline
 Application & Description & Size & Deployment Time (s) & Std. Error\\ \hline
 guestbook-py & A simple Python web application that allows users to post comments and view them & 16K & 22.13 & 0.34 \\ \hline
@@ -26,7 +26,7 @@ dep-jaxrs-app-v2 & A sample JAXRS app that exports 2 web APIs and has one depend
 \end{center}
 \caption{Sample AppScale Applications}
 \label{tab:sample_apps}
-\end{table*}
+\end{table}
 
 Note that the smallest deployment time recorded on AppScale is 22.13 seconds. Also there's a clear correlation between the
 size of the application, its average deployment time and the standard error observed. Larger applications take longer to deploy,

@@ -1,44 +1,42 @@
 The growth of the World Wide Web (WWW), web services, and cloud computing have significantly influenced the
-way developers design and implement software applications. Instead of implementing all the required functionality from
-the scratch or using standalone libraries, developers increasingly offload the
-developement of as much functionality as possible to remote,
+way developers implement software applications. Instead of implementing all the functionality from
+the scratch or using standalone libraries, developers increasingly offload
+as much application functionality as possible to remote,
 web-accessible application programming interfaces (web APIs) hosted ``in the
 cloud'', thereby significantly reducing the 
 programming workload. By doing so, developers also benefit indirectly from the efforts put in 
 by the API and cloud providers to 
-increase the reliability, scalability and availability of their respective service offerings. 
+increase the reliability, scalability and availability of their service offerings. 
 
-To facilitate wide spread use of their technologies by other programmers, development teams 
-around the world expose their applications via web APIs.
-As a result, today, we are experiencing a proliferation of web APIs. According to the 
-statistics published by the popular web API index, ProgrammableWeb, the number of publicly available
+To facilitate widespread use of their technologies by other programmers, developers 
+also prefer to expose their applications via web APIs.
+As a result, today, we are experiencing a proliferation of web APIs. According to
+ProgrammableWeb~\cite{pweb}, a popular web API index, the number of publicly available
 web APIs has shown nearly 100\% annual growth rate, from 1000 APIs in 2008 to 11000 APIs in 2013. 
-Interestingly, it took almost 3 years for ProgrammableWeb to accumulate that
-first 1000 APIs. 
 
 The growth and use of web APIs is not limited to the IT industry. 
 Industries across sectors use the WWW as a medium for conducting their 
 business and increasingly make their digital assets available via web APIs. 
 As of March 2014, ProgrammableWeb lists 256 APIs for advertising, 
 355 APIs for shopping, 227 APIs for travel and 224 APIs for education.
-Recently non-commercial entities have started publishing web 
+Recently several non-commercial entities have also started publishing web 
 APIs, e.g. IEEE~\cite{ieeeapis}, UC Berkeley~\cite{ucbapis}, and the US White
-House~\cite{whitehouseapis}.  Moreover, the 2012 US government memorandum 
-on ``Building a 21st Century Digital Government'' directs all federal agencies to 
-focus their IT strategy around creating public and open, cloud-hosted web APIs.
+House~\cite{whitehouseapis}.  %Moreover, the 2012 US government memorandum 
+%on ``Building a 21st Century Digital Government''~\cite{whmemo} directs all federal agencies to 
+%focus their IT strategy around creating public, open and cloud-hosted web APIs.
 
-This proliferation of web APIs requires new techniques and systems for 
-effectively managing and governing these artifacts.
+The proliferation of web APIs demands new techniques and systems for 
+effectively governing the API artifacts.
 The lack of governance can lead to 
 security breaches, denial of service (DoS)
 attacks, poor code reuse, violation of service-level agreements (SLAs), 
 naming and branding issues, and abuse of digital 
 assets by the API consumers. Unfortunately, most existing cloud platforms
 within which web APIs are hosted provide only minimal governance, e.g.
-API development authorization, API deployment checks and registration.
+registration and API development authorization.
 As a result, developers are responsible for API versioning, access control,
-dependency management, and policy inforcement. Recent advance in 
-API management (e.g. 3Scale~\cite{3scale}, Apigee~\cite{apigee},
+dependency management, and policy enforcement. Recently, numerous 
+API management systems (e.g. 3Scale~\cite{3scale}, Apigee~\cite{apigee},
 Layer7~\cite{layer7}) have emerged to fill this gap. 
 These third party solutions offer access control
 via API keys (typically based on OAuth), access rate limiting, and 
@@ -46,18 +44,16 @@ several other useful API governance features. But such third party
 solutions have several limitations:
 \begin{enumerate}
 \item Third party API management solutions operate as services external to the target cloud that actually hosts the APIs. Therefore 
-the API providers have to manage and potentially pay for an additional service, which increases the management overhead and overall cost.
-\item Since the API management solutions are external to the target cloud, the ability to control and govern web APIs in an enforced manner is
-lost. In other words, it is not possible to perform crucial design-time and deployment-time validations and governance checks for the APIs
-that are being developed and rolled out into the cloud. 
-\item The API management solutions fail independently of the target cloud, thereby affecting the reliability, scalability and availability of the 
-cloud-hosted APIs. This implies that the API providers cannot take advantage of the potential scalability and availability benefits of using a cloud
-platform as a deployment target.
+the API providers have to manage and pay for an additional service.
+\item Third party solutions do not possess the ability to control and govern web APIs in an enforced manner. They cannot perform 
+critical design-time and deployment-time governance checks on the APIs that are being developed and rolled out into the cloud. 
+\item The API management solutions fail independently of the target cloud, thereby affecting the scalability and availability of the 
+cloud-hosted APIs. 
 \end{enumerate}
 
 We postulate that a cloud platform can facilitate effective and 
 enforced governance in a developer-friendly and cost effective manner by
-making API governance and the related tooling an integrated component of the cloud itself. 
+making API governance an integrated component of the cloud itself. 
 That is, instead of using a third party API management
 solution that simply layers governance features on top of the cloud, 
 we propose to provide API governance as a fundamental component of the cloud
@@ -66,14 +62,14 @@ integration, and configuration of third party services, (ii) to take advantage
 of the existing functionality in cloud platforms that are also required for 
 API governance (fault tolerance, elasticity, security mechanisms), and (iii)
 to unify a vast diversity of API
-governance features and functionality across all stages of API lifetime
+governance features across all stages of API lifetime
 (development, deployment, evolution, deprecation, retirement). Such an
 approach greatly simplifies and automates API governance which we believe
-is necessary for wide spread use.
+is necessary for widespread use.
 
 Toward this end, we propose EAGER (Enforced API Governance Engine for REST), 
-a model and architecture that augment existing
-cloud platforms that facilitates API governance as a 
+a model and an architecture that augments existing
+cloud platforms in order to facilitate API governance as a 
 cloud-native feature. EAGER enforces proper versioning of APIs and supports dependency 
 management, access control, and comprehensive policy enforcement at API deployment time. 
 Deployment-time enforcement is an initial step in a complete governance
@@ -84,13 +80,12 @@ Our dependency management and policy enforcement also guarantees that
 developers reuse existing APIs when possible to create new software artifacts
 (to prevent API redundancy and unverified API use).
 EAGER also tracks changes made by developers to deployed web APIs and prevents
-any backwards incompatible API changes from being put into production, 
-thereby preventing downstream applications from breaking.
+any backwards incompatible API changes from being put into production.
 
 We augment our approach with a unifying language for specifying 
 API governance policies. Our language is distinct from 
-existing policy languages like WS-Policy~\cite{WSPolicy,soagovstandard} and
-WS-Agreement~\cite{WSAgreement} in that it avoids the verbosity of XML, 
+existing policy languages like WS-Policy~\cite{WSPolicy,soagovstandard}
+in that it avoids the verbosity of XML, 
 and it incorporates a developer-friendly Python programming language syntax for 
 specifying even the most complex policy statements in a simple and 
 intuitive manner. Moreover, we ensure that specifying the required policies 
@@ -106,7 +101,7 @@ architecture can be easily implemented in extant clouds with
 minimal changes to the underlying platform technology. We further show that 
 EAGER API governance and policy enforcement impose a negligible 
 overhead on the application deployment process, and the overhead
-is linear in the number of APIs present in the application being validated.  
+is linear in the number of APIs present in the applications being validated.  
 Finally, we show that EAGER is able to
 scale to tens of thousands of deployed web APIs and hundreds of user 
 defined governance policies.
@@ -115,5 +110,3 @@ In the sections that follow, we present some background on API governance
 and overview the design and implementation of
 EAGER. We then empirically evaluate EAGER using a wide range of APIs and
 experiments.  Finally, we discuss future and related work, and conclude.
-
-
