@@ -10,18 +10,18 @@ interface which exports some functionality that can be used by other services an
 and logic together thereby making it easier to implement and maintain the system in the long run. SOA also naturally lends itself to implementing
 systems using a wide range of programming languages, tools and platforms.
 
-With the popularization of network computing and the World Wide Web (WWW) the web services technology has emerged as a prime choice 
+With the popularization of network computing and the World Wide Web (WWW) the web services technology has emerged as a primary choice 
 for implementing systems based on SOA. A web service is a
 software component with a well-defined interface that facilitates interoperable machine-to-machine interactions over a network. As it becomes 
 evident from
 this definition, web services can easily be adapted to play the role of  ``services'' in SOA. The interface portion of a web service, which
 abstracts out its implementation details while making the service network-accessible, is commonly referred to as 
-a web API. As far as the users and applications that consume a web service is considered, the web API is the only visible and
+a web API. As far as the users and applications that consume a web service are concerned, the web API is the only visible and
 interesting part of a web service.
 
 When considering the web service development process, the implementation portion of a web service is developed and maintained separately from
 its API portion. The ``web service stack'' connects a web API to an implementation. Because the API is visible to external parties, any 
-changes to the API immediately impacts many users and applications. Therefore APIs have a much slowly evolving and long lasting lifecycle than 
+changes to the API immediately impacts many users and applications. Therefore APIs have a more slowly evolving and long lasting lifecycle than 
 their implementation counterparts. 
 
 \subsection{Cloud Computing and Web APIs}
@@ -39,9 +39,8 @@ web APIs. Most PaaS clouds make it simple to develop web services and host web A
 Backend-as-a-Service (MBaaS) clouds take this one step further where they specialize in exposing web APIs for facilitating mobile
 app development. As a result we see a significant boost in the number of web APIs hosted in the cloud.
 
-\subsection{API Governance in the Cloud}
-As more and more web APIs are developed and deployed in the cloud, the need for sophisticated API governance systems also continues to
-increase. API governance is required to:
+\subsection{API Governance}
+The proliferation of web APIs necessitate more sophisticated API governance systems. API governance is required to:
 \begin{itemize}
 \item promote and ensure code reuse among service and application developers
 \item detect programming and deployment errors and take corrective action
@@ -51,9 +50,9 @@ increase. API governance is required to:
 \item provide API services with competitive reliability, availability guarantees and SLAs
 \end{itemize}
 
-The traditional SOA community has done a lot of work in the area of service governance that can be easily extrapolated and adapted into
-API governance. Indeed, most of the commonly used service governance tactics such as versioning, policy enforcement and and lifecycle
-management are fully applicable to managing web APIs as well.
+The traditional SOA community has done a lot of work in the area of service governance that can be adapted into
+API governance. Indeed, most of the commonly used service governance tactics such as versioning, policy enforcement and lifecycle
+management can be used to assert some level of governance on web APIs as well.
 
 API governance can be particularly helpful in dealing with the API lifecycle management, i.e. changing the deployed APIs in response to new
 feature requests, bug fixes and various other technical and commercial reasons. API churn is a very common phenomenon in the WWW. Without
