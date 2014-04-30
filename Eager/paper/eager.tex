@@ -3,7 +3,6 @@ that can be built into the cloud fabrics for providing API governance as a cloud
 techniques and best practices that have served the SOA community well over the last decade. In this section, we overview the high-level
 design of EAGER and provide details on its main components and the policy language.
 
-\subsection{System Design}
 EAGER is designed as an extension to existing cloud platforms, especially PaaS offerings. It intercepts all events related to deploying applications
 and enforces deployment time governance checks on them. This includes API metadata validation, dependency validation, policy validation and 
 API backward compatibility
@@ -24,79 +23,72 @@ place during application deployment time, before an application has been checked
 the interactions that take place during deployment time, after an application has been successfully validated. Long-dashed arrows indicate
 interactions during runtime.
 
-EAGER is invoked whenever a developer attempts to deploy a new application or a new version of an existing application, using the developer
-tools available on his/her workstation. In some cloud implementations these tools could be available as an online service accessed by the 
-developers via a web browser. In either case, the application deployment request is intercepted by the API Deployment Coordinator in the cloud, which
-then queries the Metadata Manager to perform the required governance checks. If a governance check fails, the Deployment Coordinator
-will preempt the application deployment and return an error. Otherwise it proceeds to publish the application and the enclosed APIs to an
-API Discovery Portal, an API Gateway and also the actual service runtime (typically an application server) that is responsible for hosting
-the application in the cloud. 
+EAGER is invoked whenever a developer attempts to deploy an application, using the developer
+tools available on his/her workstation. In some cloud implementations these tools could be available as an online service accessed 
+via a web browser. In either case, the application deployment request is intercepted by the API Deployment Coordinator in the cloud, which
+then performs the required governance checks. If a governance check fails, the Deployment Coordinator
+will preempt the application deployment and return an error. Otherwise it proceeds with the application deployment.
 
-Note that the proposed architecture does not require major changes to the existing core components of the cloud. All the 
+Note that the proposed architecture does not require major changes to the existing components of the cloud. All the 
 significant components of EAGER that reside in the cloud can be easily implemented as feature additions, on top of what is already available 
-in the cloud platform.
-The only noteworthy change that is required is the mechanism to intercept application deployment requests and act upon them, before
-proceeding to deploy the application to its target runtime. This can be done without having to make any changes to the existing key 
-components of the cloud such as application hosting, monitoring, and load balancing.
+in the cloud. The only noteworthy change that is required is the mechanism to intercept application deployment requests and act upon them. 
+This can be done without changing the existing key components of the cloud such as application hosting, monitoring, and load balancing.
 
 Following subsections further describe the design and responsibilities of EAGER components.
 
-\subsubsection{Metadata Manager}
+\subsection{Metadata Manager}
 The Metadata Manager stores and maintains all the API metadata in EAGER. This includes API names, versions, specifications and dependencies.
 It uses the dependency information to compute the dependency tree among all deployed APIs and applications. Additionally, the Metadata Manager
 also keeps track of developers, their subscriptions to various APIs and the access credentials (API keys) issued to them. For these purposes,
 the Metadata Manager must comprise of some database management system. The developer information may be stored in a specialized user
-store (e.g. LDAP) if needed.
+store (e.g. LDAP).
 
 The Metadata Manager is exposed to other components (especially the API Deployment Coordinator) through a well defined web service interface.
-This interface allows other components to query existing API metadata and update them. In the proposed model, the stored metadata is updated 
+This interface allows querying existing API metadata and updating them. In the proposed model, the stored metadata is updated 
 occasionally (only when a new application is deployed or when a developer subscribes to a published API). Therefore the Metadata Manager
 does not need to support a very high write throughput. This allows the Metadata Manager to be implemented with strong transactional semantics,
 which reduces the development overhead of other components that rely on Metadata Manager. Availability can be improved via
-simple replication methods. Since the write operations are rare, the replication overhead is amortized over time.
+simple replication methods.
 
-\subsubsection{API Deployment Coordinator}
+\subsection{API Deployment Coordinator}
 API Deployment Coordinator (ADC) intercepts all application deployment requests and determines whether they are suitable for deployment, based
 on a set of policies specified by the cloud or organizational administrators. It receives application deployment requests via a web service interface.
-Other components in the cloud and the developer's cloud management tools can use this service interface to remotely submit new applications for
-deployment in the cloud. 
 
 An application deployment request contains the name of the application, version number, names and versions of the APIs
 exported by the application, detailed API specifications and other API dependencies as declared by the developer. As far as application developers are
 concerned, the only things they should explicitly specify are the name and version of the application and the list of dependencies (i.e. APIs consumed
-by the application). All other metadata can be computed automatically either at the client side or at the server side by performing introspection on the
-application source code. In our prototype implementation of EAGER, we have developed special tools that developers can integrate into their
-development environment that performs these metadata calculations, including the automatic generation of API specifications, at the build-time
-of an application.
+by the application). All other metadata can be computed automatically by performing introspection on the
+application source code. In our prototype implementation of EAGER, we have developed special tools that perform these metadata calculations, 
+including the automatic generation of API specifications, at the build-time of an application.
 
 The API specifications used to describe the web APIs should describe the operations and the form (schema) of their inputs and outputs with sufficient 
 details. Any standard API description language can be used for this purpose, as long as it clearly describes the schema of the requests and
 responses, and we use the same language to describe all APIs deployed via EAGER. For describing REST interfaces, we can use Web Application
-Description Language (WADL), Swagger, RAML or any other language that provides similar functionality. Our research currently focuses on RESTful 
-services only, but our design can also be adapted to govern SOAP services in the cloud, in which case Web Services Description Language 
-(WSDL) can be used to create API specifications.
+Description Language (WADL), Swagger, RAML or any other language that provides similar functionality. %Our research currently focuses on RESTful 
+%services only, but our design can also be adapted to govern SOAP services in the cloud, in which case Web Services Description Language 
+%(WSDL) can be used to create API specifications.
 
 When a new deployment request is received, the ADC checks whether the application declares any API dependencies. If so, it
 queries the Metadata Manager to make sure that all the declared dependencies are already available in the cloud. 
 Then it inspects the enclosed application metadata to see if the current application exports any web
-APIs of its own. If the application exports at least one API, the ADC makes another call to the Metadata Manager and pulls all the existing 
+APIs of its own. If the application exports at least one API, the ADC makes another call to the Metadata Manager and pulls any existing 
 metadata related to that API. If
 the Metadata Manager cannot locate any data related to the APIs in question, ADC assumes those APIs to be brand new
 APIs (i.e. no previous versions of those APIs have been deployed in the cloud), and proceeds to the next step of the governance check, which is policy
 validation. However, if any metadata regarding the APIs are found, then the ADC is dealing with a potential API update. In this
 case, the ADC compares the old API specifications with the latest ones provided in the application deployment request to see if
-they are operation and type compatible.
+they are compatible.
 
 To perform this API compatibility verification, the ADC checks to see whether the latest specification of an API contains all 
 the operations available in the old specification. If the latest API specification is missing at least one operation that it used to have, the ADC
-reports this to the user and aborts the deployment, since this may break some applications that already depend on the missing operations. 
-If all the past operations are also present in the latest specification, the ADC performs a type check to make sure that 
+reports this to the user and aborts the deployment. If all the past operations are also present in the latest specification, the ADC performs a 
+type check to make sure that 
 all past and present operations are type compatible. This is done by performing recursive introspection on the input and output types declared in the
 API specifications. However, instead of looking for exact matches, EAGER looks for ``type compatibility'' based on the following rules inspired by Hoare
 logic and the rules of type inheritance from object oriented programming world:
 \begin{itemize}
 \item New version of an input type is compatible with the old version of an input type, if the new version contains either all or less attributes than the 
-old version, and any new attributes that are unique to new version are optional.
+old version, and any new attributes that are unique to the new version are optional.
 \item New version of an output type is compatible with the old version of an output type, if the new version contains either all or more attributes than the 
 old version.
 \end{itemize}
@@ -104,13 +96,13 @@ In addition to the type checks, ADC may also look for the compatibility among ot
 such as HTTP methods, mime types and URL patterns.
 
 There is a significant optimization possible when performing these API specification comparison. In addition to the API specifications,
-the Metadata Manager can report to the ADC, whether the APIs being validated are already being used by any other application. Metadata Manager
-can find out this information by analyzing the API dependency tree that it maintains. If no other application is using the API being validated, then EAGER
+the Metadata Manager can report to the ADC, whether the API being validated is already being used by any other application. 
+If no other application is using the API being validated, then EAGER
 can completely skip the API specification comparison phase, since in this case even a backwards incompatible API change will not break any 
 downstream application. 
-Based on how much metadata is available to perform this computation, EAGER can choose to do further optimizations too. For example, if
-the Metadata Manager keeps track of which operations of an API are being used by other applications, we can restrict the specification compatibility
-check to only compare the operations that are in active use, thus greatly narrowing down the scope of the specification validation check.
+%Based on how much metadata is available to perform this computation, EAGER can choose to do further optimizations too. For example, if
+%the Metadata Manager keeps track of which operations of an API are being used by other applications, we can restrict the specification compatibility
+%check to only compare the operations that are in active use, thus greatly narrowing down the scope of the specification validation check.
 
 Once the API specifications have been successfully compared and no errors have been found, the ADC initiates the policy validation phase. Policies
 are specified by cloud administrators or administrators of the organization (tenant) that the application developer is part of. Policies are specified using
@@ -140,15 +132,13 @@ assert_app_dependency(app,`Logger',`1.0')
 \end{lstlisting}
 
 In the above example \textit{app} is a special logical variable available to all policy files. This variable allows applications to access information pertaining
-to the current application deployment request. When dealing with multiple concurrent application deployments, different threads will handle policy validation
-for each application, and each thread will maintain a separate \textit{app} variable making the entire policy validation process thread safe.
+to the current application deployment request. 
 
 EAGER has no restrictions on how many policy files can be specified by the administrators. Applications are validated against each policy file. Failure of 
 any assertion in any policy file will cause the ADC to abort the application deployment.
 
 Ones an application have been checked against all applicable policies, ADC persists the latest application and API metadata into the Metadata Manager.
-This includes the specifications of the exported APIs (for future compatibility checks), and dependencies (to update the dependency tree). At this point, the ADC
-may report success to the user and proceed with rest of the application deployment. This involves three steps:
+At this point, the ADC may report success to the user and proceed with rest of the application deployment. This involves three steps:
 
 \begin{enumerate}
 \item Deploy the application in the cloud application runtime (application server).
@@ -159,22 +149,22 @@ may report success to the user and proceed with rest of the application deployme
 Step 1 is required to complete the deployment of application in the cloud even without EAGER. The significance of steps 2 and 3 is explained in the 
 following subsections.
 
-\subsubsection{API Discovery Portal}
+\subsection{API Discovery Portal}
 API Discovery Portal (ADP) is an online catalog, where developers can browse through the available web APIs and subscribe to them. Whenever the ADC
-approves and deploys a new application, it registers all the APIs exported by the application in ADP. Developers will use the ADP to search for and discover
-the APIs that they are interested in, and also subscribe to them. EAGER mandates that any developer interested in using a particular API, first subscribe to that
+approves and deploys a new application, it registers all the APIs exported by the application in ADP. 
+EAGER mandates that any developer interested in using a particular API, first subscribe to that
 API and obtain the proper access credentials (API keys) from the ADP. The API keys issued by the ADP could be an OAuth access token or a similar authorization
 credential, that can be used to verify the developer/application that is invoking the API. This is an important component in our runtime governance
-plan, since this gives EAGER the ability to uniquely identify the developers/applications that are calling the APIs, and act upon them. 
+plan, since this gives EAGER the ability to uniquely identify the developers/applications that are using the APIs. 
 
 The API keys issued by the ADP are stored in the Metadata Manager along with other API and developer metadata. When a programmer develops a new application
 using one or more API dependencies, we may mandate that the developer declares the dependencies along with the API keys obtained from the ADP. The ADC
 can then verify this information against the Metadata Manager as a part of its dependency check, and ensure that the declared dependencies are correct and 
-the specified API keys are indeed correct for the specified dependencies. We may further incentivize declaring API dependencies explicitly by making it 
-impossible to call an API without first declaring it as a dependency along with the proper API keys. This can be done by making some changes to the application
-runtime in the cloud, so that it loads the API credentials from the dependency declaration provided by the application developer.
+the specified API keys are valid for the specified dependencies. %We may further incentivize declaring API dependencies explicitly by making it 
+%impossible to call an API without first declaring it as a dependency along with the proper API keys. This can be done by making some changes to the application
+%runtime in the cloud, so that it loads the API credentials from the dependency declaration provided by the application developer.
 
-\subsubsection{API Gateway}
+\subsection{API Gateway}
 API Gateway is another piece of the runtime governance puzzle that we intend to solve as a part of our future work. It intercepts all API calls and validates the API
 keys provided in them. The traffic interception is achieved by blocking direct access to the APIs in the application runtime (app servers), and publishing the API 
 Gateway address as the API endpoint in the ADP. The first can be achieved via a simple firewall or router configuration that prevents the cloud app servers from 
