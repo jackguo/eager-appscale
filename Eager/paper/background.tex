@@ -26,15 +26,15 @@ their implementation counterparts.
 
 \subsection{Cloud Computing and Web APIs}
 The interest towards web APIs have recently skyrocketed due to the popularization of cloud and mobile computing.
-Cloud computing is based on the idea of exposing some digital asset or a capability (e.g. compute power) as a highly scalable web service. A 
-web API determines
-what functionalities are exported by the cloud. Mobile devices, due to their limited hardware
-resources must offload most of their processing and storage needs to remote services on the Internet. Again, web APIs help with this offloading. 
+Cloud computing is based on the idea of exposing some digital asset or a capability (e.g. compute power) as a highly scalable web service. 
+Mobile devices, due to their limited hardware
+resources must offload most of their processing and storage needs to remote services on the Internet. 
+Web APIs play a crucial role in both these paradigms. 
 %Indeed, most of the popular social media and productivity apps
 %that are in use today rely on one or more web APIs hosted by their respective vendors and service providers (e.g. Twitter app, Facebook app and 
 %various geo/mapping apps).
 
-On the other hand, modern computing clouds, especially PaaS clouds, have become fertile breeding grounds for many web APIs. 
+On the other hand, modern computing clouds, especially PaaS clouds, have become fertile breeding grounds for web APIs. 
 Most PaaS clouds make it simple to develop and host web APIs for scalable use over the Internet. Mobile 
 Backend-as-a-Service (MBaaS) clouds take this one step further where they specialize in exposing web APIs for facilitating mobile
 app development. As a result we see a significant boost in the number of web APIs hosted in the cloud.
@@ -60,7 +60,7 @@ proper governance systems to manage the constant evolution of APIs, API provider
 while potentially breaking downstream applications that depend on the APIs.
 
 \subsection{Limitations of Existing API Governance Models in the Cloud}
-Unfortunately, most web development frameworks used to develop and host web APIs do not provide easy means of API governance. This is
+Unfortunately, most web frameworks used to develop and host web APIs do not provide easy means of API governance. This is
 especially true in the case of cloud platforms (e.g. PaaS, MBaaS), which are focused on facilitating easy development
 and deployment of APIs. As a consequence, developers that use cloud platforms to deploy web APIs, 
 need to implement custom governance solutions or purchase third party API management services. But 
@@ -71,10 +71,10 @@ cloud. They do not have access to all the metadata regarding the cloud to perfor
 As an example, consider the case where a developer deploys a new version of an API. In this
 situation, the actual code changes take place in the cloud. An 
 external governance system cannot see the code changes and therefore cannot facilitate any deployment-time governance checks.
-It may be possible to perform the API deployment through the external governance system, using the external governance system
+It may be possible to perform the API deployment through the external governance system, using it
 as a proxy. But this approach leaves room for the developer to accidentally
 or even intentionally bypass the governance system and roll out the changes directly to the cloud. Hence, the external governance systems
-cannot ``enforce'' the required level of governance.
+cannot ``enforce'' the required level of control.
 
 Finally, the service providers have to pay extra to use third party API governance solutions, and they require
 additional man power to be configured, maintained and monitored. This may offset some of the marginal cost benefits obtained
