@@ -2,8 +2,7 @@ We implemented a prototype of EAGER for AppScale, an open source PaaS cloud func
 AppScale enables deploying web applications written in Python, Java, Go and PHP. Our prototype facilitates enforcing governance on
 any of these applications. However, currently we only provide developer tools for implementing web APIs in Java. That is, our current set of development
 tools can only auto-generate API specifications for web APIs implemented in Java. This does not mean that only Java applications can export web
-APIs in our system. If a developer is willing to manually specify the API specifications, an application developed in any other AppScale compatible
-language can also export web APIs.
+APIs in our system. If a developer is provides the API specifications, an application developed in any other language can also export web APIs.
 
 \subsection{Developer Tools for EAGER}
 We provide two main tools for implementing applications/APIs for EAGER-enabled AppScale.
@@ -12,15 +11,14 @@ We provide two main tools for implementing applications/APIs for EAGER-enabled A
 \item A Java doclet that is used to auto-generate API specifications from web APIs implemented in Java
 \end{enumerate}
 
-Developers can invoke the Maven archetype from the command-line to initialize and start a new Java web application project for AppScale. Our
+Developers can invoke the Maven archetype from the command-line to initialize a new Java web application project. Our
 archetype sets up projects with the required AppScale (GAE) libraries, Java JAX-RS (Java API for RESTful Web Services) libraries 
-and a build configuration to
-invoke our doclet at build time to auto-generate specifications for all APIs available in the project.
+and a build configuration.
 
-Once a developer creates a new project using our Maven archetype he/she can implement the required web APIs using JAX-RS. Once the code has 
+Once a developer creates a new project using the archetype he/she can develop web APIs using JAX-RS. After the code has 
 been finalized, it can be built using the auto-generated Maven build configuration, which will introspect the project source code to
 generate specifications for all enclosed web APIs using the Swagger API description language. It will
-then package all the compiled code, required libraries (jar files), generated API specifications and the dependency declaration file into a single deployable
+then package all the compiled code, required libraries, generated API specifications and the dependency declaration file into a single deployable
 artifact.
 
 Finally, the developer can submit the generated artifact for deployment in the cloud, using the AppScale application deployment tools. We have
@@ -45,7 +43,6 @@ deployment tools to submit new deployment requests. The entire ADC component has
 \subsection{API Discovery Portal and API Gateway}
 We used WSO2 API Manager to implement the ADP and API Gateway. WSO2 API Manager is an open source API management solution that
 allows creating online portals for publishing APIs, and facilitates API key provisioning, API call authentication and rate limiting. 
-
 Our prototype starts an instance of the WSO2 API Manager when
 the AppScale cloud starts up. The product exposes several
 administrative web services, that we call from the ADC to publish APIs to the ADP and API Gateway. 

@@ -25,7 +25,7 @@ changes to the API immediately impacts many users and applications. Therefore AP
 their implementation counterparts. 
 
 \subsection{Cloud Computing and Web APIs}
-The importance and the interest towards web APIs have recently skyrocketed due to the popularization of cloud and mobile computing.
+The interest towards web APIs have recently skyrocketed due to the popularization of cloud and mobile computing.
 Cloud computing is based on the idea of exposing some digital asset or a capability (e.g. compute power) as a highly scalable web service. A 
 web API determines
 what functionalities are exported by the cloud. Mobile devices, due to their limited hardware
@@ -42,12 +42,12 @@ app development. As a result we see a significant boost in the number of web API
 \subsection{API Governance}
 The proliferation of web APIs necessitate more sophisticated API governance systems. API governance is required to:
 \begin{itemize}
-\item promote and ensure code reuse among service and application developers
+\item promote and ensure code reuse among developers
 \item detect programming and deployment errors and take corrective action
 \item change and update the APIs over time in a controlled and undisruptive manner
 \item enforce proper coding habits, naming conventions and deployment practices
-\item enforce controlled, secured and monitored usage of APIs
-\item provide API services with competitive reliability, availability guarantees and SLAs
+\item enforce controlled and secured use of APIs
+\item provide API services with competitive SLAs
 \end{itemize}
 
 The SOA community has done a lot of work in the area of service governance that can be adapted into
@@ -56,26 +56,25 @@ can be used to assert some level of governance on web APIs as well.
 
 API governance can be particularly helpful in dealing with the API lifecycle management, i.e. changing the deployed APIs in response to new
 feature requests and bug fixes. API churn is a very common phenomenon in the WWW. Without
-proper governance systems to manage the constant evolution of APIs, API providers run the risk of making their API deployments unreliable
-while potentially breaking many downstream applications that depend on the APIs.
+proper governance systems to manage the constant evolution of APIs, API providers run the risk of making their APIs unreliable
+while potentially breaking downstream applications that depend on the APIs.
 
 \subsection{Limitations of Existing API Governance Models in the Cloud}
 Unfortunately, most web development frameworks used to develop and host web APIs do not provide easy means of API governance. This is
-especially true in the case of cloud platforms (e.g. PaaS, MBaaS), which are mainly focused on facilitating easy development
+especially true in the case of cloud platforms (e.g. PaaS, MBaaS), which are focused on facilitating easy development
 and deployment of APIs. As a consequence, developers that use cloud platforms to deploy web APIs, 
-need to implement custom governance solutions or purchase third party API management services to fulfill the requirements listed above. But 
+need to implement custom governance solutions or purchase third party API management services. But 
 these add-on governance
-systems often fall short of supporting the required level of control and governance in the cloud, as they by definition have to operate outside the
-cloud. They do not have complete access to all the metadata regarding the cloud to perform strong deployment-time and
-run-time governance checks. 
+systems often fall short of supporting the required level of governance in the cloud, as they by definition have to operate outside the
+cloud. They do not have access to all the metadata regarding the cloud to perform strong governance checks. 
 
-As an example, consider the case where a developer attempts to deploy a new version of an API. In this
+As an example, consider the case where a developer deploys a new version of an API. In this
 situation, the actual code changes take place in the cloud. An 
 external governance system cannot see the code changes and therefore cannot facilitate any deployment-time governance checks.
 It may be possible to perform the API deployment through the external governance system, using the external governance system
 as a proxy. But this approach leaves room for the developer to accidentally
 or even intentionally bypass the governance system and roll out the changes directly to the cloud. Hence, the external governance systems
-cannot ``enforce'' the required level of governance, simply because they are external to the actual environment that hosts the API code.
+cannot ``enforce'' the required level of governance.
 
 Finally, the service providers have to pay extra to use third party API governance solutions, and they require
 additional man power to be configured, maintained and monitored. This may offset some of the marginal cost benefits obtained

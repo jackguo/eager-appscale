@@ -19,9 +19,9 @@ runtime API governance capability is left as future work.
 \end{figure}
 
 Figure~\ref{fig:eager_design} illustrates the main components of EAGER and their interactions. Solid arrows represent the interactions that take
-place during application deployment time, before an application has been checked and validated for deployment. Short-dashed arrows indicate
+place during application deployment time, before an application has been validted for deployment. Short-dashed arrows indicate
 the interactions that take place during deployment time, after an application has been successfully validated. Long-dashed arrows indicate
-interactions during runtime.
+interactions at run-time.
 
 EAGER is invoked whenever a developer attempts to deploy an application, using the developer
 tools available on his/her workstation. In some cloud implementations these tools could be available as an online service accessed 
@@ -81,18 +81,18 @@ they are compatible.
 
 To perform this API compatibility verification, the ADC checks to see whether the latest specification of an API contains all 
 the operations available in the old specification. If the latest API specification is missing at least one operation that it used to have, the ADC
-reports this to the user and aborts the deployment. If all the past operations are also present in the latest specification, the ADC performs a 
+reports this to the user and aborts the deployment. If all the past operations are present in the latest specification, the ADC performs a 
 type check to make sure that 
 all past and present operations are type compatible. This is done by performing recursive introspection on the input and output types declared in the
-API specifications. However, instead of looking for exact matches, EAGER looks for ``type compatibility'' based on the following rules inspired by Hoare
-logic and the rules of type inheritance from object oriented programming world:
+API specifications. EAGER looks for type compatibility based on the following rules inspired by Hoare
+logic and the rules of type inheritance from object oriented programming:
 \begin{itemize}
 \item New version of an input type is compatible with the old version of an input type, if the new version contains either all or less attributes than the 
 old version, and any new attributes that are unique to the new version are optional.
 \item New version of an output type is compatible with the old version of an output type, if the new version contains either all or more attributes than the 
 old version.
 \end{itemize}
-In addition to the type checks, ADC may also look for the compatibility among other parameters declared in the API specifications
+In addition to the type checks, ADC may also compare other parameters declared in the API specifications
 such as HTTP methods, mime types and URL patterns.
 
 There is a significant optimization possible when performing these API specification comparison. In addition to the API specifications,
@@ -150,12 +150,12 @@ Step 1 is required to complete the deployment of application in the cloud even w
 following subsections.
 
 \subsection{API Discovery Portal}
-API Discovery Portal (ADP) is an online catalog, where developers can browse through the available web APIs and subscribe to them. Whenever the ADC
+API Discovery Portal (ADP) is an online catalog, where developers can browse through the available web APIs. Whenever the ADC
 approves and deploys a new application, it registers all the APIs exported by the application in ADP. 
-EAGER mandates that any developer interested in using a particular API, first subscribe to that
-API and obtain the proper access credentials (API keys) from the ADP. The API keys issued by the ADP could be an OAuth access token or a similar authorization
+EAGER mandates that any developer interested in using an API, first subscribe to that
+API and obtain the proper credentials (API keys) from the ADP. The API keys issued by the ADP could be an OAuth access token or a similar authorization
 credential, that can be used to verify the developer/application that is invoking the API. This is an important component in our runtime governance
-plan, since this gives EAGER the ability to uniquely identify the developers/applications that are using the APIs. 
+plan, since this gives EAGER the ability to identify the developers/applications that are using the APIs. 
 
 The API keys issued by the ADP are stored in the Metadata Manager along with other API and developer metadata. When a programmer develops a new application
 using one or more API dependencies, we may mandate that the developer declares the dependencies along with the API keys obtained from the ADP. The ADC
