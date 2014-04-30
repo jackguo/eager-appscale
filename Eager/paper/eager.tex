@@ -7,7 +7,7 @@ EAGER is designed as an extension to existing cloud platforms, especially PaaS o
 and enforces deployment time governance checks. This includes API metadata validation, dependency validation, policy validation and 
 API backward compatibility
 checking. If either of these checks fails, EAGER aborts the deployment of the application.
-In this work we only present the deployment time governance check capabilities of EAGER. However, in this work we also lay the foundation for
+In this work we only present the deployment-time governance capabilities of EAGER. However, in this work we also lay the foundation for
 providing enforced run-time API governance. We will describe some of these features in this paper, but the final design and implementation of
 run-time API governance is left as future work.
 
@@ -19,31 +19,30 @@ run-time API governance is left as future work.
 \end{figure}
 
 Figure~\ref{fig:eager_design} illustrates the main components of EAGER and their interactions. Solid arrows represent the interactions that take
-place during application deployment time, before an application has been validted for deployment. Short-dashed arrows indicate
+place during application deployment time, before an application has been validated for deployment. Short-dashed arrows indicate
 the interactions that take place during deployment time, after an application has been successfully validated. Long-dashed arrows indicate
 interactions at run-time.
 
 EAGER is invoked whenever a developer attempts to deploy an application, using the developer
 tools available on his/her workstation. In some cloud implementations these tools could be available as an online service accessed 
-via a web browser. In either case, the application deployment request is intercepted by the API Deployment Coordinator in the cloud, which
-then performs the required governance checks. If a governance check fails, the Deployment Coordinator
+via a web browser. In either case, the application deployment request is intercepted by the EAGER, which
+then performs the required governance checks. If a governance check fails, EAGER
 will preempt the application deployment and return an error. Otherwise it proceeds with the application deployment.
 
 The proposed architecture does not require major changes to the existing components of the cloud. All the 
-EAGER components can be easily implemented as feature additions, on top of what is already available 
-in the cloud. The only noteworthy change that is required is the mechanism to intercept application deployment requests and act upon them. 
-This can be done without changing the existing key components of the cloud such as application hosting and monitoring.
-
+EAGER components can be easily implemented as feature additions. 
+The only noteworthy change that is required is the mechanism to intercept application deployment requests and act upon them. 
+This can be done without changing the existing components of the cloud.
 Following subsections further describe the design and responsibilities of EAGER components.
 
 \subsection{Metadata Manager}
-The Metadata Manager stores and maintains all the API metadata in EAGER. This includes API names, versions, specifications and dependencies.
+The Metadata Manager stores all the API metadata in EAGER. This includes API names, versions, specifications and dependencies.
 It uses the dependency information to compute the dependency tree among all deployed APIs and applications. Additionally, the Metadata Manager
 also keeps track of developers, their subscriptions to various APIs and the access credentials (API keys) issued to them. For these purposes,
 the Metadata Manager must comprise of some database management system. The developer information may be stored in a specialized user
 store (e.g. LDAP).
 
-The Metadata Manager is exposed to other components (especially the API Deployment Coordinator) through a well defined web service interface.
+The Metadata Manager is exposed to other components through a well defined web service interface.
 This interface allows querying existing API metadata and updating them. In the proposed model, the stored metadata is updated 
 occasionally (only when a new application is deployed or when a developer subscribes to a published API). Therefore the Metadata Manager
 does not need to support a very high write throughput. This allows the Metadata Manager to be implemented with strong transactional semantics,
@@ -52,18 +51,18 @@ simple replication methods.
 
 \subsection{API Deployment Coordinator}
 API Deployment Coordinator (ADC) intercepts all application deployment requests and determines whether they are suitable for deployment, based
-on a set of policies specified by the cloud or organizational administrators. It receives application deployment requests via a web service interface.
+on a set of policies specified by the cloud administrators. It receives application deployment requests via a web service interface.
 
 An application deployment request contains the name of the application, version number, names and versions of the APIs
-exported by the application, detailed API specifications and other API dependencies as declared by the developer. As far as application developers are
-concerned, the only things they should explicitly specify are the name and version of the application and the list of dependencies (i.e. APIs consumed
+exported by the application, detailed API specifications and other API dependencies as declared by the developer. Application developers only
+need to explicitly specify the name and version of the application and the list of dependencies (i.e. APIs consumed
 by the application). All other metadata can be computed automatically by performing introspection on the
 application source code. In our prototype implementation of EAGER, we have developed special tools that perform these metadata calculations, 
 including the automatic generation of API specifications.
 
-The API specifications used to describe the web APIs should specify the operations and the form (schema) of their inputs and outputs.
+The API specifications used to describe the web APIs should specify the operations and the schema of their inputs and outputs.
 Any standard API description language can be used for this purpose, as long as it clearly describes the schema of the requests and
-responses, and we use the same language to describe all APIs deployed via EAGER. For describing REST interfaces, we can use Web Application
+responses. For describing REST interfaces, we can use Web Application
 Description Language (WADL), Swagger, RAML or any other language that provides similar functionality. %Our research currently focuses on RESTful 
 %services only, but our design can also be adapted to govern SOAP services in the cloud, in which case Web Services Description Language 
 %(WSDL) can be used to create API specifications.
@@ -75,7 +74,7 @@ APIs. If the application exports at least one API, the ADC makes another call to
 metadata related to that API. If
 the Metadata Manager cannot locate any data related to the API in question, ADC assumes it to be a brand new
 API (i.e. no previous version of that API has been deployed in the cloud), and proceeds to the next step of the governance check, which is policy
-validation. However, if any metadata regarding the API is found, then the ADC is dealing with a potential API update. In this
+validation. However, if any metadata regarding the API is found, then the ADC is dealing with an API update. In this
 case, the ADC compares the old API specifications with the latest ones provided in the application deployment request to see if
 they are compatible.
 
@@ -145,7 +144,7 @@ At this point, the ADC may report success to the user and proceed with rest of t
 \item Publish the APIs enclosed in the application to an API Gateway server.
 \end{enumerate}
 
-Step 1 is required to complete the deployment of application in the cloud even without EAGER. The significance of steps 2 and 3 is explained in the 
+Step 1 is required to complete the application deployment in the cloud even without EAGER. The significance of steps 2 and 3 is explained in the 
 following subsections.
 
 \subsection{API Discovery Portal}
