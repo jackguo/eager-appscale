@@ -1,48 +1,77 @@
-We implemented a prototype of EAGER for AppScale, an open source PaaS cloud functionally equivalent to Google App Engine (GAE). 
-AppScale enables deploying web applications written in Python, Java, Go and PHP. Our prototype facilitates enforcing governance on
-any of these applications. However, currently we only provide developer tools for implementing web APIs in Java. That is, our current set of development
-tools can only auto-generate API specifications for web APIs implemented in Java. This does not mean that only Java applications can export web
-APIs in our system. If a developer is provides the API specifications, an application developed in any other language can also export web APIs.
+We implemented a prototype of EAGER for AppScale~\cite{XXXappscaleXXX}, 
+an open source PaaS cloud
+functionally equivalent to Google App Engine (GAE).  AppScale supports
+web applications written in Python, Java, Go and PHP. Our prototype service
+implements governance for any application hosted in an AppScale cloud. 
+However,
+currently we have prototyped the auto-generation governance tools for the
+developer (as opposed to the
+governance service component) for Java-based web services.
+That is, our current set of development tools can only auto-generate API
+specifications for web APIs implemented in Java. This does not mean that only
+Java applications can export web APIs in our system. For web services not
+written in Java, a developer can
+provide the API specifications manually.
 
 \subsection{Developer Tools for EAGER}
 We provide two main tools for implementing applications/APIs for EAGER-enabled AppScale.
 \begin{enumerate}
-\item An Apache Maven archetype that is used to initialize a Java web application project
+\item An Apache Maven~\cite{XXXMavenXXX} archetype that is used to initialize a Java web application project
 \item A Java doclet that is used to auto-generate API specifications from web APIs implemented in Java
 \end{enumerate}
 
-Developers can invoke the Maven archetype from the command-line to initialize a new Java web application project. Our
-archetype sets up projects with the required AppScale (GAE) libraries, Java JAX-RS (Java API for RESTful Web Services) libraries 
-and a build configuration.
+Developers can invoke the Maven archetype from the command-line to initialize
+a new Java web application project. Our archetype sets up projects with the
+required AppScale (GAE) libraries, Java JAX-RS~\cite{XXXjaxrsXXX} (Java API for RESTful Web
+Services) libraries and a build configuration.
 
-Once a developer creates a new project using the archetype he/she can develop web APIs using JAX-RS. After the code has 
-been finalized, it can be built using the auto-generated Maven build configuration, which will introspect the project source code to
-generate specifications for all enclosed web APIs using the Swagger API description language. It will
-then package all the compiled code, required libraries, generated API specifications and the dependency declaration file into a single deployable
-artifact.
+Once a developer creates a new project using the archetype he/she can develop
+web APIs using JAX-RS. After the code has been finalized, it can be built
+using the auto-generated Maven build configuration, which will introspect the
+project source code to generate specifications for all enclosed web APIs using
+the Swagger~\cite{XXXswaggerXXX} API description language. 
+It will then package all the compiled
+code, required libraries, generated API specifications and the dependency
+declaration file into a single deployable artifact.
 
-Finally, the developer can submit the generated artifact for deployment in the cloud, using the AppScale application deployment tools. We have
-made some minor modifications to the original AppScale application deployment tools, so that it sends an application deployment request to
-the EAGER ADC, and delegates the application deployment process to EAGER. This only required changes to less than 50 lines of code.
+Finally, the developer can submit the generated artifact for deployment in the
+cloud, using the AppScale application deployment tools. We have made some
+minor modifications to the original AppScale application deployment tools, so
+that it sends an application deployment request to the EAGER ADC, and
+delegates the application deployment process to EAGER. This change required
+changes to less than 50 lines of AppScale code.
 
-\subsection{Metadata Manager}
-We implemented the Metadata Manager using MySQL, a relational database engine. 
-The database server was registered with the built-in process coordination mechanism of AppScale, which automatically
-cleans up and restarts crashed or faulty processes. This is a good example of using the existing features in the cloud to implement
-governance in a reliable manner.
+\subsection{Metadata Manager} 
+We implemented the Metadata Manager using MySQL~\cite{XXXmysqlXXX},
+a relational database engine.  The database server was registered with the
+built-in process coordination mechanism of AppScale, which automatically
+cleans up and restarts crashed or faulty processes. 
+%This is a good example of
+%using the existing features in the cloud to implement governance in a reliable
+%manner.
 
 \subsection{API Deployment Coordinator}
-We implemented the ADC as a Python server process in our prototype. This process is also monitored and managed by the process
-coordination mechanism of AppScale. The ADC implementation exports a secure web service interface which is used by the AppScale application 
-deployment tools to submit new deployment requests. The entire ADC component has been implemented in about 975 lines of Python code. 
-%It loads the policy files from a specific directory in 
-%the server file system. In our experiments so far, we deployed new policies into the system by manually copying the policy files into this 
-%directory in the cloud. We are currently in the process of creating a toolkit for deploying and managing policies remotely, without accessing 
-%the ADC's file system directly.
+
+We implemented the ADC as a Python server process in our prototype. This
+process is also monitored and managed by the process coordination mechanism of
+AppScale. The ADC implementation exports a secure web service interface which
+is used by the AppScale application deployment tools to submit new deployment
+requests. 
+%The entire ADC component has been implemented in about 975 lines of
+
+%Python code. 
+%It loads the policy files from a specific directory in the server file
+%system. In our experiments so far, we deployed new policies into the system
+%by manually copying the policy files into this directory in the cloud. We are
+%currently in the process of creating a toolkit for deploying and managing
+%policies remotely, without accessing the ADC's file system directly.
 
 \subsection{API Discovery Portal and API Gateway}
-We used WSO2 API Manager~\cite{wso2am} to implement the ADP and API Gateway. WSO2 API Manager is an open source API management solution that
-allows creating online portals for publishing APIs, and facilitates API key provisioning, API call authentication and rate limiting. 
-Our prototype starts an instance of the WSO2 API Manager when
-the AppScale cloud starts up. The product exposes several
-administrative web services, that we call from the ADC to publish APIs to the ADP and API Gateway. 
+
+We used WSO2 API Manager~\cite{wso2am} to implement the ADP and API Gateway.
+WSO2 API Manager is an open source API management solution that allows
+creating online portals for publishing APIs, and facilitates API key
+provisioning, API call authentication and rate limiting.  Our prototype starts
+an instance of the WSO2 API Manager when the AppScale cloud starts up. The
+product exposes several administrative web services, that we call from the ADC
+to publish APIs to the ADP and API Gateway. 
