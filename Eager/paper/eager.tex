@@ -169,7 +169,12 @@ Once the API specifications have been successfully compared without errors,
 the ADC initiates policy validation. Policies are specified by cloud
 administrators or administrators of the organization (tenant) that the
 application developer is part of. Policies are specified using a subset of the
-Python programming language, which makes it easy to develop and maintain them.
+Python programming language~\cite{XXXportingeffortpaperXXX}, 
+which makes it easy to develop and maintain them\footnote{The 
+specification language based on a restricted subset of Python,
+described more completely in~\cite{XXXportingeffortpaperXXX}, essentially
+elides non-primitive types and function calls from the full Python
+language specification.}.
 %We control the built-in Python functions and modules policy files may engage
 %via a simple whitelisting method. 
 We also define a set of assertions

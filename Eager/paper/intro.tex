@@ -85,15 +85,34 @@ Toward this end, we propose EAGER ({\bf E}nforced {\bf A}PI {\bf G}overnance
 cloud platforms in order to facilitate API governance as a 
 cloud-native feature. EAGER enforces proper versioning of APIs and supports dependency 
 management and comprehensive policy enforcement at API deployment time. 
-Deployment-time enforcement is an initial step in a complete governance
-solution and ensures that APIs put into production meet all expectations of
-the developer and other stakeholders.  EAGER also implements runtime
+
+Deployment-time enforcement (heretofore unexplored) is attractive for several
+reasons.  First, if runtime only API governance is implemented, 
+policy violations will go undetected until the the offending APIs are used.  
+As a result, multiple deployments and rollbacks may occur before a policy
+volation is triggered making it difficult or impossible to determine the root
+cause of the violation.  By enforcing governance at deployment time as well as
+run time, EAGER implements ``fail fast'' in which violations are detected
+immediately making diagnosis and remediation less complex.  
+Further, from a maintenance perspective,  the overall
+system is prevented from entering a non-compliant state which aids in the
+certification of regulatory compliance.  In addition, runtime governance
+typically imples that each API will be intercepted by a policy-checking engine
+that uses admission control and an enforcement mechanism.  Because deployment
+events are less frequent, implementing policy at deployment time improves the
+scaling peoperties of governed systems.   Not all governance policies can be
+implemented strictly at deployment time, but those that can should be as a way
+of improving both compliance and system performance.
+
+Thus while
+EAGER also implements runtime
 enforcement in a way similar to API management
-solutions~\cite{XXXWS02APImanager,XXX,XXX}.  However, in this paper, we focus
-on deployment-time governance as an emerging challenge faced by those
+solutions~\cite{XXXWS02APImanager,XXX,XXX}, in this paper, we focus
+on its deployment-time governance features as a way of helping to meet the
+emerging challenges faced by those
 implementing scalable web service venues. 
 
-As such, EAGER implements policies governing the APIs that are 
+EAGER implements policies governing the APIs that are 
 deployed within a single administrative domain.  Focusing governance on
 the APIs simplifies both policy specification and the consistent
 and automatic implementation of policies.  At the same time, it promotes
