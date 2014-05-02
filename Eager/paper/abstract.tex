@@ -1,7 +1,33 @@
+Web services and cloud computing have revolutionized the way software is
+developed, deployed, and consumed.  As a consequence, there has been a
+proliferation of web services, which developers make accessible to users via
+web application programming interfaces (web APIs) and cloud-based deployment
+technologies.  Because this model significantly simplifies and expedites
+deployment of web APIs, it also poses new software maintenance and evolution
+challenges.  In particular, it is difficult to track, control, and compel
+reuse of web APIs, inadequately tested programs can be
+deployed into production, and API changes can be introduced that
+break API-user code or that breach security or organizational procedures.
+
+To address these challenges, we investigate a new approach to API governance
+-- combined policy, implementation, and deployment control of APIs for
+software and data deployed as web services.  Our approach, called EAGER,
+provides a software architecture that can be easily integrated into cloud
+platforms as cloud-native features, and that provides system wide, d
+eployment-time enforcement of API governance policies.
+Specifically, EAGER can check for and
+prevent backward incompatible API changes from
+being deployed into production,
+enforces service reuse, and facilitates enforcement of other best practices
+in software maintenance via policies.  We implement EAGER by
+extending an open source platform-as-a-service cloud and
+demonstrate its feasibility, efficiency,
+scalability, and effectiveness for enforcing cloud-based API governance.
+
+\ignore{
 Web services and cloud computing have
 revolutionized the way software is developed and maintained. Increasingly,
-cloud-based applications take the form of network-accessible
-services that export
+cloud-based applications take the form of network-accessible services that export
 web application programming interfaces (web APIs).  Application
 clients and users compose the functionality they require by making calls
 to these published interfaces. 
@@ -31,3 +57,4 @@ functionality using an open source
 Platform-as-a-Service (PaaS) cloud as an example service venue
 and demonstrate its feasibility, efficiency, scalability and
 effectiveness as an API governance system for clouds.
+}
