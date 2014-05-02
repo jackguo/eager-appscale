@@ -91,8 +91,8 @@ platform.  By doing so, this approach
 by integration, and configuration of third party services that are not
 end-to-end integrated within the cloud fabric itself, 
 \item leverages already-present cloud functionality such as fault tolerance,
-high availability, easticity, and end-to-end security implementation to
-implement goverance, and
+high availability, elasticity, and end-to-end security implementation to
+implement governance, and
 \item unifies a vast diversity of API
 governance features across all stages of API lifetime
 (development, deployment, evolution, deprecation, retirement). 
@@ -110,9 +110,26 @@ cloud-native feature. EAGER enforces proper versioning of APIs and supports depe
 management and comprehensive policy enforcement at API deployment time. 
 Deployment-time enforcement is an initial step in a complete governance
 solution and ensures that APIs put into production meet all expectations of
-the developer and other stakeholders, and that they are ready for use
-by potentially thousands of consumers over the lifetime of the API.
-EAGER guarantees that 
+the developer and other stakeholders.  EAGER is also implements runtime
+enforcement in a way similar to API management
+solutions~\cite{XXXWS02APImanager,XXX,XXX}.  However, in this paper, we focus
+on deployment-time governance as an emerging challenge faced by those
+implementing scalable web service venues. 
+
+As such, EAGER implements policies governing the APIs that are 
+deployed within a single administrative domain.  Focusing governance on
+the APIs simplifies both policy specification and the consistent
+and automatic implementation of policies.  At the same time, it promotes
+software maintainability by separating the API lifecycle management from that
+of the service implementations and the client users.  That is, APIs are often
+longer lived than the individual clients that use them or the implementations
+of the services that they represent.  At the same time they represent the
+``gateway'' between service consumption (API clients and users) and service
+production (web service implementation).  Policy definition and enforcement at
+the API level permits the service and client implementations to change
+independently without the loss of governance control.
+
+EAGER also promotes software maintainability by guaranteeing that 
 developers reuse existing APIs when possible to create new software artifacts
 (to prevent API redundancy and unverified API use), while
 tracking the changes made by developers to deployed web APIs to prevent
@@ -123,9 +140,9 @@ API governance policies that is independent of both the APIs and services that
 the policies govern. 
 The EAGER language is distinct from 
 existing policy languages like WS-Policy~\cite{WSPolicy,soagovstandard}
-in that it avoids the verbosity of XML, 
+in that it avoids the complexities of XML, 
 and it incorporates a developer-friendly Python programming language syntax for 
-specifying even the most complex policy statements in a simple and 
+specifying complex policy statements in a simple and 
 intuitive manner. Moreover, we ensure that specifying the required policies 
 is the only additional activity that API providers should perform in
 order to benefit from EAGER. All other API governance related verification and 
