@@ -167,27 +167,34 @@ such as HTTP methods, mime types and URL patterns.
 
 Once the API specifications have been successfully compared without errors,
 the ADC initiates policy validation. Policies are specified by cloud
-administrators or administrators of the organization (tenant) that the
-application developer is part of. Policies are specified using a subset of the
-Python programming language, 
-which makes it easy to develop and maintain them.
+administrators or administrators of the organization (tenant) 
+using a subset of Python that prevents state from being preserved across
+validations\footnote{The EAGER Python interpreter for policies disables file
+and network operations, library calls and intrinsics that could allow
+state to persist across invocations.  In addtion, it resets memory before each
+policy is interpreted.  Thus each policy is evaluated as fully self-contained
+Python program that accesses no external state.}.
+%that the
+%application developer is part of. Policies are specified using a subset of the
+%Python programming language, 
+%which makes it easy to develop and maintain them.
 %We control the built-in Python functions and modules policy files may engage
 %via a simple whitelisting method. 
 We also define a set of assertions
 that policy writers can use to specify various checks that must be performed
 on the applications. 
 Currently this assertion list includes:
+{\footnotesize 
 \begin{lstlisting}[language=Python, frame=single]
 assert_true(condition, optional_error_msg)
 assert_false(condition, optional_error_msg)
-assert_app_dependency(app, 
-  d_name, d_version)
-assert_not_app_dependency(app, 
-  d_name, d_version)
-assert_app_dependency_in_range(app, name, 
-  lower, upper, 
+assert_app_dependency(app, d_name, d_version)
+assert_not_app_dependency(app, d_name, d_version)
+assert_app_dependency_in_range(app, name,\
+  lower, upper,\
   exclude_lower, exclude_upper)
 \end{lstlisting}
+}
 
 %\begin{itemize}
 %\item assert\_true(condition, optional\_error\_msg)
@@ -207,6 +214,7 @@ file that mandates all application names to begin with upper case letters and,
 all applications to take a dependency on an API called Logger-v1.0 is shown
 below:
 
+{\footnotesize
 \begin{lstlisting}[language=Python, frame=single]
 import re
 
@@ -214,6 +222,7 @@ pattern = re.compile(`^[A-Z]')
 assert_true(pattern.match(app.name))
 assert_app_dependency(app,`Logger',`1.0')
 \end{lstlisting}
+}
 
 In the above example \textit{app} is a special logical variable available to
 all policy files. This variable allows applications to access information

@@ -309,7 +309,10 @@ without randomizing the declared dependencies.
 \begin{figure}
 \centering
 \includegraphics[scale=0.45]{pweb_random_overhead}
-\caption{EAGER Overhead When Deploying on ProgrammableWeb Dataset with Dependencies}
+\caption{EAGER Overhead When Deploying on ProgrammableWeb Dataset with
+Dependencies. The numeric suffix to either ``random'' or ``fixed'' in each
+column
+label indicates the number of dependencies declared.}
 \label{fig:pweb_random_overhead}
 \end{figure}
 
@@ -319,8 +322,8 @@ without randomizing the declared dependencies.
 %randomized prior to each redeployment. Columns labeled as ``fixed'' show the
 %average overhead calculated across 3 redeployments, where the dependency
 %declaration was kept fixed across redeployments. 
-The numeric suffix to either ``random'' or ``fixed'' in each column
-label indicates the number of dependencies declared.
+%The numeric suffix to either ``random'' or ``fixed'' in each column
+%label indicates the number of dependencies declared.
 
 Interestingly, dependency count does not have a significant impact on 
 the overhead. %This is inline with our observations in figure~\ref{fig:overhead_by_deps}.
