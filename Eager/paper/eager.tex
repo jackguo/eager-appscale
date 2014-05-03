@@ -26,12 +26,12 @@ automatically prevented from transitioning out of policy compliance due to a
 change in the APIs it hosts.
 
 In this work we focus on the deployment-time governance capabilities of EAGER. 
-At present, it also implements the same runtime governance features that are
+At present, it also implements the same run-time governance features that are
 common to most API management facilities (which is necessary but not the
 subject of the research we present in this paper).
 However, our experience with the interplay between the new deployment-time
-governance techniques we discuss and the extant methodologies for runtime
-features leads to new possibilities for run time governance as well (which we
+governance techniques we discuss and the extant methodologies for run-time
+features leads to new possibilities for run-time governance as well (which we
 discuss as future work).
 %providing enforced run-time API governance. We will describe some of these features in this paper, but the final design and implementation of
 %run-time API governance is left as future work.
@@ -260,7 +260,7 @@ or a similar authorization credential, that can be used to verify the
 developer/application that is invoking the API. This credential management
 function is
 important both to auditing and also as a connection to
-runtime governance since it gives EAGER the ability to identify
+run-time governance since it gives EAGER the ability to identify
 the developers/applications that are using the APIs. 
 
 The API keys issued by the ADP are stored in the Metadata Manager. When a
@@ -283,7 +283,7 @@ the dependency declaration provided by the application developer.
 %linkage between deployment and runtime governance.
 
 \subsection{API Gateway} 
-Runtime governance of applications by systems such as
+Run-time governance of applications by systems such as
 Synapse~\cite{synapse} make use of an API ``proxy'' or gateway.
 %API Gateway is another piece of the runtime
 %governance puzzle that we intend to solve as a part of our future work. 
@@ -302,7 +302,7 @@ behind a scalable load balancer. %Since most API metadata, especially the API ke
 %frequently, it can afford to cache such information locally for better runtime performance. 
 In addition to API key validation, it may perform other
 functions as well, such as monitoring, throttling (rate limiting), SLA
-enforcement and runtime policy validation. We intend to further evaluate these
-runtime governance features and the way they must be integrated with
+enforcement and run-time policy validation. We intend to further evaluate these
+run-time governance features and the way they must be integrated with
 EAGER deployment-time governance,
 in our future research.

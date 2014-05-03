@@ -72,7 +72,7 @@ implement governance at deployment time -- the phase of the software lifecycle
 during which an API change or new API is being put into service.
 Because of the scale at which clouds operate, deployment-time governance is
 critical since it permits policy violations to be remediated before the
-changes are put into production ({\em i.e.} before runtime).
+changes are put into production ({\em i.e.} before run-time).
 
 Thus, our thesis is that governance must be implemented as a cloud service to
 overcome these liabilities.
@@ -104,16 +104,16 @@ cloud-native feature. EAGER enforces proper versioning of APIs and supports depe
 management and comprehensive policy enforcement at API deployment time. 
 
 Deployment-time enforcement (heretofore unexplored) is attractive for several
-reasons.  First, if runtime only API governance is implemented, 
+reasons.  First, if run-time only API governance is implemented, 
 policy violations will go undetected until the the offending APIs are used.  
 As a result, multiple deployments and rollbacks may occur before a policy
 violation is triggered making it difficult or impossible to determine the root
-cause of the violation.  By enforcing governance at deployment time as well as
-runtime, EAGER implements ``fail fast'' in which violations are detected
+cause of the violation.  By enforcing governance at deployment-time as well as
+run-time, EAGER implements ``fail fast'' in which violations are detected
 immediately making diagnosis and remediation less complex.  
 Further, from a maintenance perspective,  the overall
 system is prevented from entering a non-compliant state which aids in the
-certification of regulatory compliance.  In addition, runtime governance
+certification of regulatory compliance.  In addition, run-time governance
 typically implies that each API call will be intercepted by a policy-checking engine
 that uses admission control and an enforcement mechanism.  Because deployment
 events are less frequent, implementing policy at deployment time improves the
@@ -122,7 +122,7 @@ implemented strictly at deployment time, but those that can provide a way
 of improving both compliance and system performance.
 
 Thus while
-EAGER also implements runtime
+EAGER also implements run-time
 enforcement in a way similar to API management
 solutions~\cite{wso2am,apigee,layer7,3scale}, in this paper, we focus
 on its deployment-time governance features as a way of helping to meet the
