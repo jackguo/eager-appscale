@@ -18,7 +18,7 @@ At the time of this writing,
 ProgrammableWeb~\cite{pweb}, a popular web API index, lists more than $11,000$
 publicly available
 web APIs and a nearly 100\% annual growth rate~\cite{pweb_growth}. 
-Many of these APIs focus on commerce-oriented applications and training (e.g.
+Many of these APIs focus on commerce-oriented applications (e.g.
 advertising, shopping, travel, etc.)
 However several non-commercial entities have recently
 also started publishing web 
@@ -29,17 +29,17 @@ This proliferation of web APIs demands new techniques and systems that
 automate the maintenance and evolution of APIs as a first-class software
 resource.  API management in the form of runtime mechanisms to implement
 access control and performance-based service level agreements (SLAs) is not
-new many good commercial offerings exist today~\cite{3scale,apigee,layer7}.   
-However support for \textit{API governance} -- consistent generalized policy
-implementation across multiple separate APIs in an administrative domain --   .
-is a new area of research made poinent by the emergence of cloud computing.
+new, and many good commercial offerings exist today~\cite{3scale,apigee,layer7}.   
+However, support for \textit{API governance} -- consistent generalized policy
+implementation across multiple separate APIs in an administrative domain --
+is a new area of research made poignant by the emergence of cloud computing.
 
 A lack of API governance can lead to 
 security breaches, denial of service (DoS)
 attacks, poor code reuse, violation of service-level agreements (SLAs), 
 naming and branding issues, and abuse of digital 
 assets by the API consumers. Unfortunately, most existing cloud platforms
-within which web APIs are hosted provide only minimal runtime support, {\em
+within which web APIs are hosted provide only minimal governance support, {\em
 e.g.}
 registration and authorization.  These mechanisms
 (available from various commercial vendors such as
@@ -60,13 +60,13 @@ API management solutions have several limitations that make them difficult to
 use to implement governance.  
 These approaches often 
 do not possess the ability to implement full enforcement and, instead, alert
-operators to potential issues without prventing non-compliant behavior.
-Many systems operate outside the 
-cloud that actually hosts the APIs thereby generating an additional cost that
+operators to potential issues without preventing non-compliant behavior.
+Many of these systems operate outside the 
+cloud that actually host the APIs thereby generating an additional cost that
 may preclude their use.
 In addition, they can fail independently of the cloud, thereby affecting 
 the scalability and availability of the software that they control.
-Finally, because they are not integrated witht he cloud itself it is difficult
+Finally, because they are not integrated with the cloud itself it is difficult
 for them to
 implement governance at deployment time -- the phase of the software lifecycle
 during which an API change or new API is being put into service.
@@ -86,9 +86,9 @@ by integration, and configuration of governance services that are not
 end-to-end integrated within the cloud fabric itself, 
 \item leverages already-present cloud functionality such as fault tolerance,
 high availability, elasticity, and end-to-end security implementation to
-implement governance, and
+facilitate governance, and
 \item unifies a vast diversity of API
-governance features across all stages of API lifecycle
+governance features across all stages of the API lifecycle
 (development, deployment, evolution, deprecation, retirement). 
 \end{itemize}
 As a native cloud functionality, such an
@@ -107,18 +107,18 @@ Deployment-time enforcement (heretofore unexplored) is attractive for several
 reasons.  First, if runtime only API governance is implemented, 
 policy violations will go undetected until the the offending APIs are used.  
 As a result, multiple deployments and rollbacks may occur before a policy
-volation is triggered making it difficult or impossible to determine the root
+violation is triggered making it difficult or impossible to determine the root
 cause of the violation.  By enforcing governance at deployment time as well as
 runtime, EAGER implements ``fail fast'' in which violations are detected
 immediately making diagnosis and remediation less complex.  
 Further, from a maintenance perspective,  the overall
 system is prevented from entering a non-compliant state which aids in the
 certification of regulatory compliance.  In addition, runtime governance
-typically imples that each API will be intercepted by a policy-checking engine
+typically implies that each API call will be intercepted by a policy-checking engine
 that uses admission control and an enforcement mechanism.  Because deployment
 events are less frequent, implementing policy at deployment time improves the
-scaling peoperties of governed systems.   Not all governance policies can be
-implemented strictly at deployment time, but those that can should be as a way
+scaling properties of governed systems.   Not all governance policies can be
+implemented strictly at deployment time, but those that can provide a way
 of improving both compliance and system performance.
 
 Thus while
@@ -150,8 +150,7 @@ tracks changes made by developers to deployed web APIs to prevent
 any backwards-incompatible API changes from being put into production.
 
 EAGER includes a language for specifying 
-API governance policies that is independent of both the APIs and services that
-the policies govern.  The EAGER language is distinct from 
+API governance policies.  The EAGER language is distinct from 
 existing policy languages like WS-Policy~\cite{WSPolicy,soagovstandard}
 in that it avoids the complexities of XML, 
 and it incorporates a developer-friendly Python programming language syntax for 
