@@ -13,6 +13,12 @@ Java applications can export web APIs in our system. For web services not
 written in Java, a developer can
 provide the API specifications manually.
 
+Like many PaaS platforms, AppScale also includes an application deployment
+service that distributes, launches, makes an application available
+as a web-accessible service.  EAGER controls the use of this deployment
+service according
+to the policies with which it is configured.
+
 \subsection{Developer Tools for EAGER}
 We provide two main tools for implementing applications/APIs for EAGER-enabled AppScale.
 \begin{enumerate}
@@ -41,22 +47,39 @@ that it sends an application deployment request to the EAGER ADC, and
 delegates the application deployment process to EAGER. This change required
 changes to less than 50 lines of AppScale code.
 
-\subsection{Metadata Manager} 
-We implemented the Metadata Manager using MySQL~\cite{mysql},
-a relational database engine.  The database server was registered with the
-built-in process coordination mechanism of AppScale, which automatically
-cleans up and restarts crashed or faulty processes. 
+
+\begin{table}[ht]
+\begin{center}
+\begin{tabular}{| p{4cm} | p{4cm} |}
+\hline
+EAGER Component & Implementation Technology\\ \hline
+Metadata Manager & MySQL~\cite{mysql}\\
+API Deployment Coordinator & Native Python implementation\\
+API Discovery Portal & WSO2 API Manager~\cite{wso2am}\\
+API Gateway & WSO2 API Manager\\
+\hline
+\end{tabular}
+\end{center}
+\caption{Implementation Technologies used to Implement the EAGER Prototype}
+\label{tab:imp-tech}
+\end{table}
+%\subsection{Metadata Manager} 
+%We implemented the Metadata Manager using MySQL~\cite{mysql},
+%a relational database engine.  
+%The database server was registered with the
+%built-in process coordination mechanism of AppScale, which automatically
+%cleans up and restarts crashed or faulty processes. 
 %This is a good example of
 %using the existing features in the cloud to implement governance in a reliable
 %manner.
 
-\subsection{API Deployment Coordinator}
-
-We implemented the ADC as a Python server process in our prototype. This
-process is also monitored and managed by the process coordination mechanism of
-AppScale. The ADC implementation exports a secure web service interface which
-is used by the AppScale application deployment tools to submit new deployment
-requests. 
+%\subsection{API Deployment Coordinator}
+%
+%We implemented the ADC as a Python server process in our prototype. This
+%process is also monitored and managed by the process coordination mechanism of
+%AppScale. The ADC implementation exports a secure web service interface which
+%is used by the AppScale application deployment tools to submit new deployment
+%requests. 
 %The entire ADC component has been implemented in about 975 lines of
 
 %Python code. 
@@ -66,12 +89,17 @@ requests.
 %currently in the process of creating a toolkit for deploying and managing
 %policies remotely, without accessing the ADC's file system directly.
 
-\subsection{API Discovery Portal and API Gateway}
+%\subsection{API Discovery Portal and API Gateway}
+%
+%We used WSO2 API Manager~\cite{wso2am} to implement the ADP and API Gateway.
+%WSO2 API Manager is an open source API management solution that allows
+%creating online portals for publishing APIs, and facilitates API key
+%provisioning, API call authentication and rate limiting.  Our prototype starts
+%an instance of the WSO2 API Manager when the AppScale cloud starts up. The
+%product exposes several administrative web services, that we call from the ADC
+%to publish APIs to the ADP and API Gateway. 
 
-We used WSO2 API Manager~\cite{wso2am} to implement the ADP and API Gateway.
-WSO2 API Manager is an open source API management solution that allows
-creating online portals for publishing APIs, and facilitates API key
-provisioning, API call authentication and rate limiting.  Our prototype starts
-an instance of the WSO2 API Manager when the AppScale cloud starts up. The
-product exposes several administrative web services, that we call from the ADC
-to publish APIs to the ADP and API Gateway. 
+These technologies implement the various EAGER functionalities described in
+Section~\ref{sec:eager} as services within AppScale itself.  For example, AppScale
+controls the lifecycle of the MySQL database as it would any of its other
+constituent services.

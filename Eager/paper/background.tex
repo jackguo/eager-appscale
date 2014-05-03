@@ -1,18 +1,21 @@
-Service Oriented Architecture (SOA)~\cite{Haines:2010:SAM:1787234.1787269} is a popular architectural style for
-implementing complex systems in a modular fashion. A SOA system
-is implemented as a composition of a number of independent software components
-referred to as ``services.'' Each service has a well-defined interface which
-exports some functionality that can be used by other services and/or users.
-This service abstraction helps group related data and logic together thereby
-making long-term software maintenance more effective and cost efficient. 
+%Service Oriented Architecture (SOA)~\cite{Haines:2010:SAM:1787234.1787269} is a popular architectural style for
+%mplementing complex systems in a modular fashion. A SOA system
+%s implemented as a composition of a number of independent software components
+%eferred to as ``services.'' Each service has a well-defined interface which
+%xports some functionality that can be used by other services and/or users.
+%his service abstraction helps group related data and logic together thereby
+%aking long-term software maintenance more effective and cost efficient. 
 
 The popularization of network computing and the World Wide Web (WWW) 
 has led to the development and adoption of web services~\cite{6094008} as
-the technology of choice for implementing modern SOA.  The
+the technology of choice for implementing modern service-oriented
+(SOA~\cite{Haines:2010:SAM:1787234.1787269}) architectures.
+The
 interface portion of a web service, which abstracts and modularizes
 its service implementation
 details while making the service network-accessible, is commonly referred to
-as a web API. As far as the users and applications that consume a web service
+as a {\em web API}. As far as the users and applications that consume a 
+web service
 are concerned, the web API is the only point of contact and source of
 functionality for the underlying service implementation.
 
@@ -36,7 +39,6 @@ slowly evolving and long lasting lifecycle than the the service
 implementations
 to which the interface. 
 
-\subsection{Cloud Computing and Web APIs}
 Cloud computing is based on the idea of exposing some digital asset or a
 capability ({\em e.g.} compute power, database, etc.) 
 as a highly scalable web service.  Mobile
@@ -53,24 +55,22 @@ clouds~\cite{appscale13,cloudfoundry,openshift} include
 features designed to
 ease the development and hosting web APIs for scalable use over the Internet. 
 
-\subsection{API Governance}
-This proliferation of web APIs necessitate more sophisticated API 
-governance systems. API governance is required to:
-\begin{itemize}
-\item promote and ensure code reuse among developers
-\item detect programming and deployment errors and take corrective action
-\item change and update the APIs over time in a controlled and nondisruptive manner
-\item enforce proper coding habits, naming conventions and deployment practices
-\item enforce controlled and secured use of APIs
-\item provide API services with differentiated SLAs
-\end{itemize}
-
+In particular, API governance promotes code reuse among developers
+since the API must be treated as tracked and controlled software entity.
+It also ensures that software users benefit from change control since the APIs
+they use
+change in as controlled and nondisruptive manner.  From a maintenance
+perspective, API governance 
+makes it possible to enforce best practice coding procedures, 
+naming conventions, and deployment procedures uniformly.
+%\item enforce controlled and secured use of APIs
+%\item provide API services with differentiated SLAs
+%\end{itemize}
 %%NOT HERE -- needs to move to the related work section
 %The SOA community has done a lot of work in the area of service governance that can be adapted into
 %API governance. Indeed, most of the commonly used service governance tactics such as versioning and policy enforcement
 %can be used to assert some level of governance on web APIs as well.
-
-API governance is critical to API lifecycle
+API governance is also critical to API lifecycle
 management --  the management of deployed APIs in response to new feature
 requests, bug fixes, and organizational priorities. 
 API ``churn'' that results from lifecycle management
@@ -80,7 +80,7 @@ Without proper governance systems to manage the constant evolution of APIs,
 API providers run the risk of making their APIs unreliable while potentially
 breaking downstream applications that depend on the APIs.
 
-\subsection{API Governance Models in the Cloud}
+%\subsection{API Governance Models in the Cloud}
 
 Unfortunately, most web frameworks used to develop and host web APIs do not 
 provide API governance facilities. This missing functionality is

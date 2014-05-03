@@ -177,13 +177,25 @@ We also define a set of assertions
 that policy writers can use to specify various checks that must be performed
 on the applications. 
 Currently this assertion list includes:
-\begin{itemize}
-\item assert\_true(condition, optional\_error\_msg)
-\item assert\_false(condition, optional\_error\_msg)
-\item assert\_app\_dependency(app, d\_name, d\_version)
-\item assert\_not\_app\_dependency(app, d\_name, d\_version)
-\item assert\_app\_dependency\_in\_range(app, name, lower, upper, exclude\_lower, exclude\_upper)
-\end{itemize}
+\begin{lstlisting}[language=Python, frame=single]
+assert_true(condition, optional_error_msg)
+assert_false(condition, optional_error_msg)
+assert_app_dependency(app, 
+  d_name, d_version)
+assert_not_app_dependency(app, 
+  d_name, d_version)
+assert_app_dependency_in_range(app, name, 
+  lower, upper, 
+  exclude_lower, exclude_upper)
+\end{lstlisting}
+
+%\begin{itemize}
+%\item assert\_true(condition, optional\_error\_msg)
+%\item assert\_false(condition, optional\_error\_msg)
+%\item assert\_app\_dependency(app, d\_name, d\_version)
+%\item assert\_not\_app\_dependency(app, d\_name, d\_version)
+%\item assert\_app\_dependency\_in\_range(app, name, lower, upper, exclude\_lower, exclude\_upper)
+%\end{itemize}
 
 %Using the above assertions and the restricted Python syntax it is possible to
 %implement even the most complex policies in a simple and intuitive manner.

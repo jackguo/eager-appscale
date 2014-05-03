@@ -26,15 +26,22 @@ APIs, e.g. IEEE~\cite{ieeeapis}, UC Berkeley~\cite{ucbapis}, and the US White
 House~\cite{whitehouseapis}.  
 
 This proliferation of web APIs demands new techniques and systems that
-automate the maintenance and evolution of APIs. In particular, we require
-support for defining and enforcing policies that control and manage the API 
-lifecycle, i.e. \textit{API governance}.  A lack of governance can lead to 
+automate the maintenance and evolution of APIs as a first-class software
+resource.  API management in the form of runtime mechanisms to implement
+access control and performance-based service level agreements (SLAs) is not
+new many good commercial offerings exist today~\cite{3scale,apigee,layer7}.   
+However support for \textit{API governance} -- consistent generalized policy
+implementation across multiple separate APIs in an administrative domain --   .
+is a new area of research made poinent by the emergence of cloud computing.
+
+A lack of API governance can lead to 
 security breaches, denial of service (DoS)
 attacks, poor code reuse, violation of service-level agreements (SLAs), 
 naming and branding issues, and abuse of digital 
 assets by the API consumers. Unfortunately, most existing cloud platforms
-within which web APIs are hosted provide only minimal governance support, e.g.
-registration and API development authorization.  These mechanisms
+within which web APIs are hosted provide only minimal runtime support, {\em
+e.g.}
+registration and authorization.  These mechanisms
 (available from various commercial vendors such as
 3Scale~\cite{3scale}, Apigee~\cite{apigee},
 Layer7~\cite{layer7})
@@ -42,31 +49,40 @@ are important to policy implementation since governance policies often need to
 express access control specifications.  
 However, developers are still responsible for implementing governance policies
 that {\em combine} features such as API versioning, access control,
-dependency management, and SLA enforcement.  Moreover, each application must
+dependency management, and SLA enforcement as part of their respective
+applications.  Moreover, each application must
 implement its own governance -- there is no system for ensuring that the
 policies implemented by different developers are consistent both in their
 specification and their implementation.
 
-In addition, many third party 
+In addition, many existing
 API management solutions have several limitations that make them difficult to
-use to implement governance:
-\begin{enumerate}
-\item Third party API management solutions often operate outside the cloud that actually hosts the APIs. Therefore 
-the API providers have to manage and pay for an additional service.
-\item Third party solutions typically do not possess the ability to control and govern web APIs in an enforced manner. They cannot perform 
-critical deployment-time governance checks on the APIs that are being developed and rolled out into the cloud. 
-\item The API management solutions can fail independently of the cloud, thereby affecting the scalability and availability of the cloud-hosted APIs. 
-\end{enumerate}
+use to implement governance.  
+These approaches often 
+do not possess the ability to implement full enforcement and, instead, alert
+operators to potential issues without prventing non-compliant behavior.
+Many systems operate outside the 
+cloud that actually hosts the APIs thereby generating an additional cost that
+may preclude their use.
+In addition, they can fail independently of the cloud, thereby affecting 
+the scalability and availability of the software that they control.
+Finally, because they are not integrated witht he cloud itself it is difficult
+for them to
+implement governance at deployment time -- the phase of the software lifecycle
+during which an API change or new API is being put into service.
+Because of the scale at which clouds operate, deployment-time governance is
+critical since it permits policy violations to be remediated before the
+changes are put into production ({\em i.e.} before runtime).
 
-We postulate that governance must be implemented as a cloud service to
+Thus, our thesis is that governance must be implemented as a cloud service to
 overcome these liabilities.
-That is, instead of using a third party API management
-solution that layers governance features on top of the cloud, 
+That is, instead of an API management
+approach that layers governance features on top of the cloud, 
 we propose to provide API governance as a fundamental component of the cloud
 platform.  By doing so, this approach
-\begin{enumerate}
+\begin{itemize}
 \item avoids inconsistencies and failure modes caused  
-by integration, and configuration of third party services that are not
+by integration, and configuration of governance services that are not
 end-to-end integrated within the cloud fabric itself, 
 \item leverages already-present cloud functionality such as fault tolerance,
 high availability, elasticity, and end-to-end security implementation to
@@ -74,10 +90,11 @@ implement governance, and
 \item unifies a vast diversity of API
 governance features across all stages of API lifecycle
 (development, deployment, evolution, deprecation, retirement). 
-\end{enumerate}
-As a native cloud service, such an
+\end{itemize}
+As a native cloud functionality, such an
 approach also simplifies and automates API governance implementation for
-the administrators or ``DevOps'' teams responsible for service deployment and
+the administrators or ``DevOps'' teams responsible for application
+software deployment and
 maintenance.
 
 Toward this end, we propose EAGER ({\bf E}nforced {\bf A}PI {\bf G}overnance
@@ -92,7 +109,7 @@ policy violations will go undetected until the the offending APIs are used.
 As a result, multiple deployments and rollbacks may occur before a policy
 volation is triggered making it difficult or impossible to determine the root
 cause of the violation.  By enforcing governance at deployment time as well as
-run time, EAGER implements ``fail fast'' in which violations are detected
+runtime, EAGER implements ``fail fast'' in which violations are detected
 immediately making diagnosis and remediation less complex.  
 Further, from a maintenance perspective,  the overall
 system is prevented from entering a non-compliant state which aids in the
@@ -120,7 +137,8 @@ software maintainability by separating the API lifecycle management from that
 of the service implementations and the client users.  That is, APIs are often
 longer lived than the individual clients that use them or the implementations
 of the services that they represent.  At the same time they represent the
-``gateway'' between service consumption (API clients and users) and service
+``gateway'' between software functionality consumption 
+(API clients and users) and service
 production (web service implementation).  Policy definition and enforcement at
 the API level permits the service and client implementations to change
 independently without the loss of governance control.

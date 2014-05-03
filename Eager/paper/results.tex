@@ -1,9 +1,9 @@
-In this section we present the results of a series of experiments we have conducted using our EAGER prototype. We focus
-on evaluating the overhead imposed by EAGER on the application deployment process as the number of deployed APIs and dependencies
-grows. We also deploy a real-world API dataset (from ProgrammableWeb.com) on EAGER, and evaluate how a large 
-volume of API metadata impacts EAGER.
+%In this section we present the results of a series of experiments we have conducted using our EAGER prototype. We focus
+%on evaluating the overhead imposed by EAGER on the application deployment process as the number of deployed APIs and dependencies
+%grows. We also deploy a real-world API dataset (from ProgrammableWeb.com) on EAGER, and evaluate how a large 
+%volume of API metadata impacts EAGER.
 
-\subsection{Experimental Control: Performance of AppScale without EAGER}
+%\subsection{Experimental Control: Performance of AppScale without EAGER}
 
 As a baseline, we start by analyzing how long it takes AppScale to deploy an
 application.  The results are conservative in that they are taken from a
@@ -47,27 +47,33 @@ terms of transfer latency) where the AppScale App Servers and the application
 repository are located in the same VM.  At larger scale, the baseline
 deployment times would likely be larger.
 
-We noticed that the extra overhead imposed by EAGER is much smaller compared
-to the overall application deployment times observed in the cloud (100's of
-milliseconds compared to 10's of seconds).  Thus the first result is that
-EAGER adds little overhead to the fastest deployment times we could achieve
-with native AppScale.
+Because the extra overhead imposed by EAGER is much smaller compared
+to the overall application deployment times observed in AppScale
+(100's of milliseconds compared to 10's of seconds) the remaining results show
+EAGER overheads using absolute units of measure.  To understand them as a
+percentage of deployment time, they should be divided by the baseline times
+shown in Table~\ref{tab:sample_apps}.
 
-To avoid confusion
-caused by this scale difference and
-improve the accuracy of our test results, we instrumented our experiments to
-only record the extra time spent on EAGER. 
-Hence, the figures that follow only present the additional time taken by EAGER
-during application deployment process.  Note that the units for these
-measurements of EAGER are one to two
-orders of magnitude smaller than those for the
-full deployment time.
+%.  Thus the first result is that
+%EAGER adds little overhead to the fastest deployment times we could achieve
+%with native AppScale.
 
-\subsection{EAGER Overhead by Application}
+%To avoid confusion
+%caused by this scale difference and
+%improve the accuracy of our test results, we instrumented our experiments to
+%only record the extra time spent on EAGER. 
+%Hence, the figures that follow only present the additional time taken by EAGER
+%during application deployment process.  Note that the units for these
+%measurements of EAGER are one to two
+%orders of magnitude smaller than those for the
+%full deployment time.
+
+\subsection{Baseline EAGER Overhead by Application}
 
 Figure~\ref{fig:overhead_by_app} illustrates the time taken by EAGER to validate and verify the applications.
 These results were recorded on an EAGER deployment without any policies deployed, and without any prior
-metadata recorded in the API metadata manager (that is, on a clean database).
+metadata recorded in the API metadata manager (that is, an unpopulated 
+database of policies).
 
 \begin{figure}
 \centering
@@ -76,18 +82,28 @@ metadata recorded in the API metadata manager (that is, on a clean database).
 \label{fig:overhead_by_app}
 \end{figure}
 
-Note that for the applications that do not export any web APIs, the overhead
-is negligibly small (around 0.1s). This is because EAGER does not have to
-contact the Metadata Manager for such applications. This implies that EAGER
-will not affect the deployment time of most existing apps. For the
-applications that export web APIs EAGER performs additional work. As a result
-we see some extra overhead with such applications.  For applications that
-export web APIs, the recorded overhead figures include the time it takes to
+Note that some of the test applications that do not export any web APIs and
+for these the overhead
+is negligibly small (approximately $0.1$s). 
+%This is because EAGER does not have to
+%contact the Metadata Manager for such applications. 
+This result indicates that EAGER
+will not affect the deployment time of applications that do not require API
+governance. 
+%For the
+%applications that do export web APIs EAGER performs additional work. 
+%As a result
+%we see some extra overhead with such applications.  
+For applications that do
+export web APIs, the recorded overhead measurements include the time it takes to
 retrieve old API specifications from the Metadata Manager, the time it takes
 to compare the new API specifications with the old ones, the time it takes to
 update the API specifications and other metadata in the Metadata Manager and
-the time it takes to publish the updated APIs to the cloud.  But even with
-this extra work, the worst case observed overhead (for simple-jaxrs-app) is
+the time it takes to publish the updated APIs to the cloud.  
+%But even with
+%this extra work, 
+The worst case observed overhead for governed APIs (simple-jaxrs-app in the
+Figure~\ref{fig:overhead_by_app}) is
 $0.65s / 23.45s$ or 2.8\%.
 
 %The overhead difference between dep-jaxrs-app and dep-jaxrs-app-v2 suggests that the EAGER overhead increases with the number
