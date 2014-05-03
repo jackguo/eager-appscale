@@ -1,4 +1,4 @@
-We implemented a prototype of EAGER for AppScale~\cite{XXXappscaleXXX}, 
+We implemented a prototype of EAGER for AppScale~\cite{appscale13}, 
 an open source PaaS cloud
 functionally equivalent to Google App Engine (GAE).  AppScale supports
 web applications written in Python, Java, Go and PHP. Our prototype service
@@ -16,20 +16,20 @@ provide the API specifications manually.
 \subsection{Developer Tools for EAGER}
 We provide two main tools for implementing applications/APIs for EAGER-enabled AppScale.
 \begin{enumerate}
-\item An Apache Maven~\cite{XXXMavenXXX} archetype that is used to initialize a Java web application project
+\item An Apache Maven~\cite{maven} archetype that is used to initialize a Java web application project
 \item A Java doclet that is used to auto-generate API specifications from web APIs implemented in Java
 \end{enumerate}
 
 Developers can invoke the Maven archetype from the command-line to initialize
 a new Java web application project. Our archetype sets up projects with the
-required AppScale (GAE) libraries, Java JAX-RS~\cite{XXXjaxrsXXX} (Java API for RESTful Web
+required AppScale (GAE) libraries, Java JAX-RS~\cite{jaxrs} (Java API for RESTful Web
 Services) libraries and a build configuration.
 
 Once a developer creates a new project using the archetype he/she can develop
 web APIs using JAX-RS. After the code has been finalized, it can be built
 using the auto-generated Maven build configuration, which will introspect the
 project source code to generate specifications for all enclosed web APIs using
-the Swagger~\cite{XXXswaggerXXX} API description language. 
+the Swagger~\cite{swagger} API description language. 
 It will then package all the compiled
 code, required libraries, generated API specifications and the dependency
 declaration file into a single deployable artifact.
@@ -42,7 +42,7 @@ delegates the application deployment process to EAGER. This change required
 changes to less than 50 lines of AppScale code.
 
 \subsection{Metadata Manager} 
-We implemented the Metadata Manager using MySQL~\cite{XXXmysqlXXX},
+We implemented the Metadata Manager using MySQL~\cite{mysql},
 a relational database engine.  The database server was registered with the
 built-in process coordination mechanism of AppScale, which automatically
 cleans up and restarts crashed or faulty processes. 

@@ -169,12 +169,8 @@ Once the API specifications have been successfully compared without errors,
 the ADC initiates policy validation. Policies are specified by cloud
 administrators or administrators of the organization (tenant) that the
 application developer is part of. Policies are specified using a subset of the
-Python programming language~\cite{XXXportingeffortpaperXXX}, 
-which makes it easy to develop and maintain them\footnote{The 
-specification language based on a restricted subset of Python,
-described more completely in~\cite{XXXportingeffortpaperXXX}, essentially
-elides non-primitive types and function calls from the full Python
-language specification.}.
+Python programming language, 
+which makes it easy to develop and maintain them.
 %We control the built-in Python functions and modules policy files may engage
 %via a simple whitelisting method. 
 We also define a set of assertions
@@ -238,7 +234,7 @@ approves and deploys a new application, it registers all the APIs exported by
 the application in ADP.  EAGER mandates that any developer interested in using
 an API, first subscribe to that API and obtain the proper credentials (API
 keys) from the ADP. The API keys issued by the ADP could be an
-OAuth~\cite{XXXOAuthXXXX} access
+OAuth~\cite{oauth2} access
 token (as is typically of many REST-based web services) 
 or a similar authorization credential, that can be used to verify the
 developer/application that is invoking the API. This credential management
@@ -268,7 +264,7 @@ the dependency declaration provided by the application developer.
 
 \subsection{API Gateway} 
 Runtime governance of applications by systems such as
-Synapse~\cite{XXXSynapseXXX} make use of an API ``proxy'' or gateway.
+Synapse~\cite{synapse} make use of an API ``proxy'' or gateway.
 %API Gateway is another piece of the runtime
 %governance puzzle that we intend to solve as a part of our future work. 
 It
