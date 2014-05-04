@@ -19,7 +19,7 @@ ProgrammableWeb~\cite{pweb}, a popular web API index, lists more than $11,000$
 publicly available
 web APIs and a nearly 100\% annual growth rate~\cite{pweb_growth}. 
 Many of these APIs focus on commerce-oriented applications (e.g.
-advertising, shopping, travel, etc.)
+advertising, shopping, travel, etc.).
 However several non-commercial entities have recently
 also started publishing web 
 APIs, e.g. IEEE~\cite{ieeeapis}, UC Berkeley~\cite{ucbapis}, and the US White
@@ -48,7 +48,7 @@ Layer7~\cite{layer7})
 are important to policy implementation since governance policies often need to
 express access control specifications.  
 However, developers are still responsible for implementing governance policies
-that {\em combine} features such as API versioning, access control,
+that {\em combine} features such as API versioning, 
 dependency management, and SLA enforcement as part of their respective
 applications.  Moreover, each application must
 implement its own governance -- there is no system for ensuring that the
@@ -68,13 +68,13 @@ In addition, they can fail independently of the cloud, thereby affecting
 the scalability and availability of the software that they control.
 Finally, because they are not integrated with the cloud itself it is difficult
 for them to
-implement governance at deployment time -- the phase of the software lifecycle
-during which an API change or new API is being put into service.
+implement governance at deployment-time -- the phase of the software lifecycle
+during which an API change or a new API is being put into service.
 Because of the scale at which clouds operate, deployment-time governance is
 critical since it permits policy violations to be remediated before the
 changes are put into production ({\em i.e.} before run-time).
 
-Thus, our thesis is that governance must be implemented as a cloud service to
+Thus, our thesis is that governance must be implemented as a built-in cloud service to
 overcome these liabilities.
 That is, instead of an API management
 approach that layers governance features on top of the cloud, 
@@ -101,7 +101,7 @@ Toward this end, we propose EAGER ({\bf E}nforced {\bf A}PI {\bf G}overnance
 {\bf E}ngine for {\bf R}EST), a model and an architecture that augments existing
 cloud platforms in order to facilitate API governance as a 
 cloud-native feature. EAGER enforces proper versioning of APIs and supports dependency 
-management and comprehensive policy enforcement at API deployment time. 
+management and comprehensive policy enforcement at API deployment-time. 
 
 Deployment-time enforcement (heretofore unexplored) is attractive for several
 reasons.  First, if run-time only API governance is implemented, 
@@ -116,9 +116,9 @@ system is prevented from entering a non-compliant state which aids in the
 certification of regulatory compliance.  In addition, run-time governance
 typically implies that each API call will be intercepted by a policy-checking engine
 that uses admission control and an enforcement mechanism.  Because deployment
-events are less frequent, implementing policy at deployment time improves the
+events are less frequent, implementing policy at deployment-time improves the
 scaling properties of governed systems.   Not all governance policies can be
-implemented strictly at deployment time, but those that can provide a way
+implemented strictly at deployment-time, but those that can provide a way
 of improving both compliance and system performance.
 
 Thus while
@@ -143,7 +143,7 @@ production (web service implementation).  Policy definition and enforcement at
 the API level permits the service and client implementations to change
 independently without the loss of governance control.
 
-EAGER also promotes software maintainability by guaranteeing that 
+EAGER further enhances software maintainability by guaranteeing that 
 developers reuse existing APIs when possible to create new software artifacts
 (to prevent API redundancy and unverified API use). Concurrently, it
 tracks changes made by developers to deployed web APIs to prevent
@@ -176,4 +176,4 @@ defined governance policies.
 In the sections that follow, we present some background on API governance
 and overview the design and implementation of
 EAGER. We then empirically evaluate EAGER using a wide range of APIs and
-experiments.  Finally, we discuss future and related work, and conclude.
+experiments.  Finally, we discuss related work, and conclude.

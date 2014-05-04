@@ -20,7 +20,7 @@ are concerned, the web API is the only point of contact and source of
 functionality for the underlying service implementation.
 
 Software engineering best practices separate the service implementation
-and API implementation, both during development and maintenance.
+from API, both during development and maintenance.
 The service implementation and API are integrated via 
 a ``web service stack'' that implements functionality common to all web
 services (message routing, request authentication, etc.)
@@ -35,7 +35,7 @@ technological innovations often prompt service reimplementation and/or
 upgrade to
 achieve greater cost efficiencies, performance levels, etc.
 Thus APIs typically have a more
-slowly evolving and long lasting lifecycle than the the service
+slowly evolving and long lasting lifecycle than the service
 implementations
 to which they interface. 
 
@@ -44,7 +44,7 @@ capability ({\em e.g.} compute power, database, etc.)
 as a highly scalable web service.  Mobile
 devices, due to their limited hardware resources often offload much of their
 processing and storage needs to remote services running in a ``cloud''
-connected the Internet.  Web APIs
+connected to the Internet.  Web APIs
 play a crucial role in both these paradigms. 
 
 As a result, modern computing clouds, especially clouds implementing some form

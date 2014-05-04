@@ -12,7 +12,7 @@ components and the policy language.
 EAGER is designed to be integrated with extant cloud platforms, 
 especially those providing PaaS services. 
 It intercepts all events related to application deployment within the cloud
-and enforces deployment time governance checks and
+and enforces deployment-time governance checks and
 logging. 
 These governance features include API metadata validation, 
 dependency validation, policy validation and 
@@ -45,9 +45,9 @@ discuss as future work).
 
 Figure~\ref{fig:eager_design} illustrates the main components of EAGER and
 their interactions. Solid arrows represent the interactions that take place
-during application deployment time, before an application has been validated
+during application deployment-time, before an application has been validated
 for deployment. Short-dashed arrows indicate the interactions that take place
-during deployment time, after an application has been successfully validated.
+during deployment-time, after an application has been successfully validated.
 Long-dashed arrows indicate interactions at run-time.
 
 EAGER is invoked whenever a developer attempts to deploy an application, using
@@ -75,8 +75,7 @@ be web service based.  However, EAGER does require integration at the service le
 \subsection{Metadata Manager}
 The Metadata Manager stores all the API metadata in EAGER. This metadata 
 includes API names, versions, specifications and dependencies.
-It uses the dependency information to compute the dependency tree (including
-versioning information)
+It uses the dependency information to compute the dependency tree 
 among 
 all deployed APIs and applications. Additionally, the Metadata Manager
 also keeps track of developers, their subscriptions to various APIs and the access credentials (API keys) issued to them. For these purposes,
@@ -115,7 +114,7 @@ operations and the schema of their inputs and outputs.  Any standard API
 description language can be used for this purpose, as long as it clearly
 describes the schema of the requests and responses. For describing REST
 interfaces, we can use Web Application Description Language (WADL), Swagger,
-RAML or any other language that provides similar functionality. %Our research
+RESTful API Modeling Language (RAML) or any other language that provides similar functionality. %Our research
 %currently focuses on RESTful 
 %services only, but our design can also be adapted to govern SOAP services in
 %the cloud, in which case Web Services Description Language (WSDL) can be used
@@ -283,7 +282,7 @@ the dependency declaration provided by the application developer.
 %linkage between deployment and runtime governance.
 
 \subsection{API Gateway} 
-Run-time governance of applications by systems such as
+Run-time governance of web services by systems such as
 Synapse~\cite{synapse} make use of an API ``proxy'' or gateway.
 %API Gateway is another piece of the runtime
 %governance puzzle that we intend to solve as a part of our future work. 
