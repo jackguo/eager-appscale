@@ -1,8 +1,5 @@
 Our research builds upon advances in the areas of SOA governance and
 service management. 
-%Many researchers have highlighted the importance of these
-%subjects in the past and introduced various models and systems to implement
-%them. 
 Guan et al introduced FASWSM~\cite{1607141} a web service management
 framework for application servers. FASWSM uses an adaptation technique that
 wraps web services in a way so they can be managed by the underlying
@@ -10,54 +7,50 @@ application server platform. Wu et al introduced DART-Man~\cite{1504267} a web
 service management system based on semantic web concepts.  Zhu and Wang
 proposed a model that uses Hadoop and HBase to store web service metadata and
 process them to implement a variety of management functions~\cite{5959326}.
-Our work differentiates 
-from these past approaches since EAGER is strongly focused
-towards managing APIs in cloud platforms ({\em e.g.} PaaS) and it supports powerful
-policy enforcement features.
+Our work is different 
+from these past approaches in that EAGER targets policy \textit{enforcement} 
+and we focus on doing so by extending extant
+cloud platforms (e.g. PaaS) to provide an integrated and scalable governance
+solution.
 
 Lin et al proposed a service management system for clouds that monitors all
 service interactions via special ``hooks'' that are connected to the
 cloud-hosted services~\cite{5616981}. These hooks monitor and record service
 invocations, and also provide an interface so that the individual service
 artifacts can be managed remotely. However, this system only supports run-time
-service management and provides no support for deployment-time service
-management or policy enforcement which are key components of a complete API
-governance solution. Kikuchi and Aoki~\cite{6525502} proposed a technique
+service management and provides no support for deployment-time policy checking
+and enforcement.  Kikuchi and Aoki~\cite{6525502} proposed a technique
 based on model checking to evaluate the operational vulnerabilities and fault
-propagation patterns in cloud services. However, it does not provide any
-active monitoring or enforcement functionality that is required to make it a
-deployment-time or run-time governance component. Sun et al proposed a
-reference architecture for monitoring and managing cloud
+propagation patterns in cloud services. However, this system provides no
+active monitoring or enforcement functionality.
+Sun et al proposed a reference architecture for monitoring and managing cloud
 services~\cite{5579654}. This too lacks deployment-time governance, policy
-validation support and the ability to intercept and act upon API calls which
-makes it severely short of being a comprehensive governance solution for
-clouds.
+validation support, and the ability to intercept and act upon API calls which
+limits its use as a comprehensive governance solution for clouds.
 
-%Using policies to govern web service and SOA venues is a well researched idea
-%that's already in widespread use. 
-Researchers have shown that policies can be
+Other researchers have shown that policies can be
 used to perform a wide range of governance tasks for SOA as access
 control~\cite{4279630,5713420}, fault diagnosis~\cite{6154236},
 customization~\cite{4027138},
 composition~\cite{1592403,Erradi:2006:PMS:1515984.1515990} and
 management~\cite{Suleiman:2009:IUM:1564601.1564730,6481237,4028029}. We build
-on the foundation of these past efforts and use policies to govern
+upon the foundation of these past efforts and use policies to govern
 RESTful web APIs deployed in cloud settings. 
-However, our work is differentiated by
-%of policy languages, each targeted at achieving a specific governance task,
-%and instead strive to implement a single 
-its unifying policy language that can be
-used to specify a wide range of governance requirements. We also use a simple
-and developer-familiar syntax based on the Python programming language.
-%instead of
-%using WS-Policy or any other XML-based language which we believe are too
-%verbose and tedious to program with.
+Our work is also different it that it provides a 
+unifying policy language that employs a simple, developer-friendly syntax
+based upon the Python language (vs XML), which can be
+used to specify a wide range of governance requirements.
 
 Peng, Lui and Chen showed that
-the major concerns associated with SOA governance involve retaining the high reliability of services, recording how many services
-are available on the platform to serve, and making sure all the available services are operating within an acceptable service
-level~\cite{4730489}. EAGER attempts to satisfy similar requirements for modern RESTful web APIs deployed in cloud environments. EAGER's policy
-validation, dependency management and API change management features are geared at ensuring that deployed services
-are highly reliable. Its Metadata Manager and ADP record and keep track of all deployed APIs in a simple but comprehensive manner.
-%Our future work on run-time governance will focus on ensuring that deployed services are operating under well-defined SLAs 
-%while providing satisfactory quality of service features
+the major concerns associated with SOA governance 
+involve retaining the high reliability of services, recording how many services
+are available on the platform to serve, and making sure all the available 
+services are operating within an acceptable service
+level~\cite{4730489}. EAGER attempts to satisfy similar requirements for 
+modern RESTful web APIs deployed in cloud environments. 
+However, EAGER's Metadata Manager and ADP record and track of all deployed APIs 
+in a simple, extensible, and comprehensive manner.  Moreover, EAGER's policy
+validation, dependency management, and API change management features 
+``fail fast'' to detect violations immediately making
+diagnosis and remediation less complex, and prevent
+the system from ever entering a non-compliant state.

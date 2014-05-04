@@ -1,17 +1,8 @@
-%Service Oriented Architecture (SOA)~\cite{Haines:2010:SAM:1787234.1787269} is a popular architectural style for
-%mplementing complex systems in a modular fashion. A SOA system
-%s implemented as a composition of a number of independent software components
-%eferred to as ``services.'' Each service has a well-defined interface which
-%xports some functionality that can be used by other services and/or users.
-%his service abstraction helps group related data and logic together thereby
-%aking long-term software maintenance more effective and cost efficient. 
-
 The popularization of network computing and the World Wide Web (WWW) 
 has led to the development and adoption of web services~\cite{6094008} as
 the technology of choice for implementing modern service-oriented 
 architectures (SOA~\cite{Haines:2010:SAM:1787234.1787269}).
-The
-interface portion of a web service, which abstracts and modularizes
+The interface portion of a web service, which abstracts and modularizes
 its service implementation
 details while making the service network-accessible, is commonly referred to
 as a {\em web API}. As far as the users and applications that consume a 
@@ -65,13 +56,6 @@ change in a controlled and non-disruptive manner.  From a maintenance
 perspective, API governance 
 makes it possible to enforce best practice coding procedures, 
 naming conventions, and deployment procedures uniformly.
-%\item enforce controlled and secured use of APIs
-%\item provide API services with differentiated SLAs
-%\end{itemize}
-%%NOT HERE -- needs to move to the related work section
-%The SOA community has done a lot of work in the area of service governance that can be adapted into
-%API governance. Indeed, most of the commonly used service governance tactics such as versioning and policy enforcement
-%can be used to assert some level of governance on web APIs as well.
 API governance is also critical to API lifecycle
 management --  the management of deployed APIs in response to new feature
 requests, bug fixes, and organizational priorities. 
@@ -81,8 +65,6 @@ problem for web-based applications~\cite{portingeffort}.
 Without proper governance systems to manage the constant evolution of APIs,
 API providers run the risk of making their APIs unreliable while potentially
 breaking downstream applications that depend on the APIs.
-
-%\subsection{API Governance Models in the Cloud}
 
 Unfortunately, most web frameworks used to develop and host web APIs do not 
 provide API governance facilities. This missing functionality is
@@ -107,14 +89,3 @@ As such, they do not have the end-to-end
 access to all the metadata and cloud-internal control mechanisms
 that are necessary to implement strong governance at scale. 
 
-%As an example, consider the case where a developer deploys a new version of an API. In this
-%situation, the actual code changes take place in the cloud. An 
-%external governance system cannot see the code changes and therefore cannot facilitate any deployment-time governance checks.
-%It may be possible to perform the API deployment through the external governance system, using it
-%as a proxy. But this approach leaves room for the developer to accidentally
-%or even intentionally bypass the governance system and roll out the changes directly to the cloud. Hence, the external governance systems
-%cannot ``enforce'' the required level of control.
-
-%Finally, the service providers have to pay extra to use third party API governance solutions, and they require
-%additional man power to be configured, maintained and monitored. This may offset some of the marginal cost benefits obtained
-%by using a cloud platform as a deployment target for APIs.
