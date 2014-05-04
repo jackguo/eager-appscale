@@ -18,19 +18,20 @@ At the time of this writing,
 ProgrammableWeb~\cite{pweb}, a popular web API index, lists more than $11,000$
 publicly available
 web APIs and a nearly 100\% annual growth rate~\cite{pweb_growth}. 
-Many of these APIs focus on commerce-oriented applications (e.g.
+These APIs primarily and increasingly employ the REST architectural style and 
+many target commerce-oriented applications (e.g.
 advertising, shopping, travel, etc.).
-However several non-commercial entities have recently
-also started publishing web 
+However, several non-commercial entities have also recently
+published web 
 APIs, e.g. IEEE~\cite{ieeeapis}, UC Berkeley~\cite{ucbapis}, and the US White
-House~\cite{whitehouseapis}.  
+House~\cite{whitehouseapis}. 
 
 This proliferation of web APIs demands new techniques and systems that
 automate the maintenance and evolution of APIs as a first-class software
-resource.  API management in the form of runtime mechanisms to implement
+resource.  API management in the form of run-time mechanisms to implement
 access control and performance-based service level agreements (SLAs) is not
 new, and many good commercial offerings exist today~\cite{3scale,apigee,layer7}.   
-However, support for \textit{API governance} -- consistent generalized policy
+However, support for \textit{API governance} -- consistent, generalized, policy
 implementation across multiple separate APIs in an administrative domain --
 is a new area of research made poignant by the emergence of cloud computing.
 
@@ -108,8 +109,9 @@ reasons.  First, if run-time only API governance is implemented,
 policy violations will go undetected until the the offending APIs are used.  
 As a result, multiple deployments and rollbacks may occur before a policy
 violation is triggered making it difficult or impossible to determine the root
-cause of the violation.  By enforcing governance at deployment-time as well as
-run-time, EAGER implements ``fail fast'' in which violations are detected
+cause of the violation.  By enforcing governance at deployment-time (and
+run-time),
+EAGER implements ``fail fast'' in which violations are detected
 immediately making diagnosis and remediation less complex.  
 Further, from a maintenance perspective,  the overall
 system is prevented from entering a non-compliant state which aids in the

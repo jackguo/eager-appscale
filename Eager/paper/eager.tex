@@ -238,7 +238,7 @@ activity typically involves three
 steps:
 
 \begin{enumerate}
-\item Deploy the application in the cloud application runtime (application server).
+\item Deploy the application in the cloud application run-time (application server).
 \item Publish the APIs enclosed in the application and their specifications to
 API Discovery Portal or catalog.
 \item Publish the APIs enclosed in the application to an API Gateway server.
@@ -275,21 +275,21 @@ dependencies explicitly by making it
 impossible to call an API without first declaring it as a dependency along
 with the proper API keys. These types of policies can be implemented
 by making some changes to the
-application runtime in the cloud, so that it loads the API credentials from
+application run-time in the cloud, so that it loads the API credentials from
 the dependency declaration provided by the application developer.
 %  Currently
-%neither EAGER nor any of the extant runtime governance facilities provide this
-%linkage between deployment and runtime governance.
+%neither EAGER nor any of the extant run-time governance facilities provide this
+%linkage between deployment and run-time governance.
 
 \subsection{API Gateway} 
 Run-time governance of web services by systems such as
 Synapse~\cite{synapse} make use of an API ``proxy'' or gateway.
-%API Gateway is another piece of the runtime
+%API Gateway is another piece of the run-time
 %governance puzzle that we intend to solve as a part of our future work. 
 It
 intercepts all API calls and validates the API keys provided in them. The
 traffic interception is achieved by blocking direct access to the APIs in the
-application runtime (app servers), and publishing the API Gateway address as
+application run-time (app servers), and publishing the API Gateway address as
 the API endpoint in the ADP. The first can be achieved via a simple firewall
 or router configuration that prevents the cloud app servers from receiving any
 API traffic from a source other than the API Gateway. Once an API call has
@@ -298,7 +298,8 @@ actual application server in the cloud that hosts the API.
 
 The API Gateway can be a single server or a cluster of servers 
 behind a scalable load balancer. %Since most API metadata, especially the API keys, do not change
-%frequently, it can afford to cache such information locally for better runtime performance. 
+%frequently, it can afford to cache such information locally for better
+%run-time performance. 
 In addition to API key validation, it may perform other
 functions as well, such as monitoring, throttling (rate limiting), SLA
 enforcement and run-time policy validation. We intend to further evaluate these
