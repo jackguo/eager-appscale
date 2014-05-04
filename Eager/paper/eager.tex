@@ -158,7 +158,7 @@ the ADC initiates policy validation. Policies are specified by cloud
 or organizational administrators using a subset of the Python language.  
 We restrict the language to prevent state from being preserved across
 policy validations. In particular, the EAGER policy interpreter disables file
-and network operations, library calls, and intrinsics that allow
+and network operations, most library calls, and intrinsics that allow
 state to persist across invocations.  In addition, it processes each 
 policy independently of others (i.e. each policy must be self-contained and 
 access no external state).  As part of this policy language toolkit, EAGER
@@ -201,7 +201,7 @@ assert_app_dependency(app,`Logger',`1.0')
 }
 
 In the above example \textit{app} is a special immutable logical variable available to
-all policy files. This variable allows applications to access information
+all policy files. This variable allows policies to access information
 pertaining to the current application deployment request. 
 
 EAGER places no restrictions on how many policy files are specified by 
@@ -226,20 +226,20 @@ following subsections.
 
 \subsection{API Discovery Portal} 
 The API Discovery Portal (ADP) is an online
-catalog that developers can browse available web APIs. Whenever the ADC
+catalog where developers can browse available web APIs. Whenever the ADC
 approves and deploys a new application, it registers all the APIs exported by
-the application.  EAGER mandates that any developer interested in using
+the application in ADP.  EAGER mandates that any developer interested in using
 an API, first subscribe to that API and obtain the proper credentials (API
 keys) from the ADP. The API keys issued by the ADP can consist of an
 OAuth~\cite{oauth2} access
 token (as is typical of many REST-based web services) 
 or a similar authorization credential, which can be used to identify the
 developer/application that is invoking the API. This credential management
-identification proces is used for auditing and run-time governance in EAGER.
+identification process is used for auditing and run-time governance in EAGER.
 
 The API keys issued by the ADP are stored in the Metadata Manager. When a
 programmer develops a new application using one or more API dependencies, we
-require the developer to declare its dependencies along with the API
+can require the developer to declare its dependencies along with the API
 keys obtained from the ADP. The ADC verifies this information against
 the Metadata Manager as a part of its dependency check and ensures that the
 declared dependencies are correct and the specified API keys are valid. 
@@ -250,7 +250,7 @@ dependencies explicitly by making it
 impossible to call an API without first declaring it as a dependency along
 with the proper API keys. These types of policies can be implemented
 with minor changes to the
-application run-time in the cloud that loads the API credentials from
+application run-time in the cloud so that it loads the API credentials from
 the dependency declaration provided by the application developer.
 
 \subsection{API Gateway} 

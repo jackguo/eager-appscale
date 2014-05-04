@@ -1,6 +1,5 @@
-
 In this section, we describe our empirical evaluation of the EAGER
-prototype and evaluate its overhead and scaling characterists.
+prototype and evaluate its overhead and scaling characteristics.
 We start by presenting the time required for AppScale application deployment
 without EAGER as it is this process on which we piggyback EAGER support.  
 These measurements are conservative in that they are taken 
@@ -38,7 +37,7 @@ dep-jaxrs-app-v2 & A sample JAXRS app that exports 2 web APIs and has one depend
 
 On average, deployment without EAGER takes $34.5$ seconds and this time 
 is correlated with application artifact size.  The total time consists
-of network transfer time of the application to the cloud (which is this 
+of network transfer time of the application to the cloud (which in this 
 case is via localhost networking) and disk copy to the application servers.
 For actual deployments, both components are likely to increase due to network
 latency, available bandwidth, contention, and large numbers of distributed
@@ -57,27 +56,26 @@ application servers.
 
 Figure~\ref{fig:overhead_by_app} shows the time in seconds taken by EAGER to validate and 
 verify each application.  We record these results on an EAGER deployment without any policies 
-deployed, and without any prior metadata recorded in the API metadata manager 
+deployed, and without any prior metadata recorded in the API Metadata Manager 
 (that is, an unpopulated database of policies).
 We present the values as absolute measurements (here and henceforth) because
-of the signficant (order of magnitude) difference between them and 
-AppScale deployment time.  We can alternatively observe this overhead as a 
-percentage AppScale deployment time by dividing these times by 
+of the significant difference between them and 
+deployment times on AppScale without EAGER (100's of milliseconds compared to 10's of seconds).  
+We can alternatively observe this overhead as a 
+percentage of AppScale deployment time by dividing these times by 
 those shown in Table~\ref{tab:sample_apps}.
-
 
 Note that some applications do not export any web APIs;
 for these EAGER overhead is negligibly small (approximately $0.1$s). 
 This result indicates that EAGER does not impact deployment time of applications 
 that do not require API governance.  For applications that do
 export web APIs, the recorded overhead measurements include the time
-retrieve old API specifications from the Metadata Manager, the time 
-to compare the new API specifications with the old ones, the time
+to retrieve old API specifications from the Metadata Manager, the time 
+to compare the new API specifications with the old ones, the time to
 update the API specifications and other metadata in the Metadata Manager, and
 the time to publish the updated APIs to the cloud.  
 The worst case observed overhead for governed APIs (simple-jaxrs-app in the
 Figure~\ref{fig:overhead_by_app}) is 2.8\%.
-
 
 \subsection{Impact of Number of APIs and Dependencies}
 
@@ -174,7 +172,7 @@ simple-jaxrs-app is higher than that of the guestbook-py because,
 simple-jaxrs-app exports web APIs. This means the third assertion in the
 policy set is executed for this app and not for guestbook-py. 
 
-Out results indicate that EAGER scales well to hundreds of policies. That is,
+Our results indicate that EAGER scales well to hundreds of policies. That is,
 there is no significant overhead associated with simply having a large number
 of policy files. However, as mentioned earlier, the content of a policy may
 influence the overhead of policy validation and will be specific to the policy and 
@@ -239,7 +237,7 @@ We populated the EAGER Metadata Manager with these APIs and
 registered each of the mashups as APIs in EAGER. We then used the
 mashup-API dependency information to register dependencies among the APIs in 
 EAGER. This resulted in a total dependency graph of $18322$ APIs 
-with $33615$ dependencies.  We the deploy a subset of our applications
+with $33615$ dependencies.  We then deploy a subset of our applications
 and measure EAGER overhead.
 
 \begin{figure}
@@ -265,7 +263,7 @@ when applications become dependent on other APIs registered in EAGER, we
 deploy a test application that declares random fictitious dependencies on APIs
 from the ProgrammableWeb corpus registered in EAGER.  We consider 
 $10$, $20$, and $50$ declared dependencies and deploy each
-the application three times.
+application three times.
 We present the results in Figure~\ref{fig:pweb_random_overhead}.
 For the ``random'' datasets, we
 run a deployment script that randomly modifies the 

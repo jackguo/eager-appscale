@@ -4,17 +4,17 @@ functionally equivalent to Google App Engine (GAE).  AppScale supports
 web applications written in Python, Java, Go and PHP. Our prototype
 implements governance for all applications and APIs hosted in an AppScale cloud. 
 Our current prototype of the EAGER developer tools that automatically generate
-API specification and dependency metadata (c.f. Section~\ref{sec:adc}),
-provides support for the Java language.  Developers document APIs and their
-dependences manually for web services written in other languages.
+API specifications and other metadata (c.f. Section~\ref{sec:adc}),
+currently support only the Java language.  Developers document the APIs manually
+for web services implemented in other languages.
 
 Like most PaaS technologies, AppScale includes an application deployment
-service that distributes, launches, exports an application
+service that distributes, launches and exports an application
 as a web-accessible service.  EAGER controls this deployment
-process according to the policies that the platform adminstrator specifies.
+process according to the policies that the platform administrator specifies.
 
 \subsection{Developer Tools for EAGER}
-EAGER provide two developer tools for implementing applications and APIs for an
+EAGER provides two developer tools for implementing applications and APIs for an
 EAGER-enabled cloud platform.
 \begin{enumerate}
 \item An Apache Maven~\cite{maven} archetype that is used to initialize a Java
