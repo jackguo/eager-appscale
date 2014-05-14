@@ -35,9 +35,14 @@ public abstract class AbstractSimulator implements InstructionSimulator {
     private Map<SootMethod,SimulationManager> cache = new HashMap<SootMethod,SimulationManager>();
 
     private Set<String> userPackages = new HashSet<String>();
+    private Set<String> specialPackages = new HashSet<String>();
 
     public void addUserPackage(String pkg) {
         userPackages.add(pkg);
+    }
+
+    public void addSpecialPackage(String pkg) {
+        specialPackages.add(pkg);
     }
 
     private SimulationManager getSimulationManager(SootMethod method) {
@@ -59,13 +64,17 @@ public abstract class AbstractSimulator implements InstructionSimulator {
                 // If it's a user-defined function, run the simulation recursively
                 SimulationManager manager = getSimulationManager(method);
                 return manager.simulate(1, false);
+            } else if (specialPackages.contains(pkg)) {
+                return simulateSpecialInvokeInstruction(invocation);
             }
-            return simulateInvokeInstruction(invocation);
+            return simulateRegularInvokeInstruction(invocation);
         }
         return simulateNonInvokeInstruction(stmt);
     }
 
-    protected abstract double simulateInvokeInstruction(InvokeExpr invocation);
+    protected abstract double simulateSpecialInvokeInstruction(InvokeExpr invocation);
+
+    protected abstract double simulateRegularInvokeInstruction(InvokeExpr invocation);
 
     protected abstract double simulateNonInvokeInstruction(Stmt stmt);
 }

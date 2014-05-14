@@ -36,15 +36,16 @@ public class AvailabilitySimulator extends AbstractSimulator {
     }
 
     @Override
-    protected double simulateInvokeInstruction(InvokeExpr invocation) {
+    protected double simulateSpecialInvokeInstruction(InvokeExpr invocation) {
         SootMethod method = invocation.getMethod();
-        if ("edu.ucsb.cs.eager.gae".equals(method.getDeclaringClass().getPackageName())) {
-            // (Mock) GAE API call
-            if (method.getName().equals("query1")) {
-                return 99.99;
-            }
-            return 99.999;
+        if (method.getName().equals("query1")) {
+            return 99.99;
         }
+        return 99.999;
+    }
+
+    @Override
+    protected double simulateRegularInvokeInstruction(InvokeExpr invocation) {
         return 100.0;
     }
 

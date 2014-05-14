@@ -35,12 +35,12 @@ public class PerformanceSimulator extends AbstractSimulator {
         return current + update;
     }
 
-    public double simulateInvokeInstruction(InvokeExpr invocation) {
-        SootMethod method = invocation.getMethod();
-        if ("edu.ucsb.cs.eager.gae".equals(method.getDeclaringClass().getPackageName())) {
-            // (Mock) GAE API call
-            return 1.0;
-        }
+    @Override
+    protected double simulateSpecialInvokeInstruction(InvokeExpr invocation) {
+        return 1.0;
+    }
+
+    public double simulateRegularInvokeInstruction(InvokeExpr invocation) {
         return 0.0;
     }
 

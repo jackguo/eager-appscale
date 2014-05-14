@@ -32,12 +32,14 @@ public class SimulatorTest extends TestCase {
     public void testPerformanceSimulator() {
         PerformanceSimulator simulator = new PerformanceSimulator();
         simulator.addUserPackage("net.eager.testing");
+        simulator.addSpecialPackage("edu.ucsb.cs.eager.gae");
 
         SootClass c = Scene.v().loadClassAndSupport("net.eager.testing.TestClass");
         c.setApplicationClass();
         SootMethod m = c.getMethodByName("main");
         Body b = m.retrieveActiveBody();
         UnitGraph g = new BriefUnitGraph(b);
+
         SimulationManager manager = new SimulationManager(g, simulator);
         double result = manager.simulate(10, true);
         System.out.println("Average performance = " + result);
@@ -46,12 +48,14 @@ public class SimulatorTest extends TestCase {
     public void testAvailabilitySimulator() {
         AvailabilitySimulator simulator = new AvailabilitySimulator();
         simulator.addUserPackage("net.eager.testing");
+        simulator.addSpecialPackage("edu.ucsb.cs.eager.gae");
 
         SootClass c = Scene.v().loadClassAndSupport("net.eager.testing.TestClass");
         c.setApplicationClass();
         SootMethod m = c.getMethodByName("main");
         Body b = m.retrieveActiveBody();
         UnitGraph g = new BriefUnitGraph(b);
+
         SimulationManager manager = new SimulationManager(g, simulator);
         double result = manager.simulate(10, true);
         System.out.println("Minimum availability = " + result + "%");
