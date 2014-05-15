@@ -32,7 +32,7 @@ import java.util.Set;
 
 public abstract class AbstractSimulator implements InstructionSimulator {
 
-    private Map<SootMethod,SimulationManager> cache = new HashMap<SootMethod,SimulationManager>();
+    private Map<String,SimulationManager> cache = new HashMap<String,SimulationManager>();
 
     private Set<String> userPackages = new HashSet<String>();
     private Set<String> specialPackages = new HashSet<String>();
@@ -46,13 +46,18 @@ public abstract class AbstractSimulator implements InstructionSimulator {
     }
 
     private SimulationManager getSimulationManager(SootMethod method) {
-        SimulationManager manager = cache.get(method);
+        String key = getKey(method);
+        SimulationManager manager = cache.get(key);
         if (manager == null) {
             UnitGraph subGraph = new BriefUnitGraph(method.retrieveActiveBody());
             manager = new SimulationManager(subGraph, this);
-            cache.put(method, manager);
+            cache.put(key, manager);
         }
         return manager;
+    }
+
+    private String getKey(SootMethod method) {
+        return method.getDeclaringClass().getName() + "#" + method.getName();
     }
 
     public double simulateInstruction(Stmt stmt) {
