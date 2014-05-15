@@ -36,8 +36,7 @@ public class AvailabilitySimulator extends AbstractSimulator {
     }
 
     @Override
-    protected double simulateSpecialInvokeInstruction(InvokeExpr invocation) {
-        SootMethod method = invocation.getMethod();
+    protected double simulateSpecialInvokeInstruction(InvokeExpr invocation, SootMethod method) {
         if (method.getName().equals("query1")) {
             return 99.99;
         }
@@ -45,7 +44,7 @@ public class AvailabilitySimulator extends AbstractSimulator {
     }
 
     @Override
-    protected double simulateRegularInvokeInstruction(InvokeExpr invocation) {
+    protected double simulateRegularInvokeInstruction(InvokeExpr invocation, SootMethod method) {
         return 100.0;
     }
 

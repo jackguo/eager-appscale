@@ -65,16 +65,39 @@ public abstract class AbstractSimulator implements InstructionSimulator {
                 SimulationManager manager = getSimulationManager(method);
                 return manager.simulate(1, false);
             } else if (specialPackages.contains(pkg)) {
-                return simulateSpecialInvokeInstruction(invocation);
+                return simulateSpecialInvokeInstruction(invocation, method);
             }
-            return simulateRegularInvokeInstruction(invocation);
+            return simulateRegularInvokeInstruction(invocation, method);
         }
         return simulateNonInvokeInstruction(stmt);
     }
 
-    protected abstract double simulateSpecialInvokeInstruction(InvokeExpr invocation);
+    /**
+     * Simulate the invocation of a "special" method. Special methods are the methods that
+     * belong to any of the special packages. Special packages can be defined by calling
+     * the addSpecialPackage method.
+     *
+     * @param invocation InvokeExpr instruction
+     * @param method SootMethod instance
+     * @return a double value
+     */
+    protected abstract double simulateSpecialInvokeInstruction(InvokeExpr invocation, SootMethod method);
 
-    protected abstract double simulateRegularInvokeInstruction(InvokeExpr invocation);
+    /**
+     * Simulate the invocation of a regular method. Any method that doesn't belong to a special
+     * package and does not belong to any of the user packages is considered to be regular.
+     *
+     * @param invocation InvokeExpr instruction
+     * @param method SootMethod instance
+     * @return a double value
+     */
+    protected abstract double simulateRegularInvokeInstruction(InvokeExpr invocation, SootMethod method);
 
+    /**
+     * Simulate the execution of an instruction that is not a method call.
+     *
+     * @param stmt Instruction to be simulated
+     * @return a double value
+     */
     protected abstract double simulateNonInvokeInstruction(Stmt stmt);
 }

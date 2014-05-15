@@ -36,11 +36,11 @@ public class PerformanceSimulator extends AbstractSimulator {
     }
 
     @Override
-    protected double simulateSpecialInvokeInstruction(InvokeExpr invocation) {
+    protected double simulateSpecialInvokeInstruction(InvokeExpr invocation, SootMethod method) {
         return 1.0;
     }
 
-    public double simulateRegularInvokeInstruction(InvokeExpr invocation) {
+    public double simulateRegularInvokeInstruction(InvokeExpr invocation, SootMethod method) {
         return 0.0;
     }
 
