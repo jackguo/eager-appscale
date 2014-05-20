@@ -17,19 +17,32 @@
  *  under the License.
  */
 
-package edu.ucsb.cs.eager.sa;
+package edu.ucsb.cs.eager.sa.bp.tlat;
 
-import soot.Unit;
+public class TakeLastPattern implements BranchPattern {
 
-import java.util.List;
-import java.util.Random;
-
-public class RandomBranchSelector implements BranchSelector {
-
-    private static final Random rand = new Random();
+    private boolean initial = true;
+    private boolean last;
 
     @Override
-    public Unit select(List<Unit> candidates) {
-        return candidates.get(rand.nextInt(candidates.size()));
+    public boolean select() {
+        if (initial) {
+            initial = false;
+            return true;
+        } else {
+            return last;
+        }
+    }
+
+    @Override
+    public void update(boolean taken) {
+        last = taken;
+    }
+
+    public static class TakeLastPatternFactory implements BranchPatternFactory {
+        @Override
+        public BranchPattern create() {
+            return new TakeLastPattern();
+        }
     }
 }

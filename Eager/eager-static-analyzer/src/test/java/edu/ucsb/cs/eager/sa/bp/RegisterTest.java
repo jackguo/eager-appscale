@@ -17,14 +17,34 @@
  *  under the License.
  */
 
-package edu.ucsb.cs.eager.sa;
+package edu.ucsb.cs.eager.sa.bp;
 
-import soot.Unit;
+import edu.ucsb.cs.eager.sa.bp.tlat.Register;
+import junit.framework.TestCase;
 
-import java.util.List;
+public class RegisterTest extends TestCase {
 
-public interface BranchSelector {
+    public void testRegister() {
+        Register register = new Register(16);
+        assertEquals(0, register.toInt());
 
-    public Unit select(Unit currentInstruction, List<Unit> candidates);
+        register.pushAndShiftLeft(true);
+        assertEquals(1, register.toInt());
 
+        register.pushAndShiftLeft(true);
+        assertEquals(3, register.toInt());
+
+        register.pushAndShiftLeft(false);
+        assertEquals(6, register.toInt());
+
+        for (int i = 0; i < 16; i++) {
+            register.pushAndShiftLeft(false);
+        }
+        assertEquals(0, register.toInt());
+
+        for (int i = 0; i < 16; i++) {
+            register.pushAndShiftLeft(true);
+        }
+        assertEquals(65535, register.toInt());
+    }
 }

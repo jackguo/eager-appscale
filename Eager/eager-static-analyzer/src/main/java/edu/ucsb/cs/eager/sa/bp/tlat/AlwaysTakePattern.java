@@ -17,14 +17,24 @@
  *  under the License.
  */
 
-package edu.ucsb.cs.eager.sa;
+package edu.ucsb.cs.eager.sa.bp.tlat;
 
-import soot.Unit;
+public class AlwaysTakePattern implements BranchPattern {
 
-import java.util.List;
+    @Override
+    public boolean select() {
+        return true;
+    }
 
-public interface BranchSelector {
+    @Override
+    public void update(boolean taken) {
+        // do nothing
+    }
 
-    public Unit select(Unit currentInstruction, List<Unit> candidates);
-
+    public static class AlwaysTakePatternFactory implements BranchPatternFactory {
+        @Override
+        public BranchPattern create() {
+            return new AlwaysTakePattern();
+        }
+    }
 }

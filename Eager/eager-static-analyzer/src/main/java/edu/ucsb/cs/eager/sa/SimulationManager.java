@@ -100,7 +100,7 @@ public class SimulationManager {
         } else if (candidates.size() == 1) {
             return candidates.get(0);
         } else {
-            return simulator.getBranchSelector().select(candidates);
+            return simulator.getBranchSelector().select(currentInstruction, candidates);
         }
     }
 

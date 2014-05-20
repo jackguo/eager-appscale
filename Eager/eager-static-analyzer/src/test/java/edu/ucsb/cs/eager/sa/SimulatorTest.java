@@ -19,6 +19,9 @@
 
 package edu.ucsb.cs.eager.sa;
 
+import edu.ucsb.cs.eager.sa.bp.RandomBranchSelector;
+import edu.ucsb.cs.eager.sa.bp.tlat.TakeLastPattern;
+import edu.ucsb.cs.eager.sa.bp.tlat.TwoLevelAdaptiveBranchSelector;
 import junit.framework.TestCase;
 import soot.Body;
 import soot.Scene;
@@ -30,7 +33,8 @@ import soot.toolkits.graph.UnitGraph;
 public class SimulatorTest extends TestCase {
 
     public void testPerformanceSimulator() {
-        PerformanceSimulator simulator = new PerformanceSimulator(new RandomBranchSelector());
+        PerformanceSimulator simulator = new PerformanceSimulator(
+                new TwoLevelAdaptiveBranchSelector(new TakeLastPattern.TakeLastPatternFactory()));
         simulator.addUserPackage("net.eager.testing");
         simulator.addSpecialPackage("edu.ucsb.cs.eager.gae");
 
@@ -41,7 +45,7 @@ public class SimulatorTest extends TestCase {
         UnitGraph g = new BriefUnitGraph(b);
 
         SimulationManager manager = new SimulationManager(g, simulator);
-        double result = manager.simulate(10, true);
+        double result = manager.simulate(100, true);
         System.out.println("Average performance = " + result);
     }
 

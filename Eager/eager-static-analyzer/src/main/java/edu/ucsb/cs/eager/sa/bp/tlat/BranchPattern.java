@@ -17,14 +17,12 @@
  *  under the License.
  */
 
-package edu.ucsb.cs.eager.sa;
+package edu.ucsb.cs.eager.sa.bp.tlat;
 
-import soot.Unit;
+public interface BranchPattern {
 
-import java.util.List;
+    public boolean select();
 
-public interface BranchSelector {
-
-    public Unit select(Unit currentInstruction, List<Unit> candidates);
+    public void update(boolean taken);
 
 }

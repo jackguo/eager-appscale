@@ -17,14 +17,20 @@
  *  under the License.
  */
 
-package edu.ucsb.cs.eager.sa;
+package edu.ucsb.cs.eager.sa.bp;
 
+import edu.ucsb.cs.eager.sa.BranchSelector;
 import soot.Unit;
 
 import java.util.List;
+import java.util.Random;
 
-public interface BranchSelector {
+public class RandomBranchSelector implements BranchSelector {
 
-    public Unit select(Unit currentInstruction, List<Unit> candidates);
+    private static final Random rand = new Random();
 
+    @Override
+    public Unit select(Unit currentInstruction, List<Unit> candidates) {
+        return candidates.get(rand.nextInt(candidates.size()));
+    }
 }

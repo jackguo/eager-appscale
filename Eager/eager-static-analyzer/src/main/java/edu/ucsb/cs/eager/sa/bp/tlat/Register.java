@@ -17,14 +17,29 @@
  *  under the License.
  */
 
-package edu.ucsb.cs.eager.sa;
+package edu.ucsb.cs.eager.sa.bp.tlat;
 
-import soot.Unit;
+public class Register {
 
-import java.util.List;
+    private boolean[] register;
 
-public interface BranchSelector {
+    public Register(int n) {
+        if (n > 31) {
+            throw new IllegalArgumentException("Bit length must be < 32");
+        }
+        register = new boolean[n];
+    }
 
-    public Unit select(Unit currentInstruction, List<Unit> candidates);
+    public void pushAndShiftLeft(boolean bit) {
+        System.arraycopy(register, 1, register, 0, register.length - 1);
+        register[register.length - 1] = bit;
+    }
 
+    public int toInt() {
+        int n = 0;
+        for (int i = 0; i < register.length; ++i) {
+            n = (n << 1) + (register[i] ? 1 : 0);
+        }
+        return n;
+    }
 }
