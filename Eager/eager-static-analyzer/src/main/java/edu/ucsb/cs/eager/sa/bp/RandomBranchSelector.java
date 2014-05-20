@@ -22,7 +22,6 @@ package edu.ucsb.cs.eager.sa.bp;
 import edu.ucsb.cs.eager.sa.BranchSelector;
 import soot.Unit;
 
-import java.util.List;
 import java.util.Random;
 
 public class RandomBranchSelector implements BranchSelector {
@@ -30,7 +29,7 @@ public class RandomBranchSelector implements BranchSelector {
     private static final Random rand = new Random();
 
     @Override
-    public Unit select(Unit currentInstruction, List<Unit> candidates) {
-        return candidates.get(rand.nextInt(candidates.size()));
+    public boolean select(Unit currentInstruction) {
+        return rand.nextBoolean();
     }
 }

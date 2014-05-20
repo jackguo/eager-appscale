@@ -23,7 +23,6 @@ import edu.ucsb.cs.eager.sa.BranchSelector;
 import soot.Unit;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -44,7 +43,7 @@ public class TwoLevelAdaptiveBranchSelector implements BranchSelector {
     }
 
     @Override
-    public Unit select(Unit currentInstruction, List<Unit> candidates) {
+    public boolean select(Unit currentInstruction) {
         Register register = getHistoryRegister(currentInstruction);
         BranchPattern pattern = getBranchExecutionPattern(register);
         boolean choice = pattern.select();
@@ -56,7 +55,7 @@ public class TwoLevelAdaptiveBranchSelector implements BranchSelector {
         }
         register.pushAndShiftLeft(taken);
         pattern.update(taken);
-        return candidates.get(taken ? 0 : 1);
+        return taken;
     }
 
     private Register getHistoryRegister(Unit instruction) {

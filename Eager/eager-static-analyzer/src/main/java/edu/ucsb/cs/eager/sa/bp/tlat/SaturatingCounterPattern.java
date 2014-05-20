@@ -17,12 +17,30 @@
  *  under the License.
  */
 
-package edu.ucsb.cs.eager.sa;
+package edu.ucsb.cs.eager.sa.bp.tlat;
 
-import soot.Unit;
+public class SaturatingCounterPattern implements BranchPattern {
 
-public interface BranchSelector {
+    int count = 0;
 
-    public boolean select(Unit currentInstruction);
+    @Override
+    public boolean select() {
+        return count >= 2;
+    }
 
+    @Override
+    public void update(boolean taken) {
+        if (taken && count < 3) {
+            count++;
+        } else if (!taken && count > 0) {
+            count--;
+        }
+    }
+
+    public static class SaturatingCounterPatternFactory implements BranchPatternFactory {
+        @Override
+        public BranchPattern create() {
+            return new SaturatingCounterPattern();
+        }
+    }
 }

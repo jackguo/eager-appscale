@@ -99,9 +99,24 @@ public class SimulationManager {
             return null;
         } else if (candidates.size() == 1) {
             return candidates.get(0);
+        } else if (candidates.size() == 2) {
+            boolean take = simulator.getBranchSelector().select(currentInstruction);
+            return take ? candidates.get(0) : candidates.get(1);
         } else {
-            return simulator.getBranchSelector().select(currentInstruction, candidates);
+            return selectNextBranch(candidates);
         }
+    }
+
+    private Unit selectNextBranch(List<Unit> candidates) {
+        int i = 0;
+        while (i < candidates.size() - 1) {
+            boolean take = simulator.getBranchSelector().select(candidates.get(i));
+            if (take) {
+                return candidates.get(i);
+            }
+            i++;
+        }
+        return candidates.get(i);
     }
 
     private Loop findLoop(Unit unit) {
