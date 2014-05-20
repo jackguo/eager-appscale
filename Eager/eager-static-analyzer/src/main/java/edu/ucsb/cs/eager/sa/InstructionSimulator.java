@@ -61,4 +61,6 @@ public interface InstructionSimulator {
      */
     public double summarize(double[] results);
 
+    public BranchSelector getBranchSelector();
+
 }

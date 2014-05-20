@@ -25,6 +25,10 @@ import soot.jimple.Stmt;
 
 public class AvailabilitySimulator extends AbstractSimulator {
 
+    public AvailabilitySimulator(BranchSelector selector) {
+        super(selector);
+    }
+
     @Override
     public double getInitialValue() {
         return 100.0;

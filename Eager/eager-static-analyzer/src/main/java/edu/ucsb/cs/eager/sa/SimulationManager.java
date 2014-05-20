@@ -97,8 +97,11 @@ public class SimulationManager {
 
         if (candidates == null || candidates.size() == 0) {
             return null;
+        } else if (candidates.size() == 1) {
+            return candidates.get(0);
+        } else {
+            return simulator.getBranchSelector().select(candidates);
         }
-        return candidates.get(rand.nextInt(candidates.size()));
     }
 
     private Loop findLoop(Unit unit) {

@@ -37,6 +37,12 @@ public abstract class AbstractSimulator implements InstructionSimulator {
     private Set<String> userPackages = new HashSet<String>();
     private Set<String> specialPackages = new HashSet<String>();
 
+    private BranchSelector selector;
+
+    protected AbstractSimulator(BranchSelector selector) {
+        this.selector = selector;
+    }
+
     public void addUserPackage(String pkg) {
         userPackages.add(pkg);
     }
@@ -105,4 +111,9 @@ public abstract class AbstractSimulator implements InstructionSimulator {
      * @return a double value
      */
     protected abstract double simulateNonInvokeInstruction(Stmt stmt);
+
+    @Override
+    public BranchSelector getBranchSelector() {
+        return selector;
+    }
 }

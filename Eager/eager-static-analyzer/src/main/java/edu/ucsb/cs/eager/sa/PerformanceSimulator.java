@@ -25,6 +25,10 @@ import soot.jimple.Stmt;
 
 public class PerformanceSimulator extends AbstractSimulator {
 
+    public PerformanceSimulator(BranchSelector selector) {
+        super(selector);
+    }
+
     @Override
     public double getInitialValue() {
         return 0.0;

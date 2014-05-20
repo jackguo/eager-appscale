@@ -30,7 +30,7 @@ import soot.toolkits.graph.UnitGraph;
 public class SimulatorTest extends TestCase {
 
     public void testPerformanceSimulator() {
-        PerformanceSimulator simulator = new PerformanceSimulator();
+        PerformanceSimulator simulator = new PerformanceSimulator(new RandomBranchSelector());
         simulator.addUserPackage("net.eager.testing");
         simulator.addSpecialPackage("edu.ucsb.cs.eager.gae");
 
@@ -46,7 +46,7 @@ public class SimulatorTest extends TestCase {
     }
 
     public void testAvailabilitySimulator() {
-        AvailabilitySimulator simulator = new AvailabilitySimulator();
+        AvailabilitySimulator simulator = new AvailabilitySimulator(new RandomBranchSelector());
         simulator.addUserPackage("net.eager.testing");
         simulator.addSpecialPackage("edu.ucsb.cs.eager.gae");
 
