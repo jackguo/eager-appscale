@@ -21,8 +21,10 @@ package edu.ucsb.cs.eager.sa;
 
 import soot.Unit;
 
+import java.util.List;
+
 public interface BranchSelector {
 
-    public boolean select(Unit currentInstruction);
+    public Unit select(Unit currentInstruction, List<Unit> candidates);
 
 }
