@@ -46,7 +46,7 @@ public class AdvancedSimulatorTest extends TestCase {
 
         SimulationManager manager = new SimulationManager(g, simulator);
         double result = manager.simulate(1000, false);
-        System.out.println("Average performance (TLAT-Counter) = " + result);
+        System.out.println("Average performance (Random) = " + result);
     }
 
     public void testPerformanceSimulatorWithTLATCounter() {

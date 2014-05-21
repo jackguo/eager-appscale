@@ -26,6 +26,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * A branch predictor based on the work of Tse-Yu Yeh and Yale Patt.
+ * Refer paper "Two-Level Adaptive Training Branch Prediction" (ACM 1991).
+ */
 public class TwoLevelAdaptiveBranchSelector implements BranchSelector {
 
     private static final int HISTORY_REGISTER_LENGTH = 16;
