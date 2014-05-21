@@ -29,7 +29,7 @@ import java.util.Random;
 public class TwoLevelAdaptiveBranchSelector implements BranchSelector {
 
     private static final int HISTORY_REGISTER_LENGTH = 16;
-    private static final double PREDICTOR_ACCURACY_RATE = 0.9;
+    private static final double PREDICTOR_ACCURACY_RATE = 0.88;
 
     private static final Random rand = new Random();
 

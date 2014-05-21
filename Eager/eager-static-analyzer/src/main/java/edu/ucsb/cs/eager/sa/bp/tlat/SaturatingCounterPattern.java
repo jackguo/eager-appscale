@@ -21,7 +21,7 @@ package edu.ucsb.cs.eager.sa.bp.tlat;
 
 public class SaturatingCounterPattern implements BranchPattern {
 
-    int count = 0;
+    int count = 3;
 
     @Override
     public boolean select() {

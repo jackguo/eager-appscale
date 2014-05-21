@@ -21,17 +21,11 @@ package edu.ucsb.cs.eager.sa.bp.tlat;
 
 public class TakeLastPattern implements BranchPattern {
 
-    private boolean initial = true;
-    private boolean last;
+    private boolean last = true;
 
     @Override
     public boolean select() {
-        if (initial) {
-            initial = false;
-            return true;
-        } else {
-            return last;
-        }
+        return last;
     }
 
     @Override
