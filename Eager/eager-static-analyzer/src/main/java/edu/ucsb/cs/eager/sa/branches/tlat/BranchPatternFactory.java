@@ -17,29 +17,10 @@
  *  under the License.
  */
 
-package edu.ucsb.cs.eager.sa.bp.tlat;
+package edu.ucsb.cs.eager.sa.branches.tlat;
 
-public class Register {
+public interface BranchPatternFactory {
 
-    private boolean[] register;
+    public BranchPattern create();
 
-    public Register(int n) {
-        if (n > 31) {
-            throw new IllegalArgumentException("Bit length must be < 32");
-        }
-        register = new boolean[n];
-    }
-
-    public void pushAndShiftLeft(boolean bit) {
-        System.arraycopy(register, 1, register, 0, register.length - 1);
-        register[register.length - 1] = bit;
-    }
-
-    public int toInt() {
-        int n = 0;
-        for (int i = 0; i < register.length; ++i) {
-            n = (n << 1) + (register[i] ? 1 : 0);
-        }
-        return n;
-    }
 }

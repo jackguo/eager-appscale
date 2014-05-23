@@ -17,10 +17,20 @@
  *  under the License.
  */
 
-package edu.ucsb.cs.eager.sa.bp.tlat;
+package edu.ucsb.cs.eager.sa.branches;
 
-public interface BranchPatternFactory {
+import edu.ucsb.cs.eager.sa.BranchSelector;
+import soot.Unit;
 
-    public BranchPattern create();
+import java.util.List;
+import java.util.Random;
 
+public class RandomBranchSelector implements BranchSelector {
+
+    private static final Random rand = new Random();
+
+    @Override
+    public Unit select(Unit currentInstruction, List<Unit> candidates) {
+        return candidates.get(rand.nextInt(candidates.size()));
+    }
 }

@@ -17,24 +17,26 @@
  *  under the License.
  */
 
-package edu.ucsb.cs.eager.sa.bp.tlat;
+package edu.ucsb.cs.eager.sa.branches.tlat;
 
-public class AlwaysTakePattern implements BranchPattern {
+public class TakeLastPattern implements BranchPattern {
+
+    private boolean last = true;
 
     @Override
     public boolean select() {
-        return true;
+        return last;
     }
 
     @Override
     public void update(boolean taken) {
-        // do nothing
+        last = taken;
     }
 
-    public static class AlwaysTakePatternFactory implements BranchPatternFactory {
+    public static class TakeLastPatternFactory implements BranchPatternFactory {
         @Override
         public BranchPattern create() {
-            return new AlwaysTakePattern();
+            return new TakeLastPattern();
         }
     }
 }

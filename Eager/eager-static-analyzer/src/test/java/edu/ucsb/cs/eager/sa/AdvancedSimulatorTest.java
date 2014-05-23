@@ -19,10 +19,10 @@
 
 package edu.ucsb.cs.eager.sa;
 
-import edu.ucsb.cs.eager.sa.bp.RandomBranchSelector;
-import edu.ucsb.cs.eager.sa.bp.tlat.SaturatingCounterPattern;
-import edu.ucsb.cs.eager.sa.bp.tlat.TakeLastPattern;
-import edu.ucsb.cs.eager.sa.bp.tlat.TwoLevelAdaptiveBranchSelector;
+import edu.ucsb.cs.eager.sa.branches.RandomBranchSelector;
+import edu.ucsb.cs.eager.sa.branches.tlat.SaturatingCounterPattern;
+import edu.ucsb.cs.eager.sa.branches.tlat.TakeLastPattern;
+import edu.ucsb.cs.eager.sa.branches.tlat.TwoLevelAdaptiveBranchSelector;
 import junit.framework.TestCase;
 import soot.Body;
 import soot.Scene;

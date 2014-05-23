@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package edu.ucsb.cs.eager.sa.bp.tlat;
+package edu.ucsb.cs.eager.sa.branches.tlat;
 
 public class SaturatingCounterPattern implements BranchPattern {
 

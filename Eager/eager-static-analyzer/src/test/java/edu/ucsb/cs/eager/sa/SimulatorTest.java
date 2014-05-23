@@ -19,7 +19,7 @@
 
 package edu.ucsb.cs.eager.sa;
 
-import edu.ucsb.cs.eager.sa.bp.RandomBranchSelector;
+import edu.ucsb.cs.eager.sa.branches.RandomBranchSelector;
 import junit.framework.TestCase;
 import soot.Body;
 import soot.Scene;

@@ -17,26 +17,12 @@
  *  under the License.
  */
 
-package edu.ucsb.cs.eager.sa.bp.tlat;
+package edu.ucsb.cs.eager.sa.branches.tlat;
 
-public class TakeLastPattern implements BranchPattern {
+public interface BranchPattern {
 
-    private boolean last = true;
+    public boolean select();
 
-    @Override
-    public boolean select() {
-        return last;
-    }
+    public void update(boolean taken);
 
-    @Override
-    public void update(boolean taken) {
-        last = taken;
-    }
-
-    public static class TakeLastPatternFactory implements BranchPatternFactory {
-        @Override
-        public BranchPattern create() {
-            return new TakeLastPattern();
-        }
-    }
 }

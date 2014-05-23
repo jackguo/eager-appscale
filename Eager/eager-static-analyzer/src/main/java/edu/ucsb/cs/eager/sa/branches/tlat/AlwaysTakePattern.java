@@ -17,34 +17,24 @@
  *  under the License.
  */
 
-package edu.ucsb.cs.eager.sa.bp;
+package edu.ucsb.cs.eager.sa.branches.tlat;
 
-import edu.ucsb.cs.eager.sa.bp.tlat.Register;
-import junit.framework.TestCase;
+public class AlwaysTakePattern implements BranchPattern {
 
-public class RegisterTest extends TestCase {
+    @Override
+    public boolean select() {
+        return true;
+    }
 
-    public void testRegister() {
-        Register register = new Register(16);
-        assertEquals(0, register.toInt());
+    @Override
+    public void update(boolean taken) {
+        // do nothing
+    }
 
-        register.pushAndShiftLeft(true);
-        assertEquals(1, register.toInt());
-
-        register.pushAndShiftLeft(true);
-        assertEquals(3, register.toInt());
-
-        register.pushAndShiftLeft(false);
-        assertEquals(6, register.toInt());
-
-        for (int i = 0; i < 16; i++) {
-            register.pushAndShiftLeft(false);
+    public static class AlwaysTakePatternFactory implements BranchPatternFactory {
+        @Override
+        public BranchPattern create() {
+            return new AlwaysTakePattern();
         }
-        assertEquals(0, register.toInt());
-
-        for (int i = 0; i < 16; i++) {
-            register.pushAndShiftLeft(true);
-        }
-        assertEquals(65535, register.toInt());
     }
 }
