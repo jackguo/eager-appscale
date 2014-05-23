@@ -20,11 +20,7 @@
 package edu.ucsb.cs.eager.sa;
 
 import soot.Unit;
-import soot.jimple.AssignStmt;
-import soot.jimple.InvokeExpr;
-import soot.jimple.InvokeStmt;
 import soot.jimple.Stmt;
-import soot.jimple.internal.JInvokeStmt;
 import soot.jimple.toolkits.annotation.logic.Loop;
 import soot.jimple.toolkits.annotation.logic.LoopFinder;
 import soot.toolkits.graph.UnitGraph;
@@ -53,6 +49,7 @@ public class SimulationManager {
         if (rounds == 0) {
             throw new IllegalArgumentException("Number of rounds must be > 0");
         }
+
         double[] results = new double[rounds];
         for (int i = 0; i < rounds; i++) {
             results[i] = doSimulate(graph);
@@ -60,7 +57,6 @@ public class SimulationManager {
                 System.out.println("Round-" + i + ": " + results[i]);
             }
         }
-
         return simulator.summarize(results);
     }
 
@@ -71,15 +67,6 @@ public class SimulationManager {
             current = getNextInstruction(graph, current);
             if (current == null) {
                 break;
-            }
-
-            if (current instanceof AssignStmt) {
-                AssignStmt assignStmt = (AssignStmt) current;
-                if (assignStmt.getRightOp() instanceof InvokeExpr) {
-                    InvokeStmt invokeStmt = new JInvokeStmt(assignStmt.getRightOp());
-                    double item = simulator.simulateInstruction(invokeStmt);
-                    cost = simulator.aggregateInstructionResult(cost, item);
-                }
             }
 
             double item = simulator.simulateInstruction((Stmt) current);
