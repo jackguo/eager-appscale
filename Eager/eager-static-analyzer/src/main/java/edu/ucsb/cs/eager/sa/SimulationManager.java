@@ -20,15 +20,16 @@
 package edu.ucsb.cs.eager.sa;
 
 import soot.Unit;
+import soot.jimple.AssignStmt;
+import soot.jimple.InvokeExpr;
+import soot.jimple.InvokeStmt;
 import soot.jimple.Stmt;
+import soot.jimple.internal.JInvokeStmt;
 import soot.jimple.toolkits.annotation.logic.Loop;
 import soot.jimple.toolkits.annotation.logic.LoopFinder;
 import soot.toolkits.graph.UnitGraph;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class SimulationManager {
 
@@ -71,6 +72,16 @@ public class SimulationManager {
             if (current == null) {
                 break;
             }
+
+            if (current instanceof AssignStmt) {
+                AssignStmt assignStmt = (AssignStmt) current;
+                if (assignStmt.getRightOp() instanceof InvokeExpr) {
+                    InvokeStmt invokeStmt = new JInvokeStmt(assignStmt.getRightOp());
+                    double item = simulator.simulateInstruction(invokeStmt);
+                    cost = simulator.aggregateInstructionResult(cost, item);
+                }
+            }
+
             double item = simulator.simulateInstruction((Stmt) current);
             cost = simulator.aggregateInstructionResult(cost, item);
         }
