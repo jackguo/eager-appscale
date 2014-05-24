@@ -19,27 +19,60 @@
 
 package edu.ucsb.cs.eager.sa.loops;
 
+import edu.ucsb.cs.eager.sa.loops.ai.AbstractStateDomain;
+import edu.ucsb.cs.eager.sa.loops.ai.IntervalDomain;
 import soot.Value;
-import soot.jimple.AssignStmt;
-import soot.jimple.IfStmt;
-import soot.jimple.Stmt;
+import soot.jimple.*;
+import soot.jimple.internal.JGeExpr;
 import soot.jimple.toolkits.annotation.logic.Loop;
 
-import java.util.Map;
+import java.util.*;
 
 public class LoopBoundEstimator {
 
-    public static int estimate(Loop loop, Map<Value,Value> variables) {
+    public static int estimate(Loop loop, Map<Value,AbstractStateDomain> variables) {
+        IfStmt loopExit = findLoopExit(loop, variables);
+        Expr condition = (Expr) loopExit.getCondition();
+
+        Map<Value,AbstractStateDomain> tempVars = new HashMap<Value, AbstractStateDomain>();
+        if (condition instanceof JGeExpr) {
+            Value leftOp = ((JGeExpr) condition).getOp1();
+            Value rightOp = ((JGeExpr) condition).getOp2();
+            if (rightOp instanceof IntConstant) {
+                AbstractStateDomain dom = variables.get(leftOp);
+                if (dom != null) {
+                    if (dom instanceof IntervalDomain) {
+                        int low = ((IntervalDomain) dom).getLowerBound();
+                        int high = ((IntConstant) rightOp).value - 1;
+                        if (low <= high) {
+                            tempVars.put(leftOp, new IntervalDomain(low, high));
+                        } else {
+                            return 0;
+                        }
+                    }
+                }
+            }
+        }
+
+        // TODO: Walk the loop code
+
+        if (tempVars.size() > 0) {
+            int bound = 1;
+            for (AbstractStateDomain dom : tempVars.values()) {
+                bound *= dom.getStates();
+            }
+            return bound;
+        }
         return -1;
     }
 
-    private static IfStmt findLoopExit(Loop loop, Map<Value,Value> variables) {
+    private static IfStmt findLoopExit(Loop loop, Map<Value,AbstractStateDomain> variables) {
         for (Stmt stmt : loop.getLoopStatements()) {
             if (stmt instanceof IfStmt) {
                 return (IfStmt) stmt;
             } else if (stmt instanceof AssignStmt) {
                 AssignStmt assignStmt = (AssignStmt) stmt;
-                variables.put(assignStmt.getLeftOp(), assignStmt.getRightOp());
+                // TODO: update variables map
             }
         }
         throw new IllegalStateException("No loop exit found");

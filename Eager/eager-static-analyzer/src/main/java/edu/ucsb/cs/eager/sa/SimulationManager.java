@@ -19,8 +19,14 @@
 
 package edu.ucsb.cs.eager.sa;
 
+import edu.ucsb.cs.eager.sa.loops.ai.AbstractStateDomain;
+import edu.ucsb.cs.eager.sa.loops.ai.IntervalDomain;
 import soot.Unit;
+import soot.Value;
+import soot.jimple.AssignStmt;
+import soot.jimple.IntConstant;
 import soot.jimple.Stmt;
+import soot.jimple.internal.JimpleLocal;
 import soot.jimple.toolkits.annotation.logic.Loop;
 import soot.jimple.toolkits.annotation.logic.LoopFinder;
 import soot.toolkits.graph.UnitGraph;
@@ -36,6 +42,7 @@ public class SimulationManager {
     private UnitGraph graph;
     private Collection<Loop> loops;
     private InstructionSimulator simulator;
+    private Map<Value,AbstractStateDomain> variables = new HashMap<Value, AbstractStateDomain>();
 
     public SimulationManager(UnitGraph graph, InstructionSimulator simulator) {
         this.graph = graph;
@@ -70,9 +77,26 @@ public class SimulationManager {
             }
 
             double item = simulator.simulateInstruction((Stmt) current);
+            handleVariables((Stmt) current);
             cost = simulator.aggregateInstructionResult(cost, item);
         }
         return cost;
+    }
+
+    private void handleVariables(Stmt stmt) {
+        if (stmt instanceof AssignStmt) {
+            AssignStmt assign = (AssignStmt) stmt;
+            Value leftOp = assign.getLeftOp();
+            Value rightOp = assign.getRightOp();
+            //System.out.println(assign.getLeftOp() + " = " + assign.getRightOp() + " [" +
+            //        assign.getRightOp().getClass().getSimpleName() + "]");
+            if (rightOp instanceof IntConstant) {
+                int value = ((IntConstant) rightOp).value;
+                variables.put(leftOp, new IntervalDomain(value, value));
+            } else if (rightOp instanceof JimpleLocal) {
+                variables.put(leftOp, variables.get(rightOp));
+            }
+        }
     }
 
     private Unit getNextInstruction(UnitGraph graph, Unit currentInstruction) {
