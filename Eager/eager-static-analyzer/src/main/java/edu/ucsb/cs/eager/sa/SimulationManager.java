@@ -19,6 +19,7 @@
 
 package edu.ucsb.cs.eager.sa;
 
+import edu.ucsb.cs.eager.sa.loops.LoopBoundEstimator;
 import edu.ucsb.cs.eager.sa.loops.ai.AbstractStateDomain;
 import edu.ucsb.cs.eager.sa.loops.ai.IntervalDomain;
 import soot.Unit;
@@ -95,6 +96,8 @@ public class SimulationManager {
                 variables.put(leftOp, new IntervalDomain(value, value));
             } else if (rightOp instanceof JimpleLocal) {
                 variables.put(leftOp, variables.get(rightOp));
+            } else {
+                variables.put(leftOp, new AbstractStateDomain());
             }
         }
     }
@@ -108,6 +111,7 @@ public class SimulationManager {
             candidates.addAll(graph.getSuccsOf(currentInstruction));
             Loop loop = findLoop(currentInstruction);
             if (loop != null) {
+                System.out.println(LoopBoundEstimator.estimate(loop, variables));
                 Unit nextLoopInstruction = findNextLoopInstruction(loop, candidates);
                 if (rand.nextDouble() <= LOOP_REPETITION_PROBABILITY) {
                     return nextLoopInstruction;

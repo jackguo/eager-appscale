@@ -40,15 +40,13 @@ public class LoopBoundEstimator {
             Value rightOp = ((JGeExpr) condition).getOp2();
             if (rightOp instanceof IntConstant) {
                 AbstractStateDomain dom = variables.get(leftOp);
-                if (dom != null) {
-                    if (dom instanceof IntervalDomain) {
-                        int low = ((IntervalDomain) dom).getLowerBound();
-                        int high = ((IntConstant) rightOp).value - 1;
-                        if (low <= high) {
-                            tempVars.put(leftOp, new IntervalDomain(low, high));
-                        } else {
-                            return 0;
-                        }
+                if (dom != null && dom instanceof IntervalDomain) {
+                    int low = ((IntervalDomain) dom).getLowerBound();
+                    int high = ((IntConstant) rightOp).value - 1;
+                    if (low <= high) {
+                        tempVars.put(leftOp, new IntervalDomain(low, high));
+                    } else {
+                        return 0;
                     }
                 }
             }
