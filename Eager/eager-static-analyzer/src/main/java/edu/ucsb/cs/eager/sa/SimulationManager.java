@@ -19,15 +19,14 @@
 
 package edu.ucsb.cs.eager.sa;
 
-import edu.ucsb.cs.eager.sa.loops.LoopBoundEstimator;
-import edu.ucsb.cs.eager.sa.loops.ai.AbstractStateDomain;
-import edu.ucsb.cs.eager.sa.loops.ai.IntervalDomain;
+import edu.ucsb.cs.eager.sa.loops.LoopBoundAnalysis;
+import edu.ucsb.cs.eager.sa.loops.ai.IntegerInterval;
+import soot.IntType;
 import soot.Unit;
 import soot.Value;
 import soot.jimple.AssignStmt;
 import soot.jimple.IntConstant;
 import soot.jimple.Stmt;
-import soot.jimple.internal.JimpleLocal;
 import soot.jimple.toolkits.annotation.logic.Loop;
 import soot.jimple.toolkits.annotation.logic.LoopFinder;
 import soot.toolkits.graph.UnitGraph;
@@ -43,7 +42,7 @@ public class SimulationManager {
     private UnitGraph graph;
     private Collection<Loop> loops;
     private InstructionSimulator simulator;
-    private Map<Value,AbstractStateDomain> variables = new HashMap<Value, AbstractStateDomain>();
+    private Map<Value,IntegerInterval> variables = new HashMap<Value, IntegerInterval>();
 
     public SimulationManager(UnitGraph graph, InstructionSimulator simulator) {
         this.graph = graph;
@@ -89,15 +88,8 @@ public class SimulationManager {
             AssignStmt assign = (AssignStmt) stmt;
             Value leftOp = assign.getLeftOp();
             Value rightOp = assign.getRightOp();
-            //System.out.println(assign.getLeftOp() + " = " + assign.getRightOp() + " [" +
-            //        assign.getRightOp().getClass().getSimpleName() + "]");
             if (rightOp instanceof IntConstant) {
-                int value = ((IntConstant) rightOp).value;
-                variables.put(leftOp, new IntervalDomain(value, value));
-            } else if (rightOp instanceof JimpleLocal) {
-                variables.put(leftOp, variables.get(rightOp));
-            } else {
-                variables.put(leftOp, new AbstractStateDomain());
+                variables.put(leftOp, new IntegerInterval(((IntConstant) rightOp).value));
             }
         }
     }
@@ -111,7 +103,7 @@ public class SimulationManager {
             candidates.addAll(graph.getSuccsOf(currentInstruction));
             Loop loop = findLoop(currentInstruction);
             if (loop != null) {
-                System.out.println(LoopBoundEstimator.estimate(loop, variables));
+                System.out.println(LoopBoundAnalysis.estimateBound((Stmt) currentInstruction, loops, variables));
                 Unit nextLoopInstruction = findNextLoopInstruction(loop, candidates);
                 if (rand.nextDouble() <= LOOP_REPETITION_PROBABILITY) {
                     return nextLoopInstruction;
