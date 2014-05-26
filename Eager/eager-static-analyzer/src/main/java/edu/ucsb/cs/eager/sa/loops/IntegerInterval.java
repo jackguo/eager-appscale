@@ -57,13 +57,31 @@ public class IntegerInterval {
         }
     }
 
-    public void add(int value) {
+    public IntegerInterval add(int value) {
+        int lBound = lowerBound, uBound = upperBound;
         if (lowerBound != Integer.MIN_VALUE) {
-            lowerBound += value;
+            lBound += value;
         }
         if (upperBound != Integer.MAX_VALUE) {
-            upperBound += value;
+            uBound += value;
         }
+        return new IntegerInterval(lBound, uBound);
+    }
+
+    public IntegerInterval widen(IntegerInterval interval) {
+        int lBound, uBound;
+        if (interval.lowerBound < lowerBound) {
+            lBound = Integer.MIN_VALUE;
+        } else {
+            lBound = interval.lowerBound;
+        }
+
+        if (interval.upperBound > upperBound) {
+            uBound = Integer.MAX_VALUE;
+        } else {
+            uBound = interval.upperBound;
+        }
+        return new IntegerInterval(lBound, uBound);
     }
 
     @Override
