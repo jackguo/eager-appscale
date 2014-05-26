@@ -38,21 +38,42 @@ public class LoopBoundAnalysis {
                              Map<Value,IntegerInterval> variables) {
 
         Loop loop = findLoop(loopHead, loops);
+        Collection<Stmt> exits = loop.getLoopExits();
         Map<Value,IntegerInterval> tempVariables = new HashMap<Value, IntegerInterval>();
-        for (ValueBox useBox : loopHead.getUseBoxes()) {
-            if (useBox.getValue() instanceof JimpleLocal) {
-                IntegerInterval current = variables.get(useBox.getValue());
-                if (current != null) {
-                    tempVariables.put(useBox.getValue(), current.clone());
+        Map<Value,IntegerInterval> loopRanges = new HashMap<Value, IntegerInterval>();
+        for (Stmt exit : exits) {
+            for (ValueBox useBox : exit.getUseBoxes()) {
+                if (useBox.getValue() instanceof JimpleLocal) {
+                    IntegerInterval current = variables.get(useBox.getValue());
+                    if (current != null) {
+                        tempVariables.put(useBox.getValue(), current.clone());
+                    }
+                }
+            }
+
+            Value condition = ((IfStmt) exit).getCondition();
+            if (condition instanceof GeExpr) {
+                Value op1 = ((GeExpr) condition).getOp1();
+                Value op2 = ((GeExpr) condition).getOp2();
+                if (op2 instanceof IntConstant) {
+                    int value = ((IntConstant) op2).value;
+                    IntegerInterval interval = tempVariables.get(op1);
+                    if (interval != null) {
+                        if (interval.getLowerBound() <= value) {
+                            loopRanges.put(op1, new IntegerInterval(interval.getLowerBound(), value));
+                        } else {
+                            return 0;
+                        }
+                    } else {
+                        loopRanges.put(op1, new IntegerInterval(0, value));
+                    }
                 }
             }
         }
 
-        Value condition = ((IfStmt) loopHead).getCondition();
-        if (condition instanceof GtExpr) {
-            System.out.println(condition);
-        }
-
+        // TODO: Analyze each loop exit and figure out a range for each variable
+        // TODO: Analyze loop code to see how fast the variables grow
+        // TODO: Use the above values to make an estimation about the loop bound
         return -1;
     }
 

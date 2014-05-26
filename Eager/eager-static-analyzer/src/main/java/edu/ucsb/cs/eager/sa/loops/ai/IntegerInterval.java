@@ -25,6 +25,9 @@ public class IntegerInterval {
     private int upperBound;
 
     public IntegerInterval(int lowerBound, int upperBound) {
+        if (lowerBound > upperBound) {
+            throw new IllegalArgumentException("lower bound must be <= upper bound");
+        }
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
     }
@@ -45,4 +48,12 @@ public class IntegerInterval {
     public IntegerInterval clone() {
         return new IntegerInterval(this.lowerBound, this.upperBound);
     }
+
+    public int getStates() {
+        if (lowerBound != Integer.MIN_VALUE && upperBound != Integer.MAX_VALUE) {
+            return upperBound - lowerBound + 1;
+        }
+        return -1;
+    }
+
 }
