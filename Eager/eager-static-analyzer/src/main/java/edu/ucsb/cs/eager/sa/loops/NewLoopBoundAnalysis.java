@@ -212,6 +212,9 @@ public class NewLoopBoundAnalysis {
                     if (op1 instanceof JimpleLocal && op2 instanceof IntConstant) {
                         IntegerInterval interval = in.get(op1);
                         out.updateState(op1, interval.lte(((IntConstant) op2).value));
+                    } else if (op1 instanceof JimpleLocal && op2 instanceof JimpleLocal) {
+                        IntegerInterval interval = in.get(op1);
+                        out.updateState(op1, interval.lte(in.get(op2)));
                     }
                 }
             }

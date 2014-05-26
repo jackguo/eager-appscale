@@ -109,13 +109,13 @@ public class IntegerInterval {
     public IntegerInterval lte(IntegerInterval interval) {
         int lBound, uBound;
         if (upperBound > interval.lowerBound) {
-            uBound = interval.lowerBound;
+            uBound = interval.upperBound;
         } else {
             uBound = upperBound;
         }
 
         if (lowerBound > interval.lowerBound) {
-            lBound = Integer.MIN_VALUE;
+            lBound = interval.lowerBound;
         } else {
             lBound = lowerBound;
         }
