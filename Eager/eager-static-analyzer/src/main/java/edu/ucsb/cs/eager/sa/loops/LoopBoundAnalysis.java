@@ -19,71 +19,86 @@
 
 package edu.ucsb.cs.eager.sa.loops;
 
-import edu.ucsb.cs.eager.sa.loops.ai.IntegerInterval;
 import soot.IntType;
-import soot.Unit;
 import soot.Value;
 import soot.ValueBox;
-import soot.jimple.*;
-import soot.jimple.internal.JimpleLocal;
-import soot.jimple.toolkits.annotation.logic.Loop;
+import soot.jimple.AssignStmt;
+import soot.jimple.IntConstant;
+import soot.jimple.Stmt;
+import soot.toolkits.graph.DirectedGraph;
+import soot.toolkits.scalar.ForwardFlowAnalysis;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Iterator;
 
-public class LoopBoundAnalysis {
+public class LoopBoundAnalysis extends ForwardFlowAnalysis<Stmt,ProgramState> {
 
-    public static int estimateBound(Stmt loopHead, Collection<Loop> loops,
-                             Map<Value,IntegerInterval> variables) {
+    public LoopBoundAnalysis(DirectedGraph<Stmt> graph) {
+        super(graph);
+    }
 
-        Loop loop = findLoop(loopHead, loops);
-        Collection<Stmt> exits = loop.getLoopExits();
-        Map<Value,IntegerInterval> tempVariables = new HashMap<Value, IntegerInterval>();
-        Map<Value,IntegerInterval> loopRanges = new HashMap<Value, IntegerInterval>();
-        for (Stmt exit : exits) {
-            for (ValueBox useBox : exit.getUseBoxes()) {
-                if (useBox.getValue() instanceof JimpleLocal) {
-                    IntegerInterval current = variables.get(useBox.getValue());
-                    if (current != null) {
-                        tempVariables.put(useBox.getValue(), current.clone());
-                    }
-                }
-            }
+    public void analyze() {
+        doAnalysis();
+    }
 
-            Value condition = ((IfStmt) exit).getCondition();
-            if (condition instanceof GeExpr) {
-                Value op1 = ((GeExpr) condition).getOp1();
-                Value op2 = ((GeExpr) condition).getOp2();
-                if (op2 instanceof IntConstant) {
-                    int value = ((IntConstant) op2).value;
-                    IntegerInterval interval = tempVariables.get(op1);
-                    if (interval != null) {
-                        if (interval.getLowerBound() <= value) {
-                            loopRanges.put(op1, new IntegerInterval(interval.getLowerBound(), value));
-                        } else {
-                            return 0;
-                        }
-                    } else {
-                        loopRanges.put(op1, new IntegerInterval(0, value));
-                    }
+    @Override
+    protected void flowThrough(ProgramState in, Stmt stmt, ProgramState out) {
+        if (in != null) {
+            in.copy(out);
+        }
+        if (stmt instanceof AssignStmt) {
+            Value rightOp = ((AssignStmt) stmt).getRightOp();
+            if (rightOp.getType() instanceof IntType) {
+                Value leftOp = ((AssignStmt) stmt).getLeftOp();
+                if (rightOp instanceof IntConstant) {
+                    int value = ((IntConstant) rightOp).value;
+                    out.updateState(leftOp, value, value);
                 }
             }
         }
-
-        // TODO: Analyze each loop exit and figure out a range for each variable
-        // TODO: Analyze loop code to see how fast the variables grow
-        // TODO: Use the above values to make an estimation about the loop bound
-        return -1;
     }
 
-    private static Loop findLoop(Unit unit, Collection<Loop> loops) {
-        for (Loop loop : loops) {
-            if (loop.getHead().equals(unit)) {
-                return loop;
+    @Override
+    protected ProgramState newInitialFlow() {
+        return new ProgramState();
+    }
+
+    @Override
+    protected ProgramState entryInitialFlow() {
+        Iterator<Stmt> iterator = graph.iterator();
+        ProgramState state = new ProgramState();
+        while (iterator.hasNext()) {
+            Stmt stmt = iterator.next();
+            for (ValueBox value : stmt.getDefBoxes()) {
+                Value v = value.getValue();
+                if (v.getType() instanceof IntType) {
+                    state.updateState(v, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                }
             }
         }
-        return null;
+        return state;
     }
 
+    @Override
+    protected void merge(ProgramState in1, ProgramState in2, ProgramState out) {
+        for (Value var : in1.getVariables()) {
+            IntegerInterval interval1 = in1.get(var);
+            IntegerInterval interval2 = in2.get(var);
+            if (interval2 != null) {
+                out.updateState(var, interval1.sup(interval2));
+            } else {
+                out.updateState(var, interval1);
+            }
+        }
+
+        for (Value var : in2.getVariables()) {
+            if (in1.get(var) == null) {
+                out.updateState(var, in2.get(var));
+            }
+        }
+    }
+
+    @Override
+    protected void copy(ProgramState src, ProgramState dst) {
+        src.copy(dst);
+    }
 }

@@ -17,7 +17,9 @@
  *  under the License.
  */
 
-package edu.ucsb.cs.eager.sa.loops.ai;
+package edu.ucsb.cs.eager.sa.loops;
+
+import soot.Value;
 
 public class IntegerInterval {
 
@@ -25,16 +27,8 @@ public class IntegerInterval {
     private int upperBound;
 
     public IntegerInterval(int lowerBound, int upperBound) {
-        if (lowerBound > upperBound) {
-            throw new IllegalArgumentException("lower bound must be <= upper bound");
-        }
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
-    }
-
-    public IntegerInterval(int value) {
-        this.lowerBound = value;
-        this.upperBound = value;
     }
 
     public int getLowerBound() {
@@ -45,15 +39,35 @@ public class IntegerInterval {
         return upperBound;
     }
 
-    public IntegerInterval clone() {
-        return new IntegerInterval(this.lowerBound, this.upperBound);
-    }
-
-    public int getStates() {
-        if (lowerBound != Integer.MIN_VALUE && upperBound != Integer.MAX_VALUE) {
-            return upperBound - lowerBound + 1;
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof IntegerInterval) {
+            IntegerInterval other = (IntegerInterval) obj;
+            return other.lowerBound == lowerBound && other.upperBound == upperBound;
         }
-        return -1;
+        return false;
     }
 
+    public IntegerInterval sup(IntegerInterval interval) {
+        if (interval != null) {
+            return new IntegerInterval(Math.min(lowerBound, interval.lowerBound),
+                    Math.max(upperBound, interval.upperBound));
+        } else {
+            return new IntegerInterval(lowerBound, upperBound);
+        }
+    }
+
+    public void add(int value) {
+        if (lowerBound != Integer.MIN_VALUE) {
+            lowerBound += value;
+        }
+        if (upperBound != Integer.MAX_VALUE) {
+            upperBound += value;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "[" + lowerBound + "," + upperBound + "]";
+    }
 }

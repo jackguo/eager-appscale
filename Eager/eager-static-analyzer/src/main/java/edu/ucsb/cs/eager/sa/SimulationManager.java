@@ -19,13 +19,7 @@
 
 package edu.ucsb.cs.eager.sa;
 
-import edu.ucsb.cs.eager.sa.loops.LoopBoundAnalysis;
-import edu.ucsb.cs.eager.sa.loops.ai.IntegerInterval;
-import soot.IntType;
 import soot.Unit;
-import soot.Value;
-import soot.jimple.AssignStmt;
-import soot.jimple.IntConstant;
 import soot.jimple.Stmt;
 import soot.jimple.toolkits.annotation.logic.Loop;
 import soot.jimple.toolkits.annotation.logic.LoopFinder;
@@ -42,7 +36,6 @@ public class SimulationManager {
     private UnitGraph graph;
     private Collection<Loop> loops;
     private InstructionSimulator simulator;
-    private Map<Value,IntegerInterval> variables = new HashMap<Value, IntegerInterval>();
 
     public SimulationManager(UnitGraph graph, InstructionSimulator simulator) {
         this.graph = graph;
@@ -77,21 +70,9 @@ public class SimulationManager {
             }
 
             double item = simulator.simulateInstruction((Stmt) current);
-            handleVariables((Stmt) current);
             cost = simulator.aggregateInstructionResult(cost, item);
         }
         return cost;
-    }
-
-    private void handleVariables(Stmt stmt) {
-        if (stmt instanceof AssignStmt) {
-            AssignStmt assign = (AssignStmt) stmt;
-            Value leftOp = assign.getLeftOp();
-            Value rightOp = assign.getRightOp();
-            if (rightOp instanceof IntConstant) {
-                variables.put(leftOp, new IntegerInterval(((IntConstant) rightOp).value));
-            }
-        }
     }
 
     private Unit getNextInstruction(UnitGraph graph, Unit currentInstruction) {
@@ -103,7 +84,6 @@ public class SimulationManager {
             candidates.addAll(graph.getSuccsOf(currentInstruction));
             Loop loop = findLoop(currentInstruction);
             if (loop != null) {
-                System.out.println(LoopBoundAnalysis.estimateBound((Stmt) currentInstruction, loops, variables));
                 Unit nextLoopInstruction = findNextLoopInstruction(loop, candidates);
                 if (rand.nextDouble() <= LOOP_REPETITION_PROBABILITY) {
                     return nextLoopInstruction;
