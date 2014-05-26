@@ -21,10 +21,7 @@ package edu.ucsb.cs.eager.sa;
 
 import edu.ucsb.cs.eager.sa.branches.RandomBranchSelector;
 import junit.framework.TestCase;
-import soot.Body;
-import soot.Scene;
-import soot.SootClass;
-import soot.SootMethod;
+import soot.*;
 import soot.toolkits.graph.BriefUnitGraph;
 import soot.toolkits.graph.UnitGraph;
 

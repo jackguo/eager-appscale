@@ -29,15 +29,27 @@ import soot.toolkits.graph.DirectedGraph;
 
 import java.util.*;
 
+/**
+ * Based on abstract interpretation method from Stefan Bygde. See the dissertation
+ * titled "Static WCET analysis based on abstract interpretation and counting of
+ * elements".
+ */
 public class NewLoopBoundAnalysis {
 
     private Collection<Loop> loops;
     private final DirectedGraph<Stmt> graph;
+    private boolean debug;
+    private boolean done;
 
     private Map<Edge,ProgramState> states = new LinkedHashMap<Edge, ProgramState>();
     private Map<Edge,ProgramState> newStates;
     private Set<Value> variables = new HashSet<Value>();
     private Map<Stmt,Set<Value>> loopInvariants = new HashMap<Stmt, Set<Value>>();
+
+    public NewLoopBoundAnalysis(Body body, boolean debug) {
+        this(body);
+        this.debug = debug;
+    }
 
     public NewLoopBoundAnalysis(Body body) {
         graph = (DirectedGraph) new BriefUnitGraph(body);
@@ -75,6 +87,46 @@ public class NewLoopBoundAnalysis {
         findEdges(graph);
         System.out.println("Found states: " + states.size());
         computeStates();
+        done = true;
+    }
+
+    public Map<Loop,Integer> getLoopBounds() {
+        if (!done) {
+            analyze();
+        }
+        Map<Loop,Integer> bounds = new HashMap<Loop, Integer>();
+        for (Loop loop : loops) {
+            IfStmt head = (IfStmt) loop.getHead();
+            Set<Value> invariants = loopInvariants.get(head);
+            Set<Value> loopControlVariables = new HashSet<Value>();
+            for (ValueBox value : head.getUseBoxes()) {
+                Value v = value.getValue();
+                if (v instanceof JimpleLocal && v.getType() instanceof IntType &&
+                        !invariants.contains(v)) {
+                    loopControlVariables.add(v);
+                }
+            }
+
+            List<Stmt> next = graph.getSuccsOf(head);
+            for (Stmt stmt : next) {
+                if (!stmt.equals(head.getTarget())) {
+                    int result = 1;
+                    ProgramState state = states.get(new Edge(head, stmt));
+                    for (Value v : loopControlVariables) {
+                        int count = state.get(v).getStates();
+                        if (count > 0) {
+                            result *= count;
+                        } else {
+                            result = -1;
+                            break;
+                        }
+                    }
+                    bounds.put(loop, result);
+                    break;
+                }
+            }
+        }
+        return bounds;
     }
 
     private void computeStates() {
@@ -103,12 +155,14 @@ public class NewLoopBoundAnalysis {
                 }
             }
 
-            for (Map.Entry<Edge,ProgramState> entry : newStates.entrySet()) {
-                System.out.println(entry.getKey().src + ": " + newStates.get(entry.getKey()));
+            if (debug) {
+                for (Map.Entry<Edge,ProgramState> entry : newStates.entrySet()) {
+                    System.out.println(entry.getKey().src + ": " + newStates.get(entry.getKey()));
+                    System.out.flush();
+                }
+                System.out.println("\n\n");
                 System.out.flush();
             }
-            System.out.println("\n\n");
-            System.out.flush();
 
             states = newStates;
             if (stabilized) {
@@ -144,6 +198,9 @@ public class NewLoopBoundAnalysis {
             ProgramState in2 = newStates.get(new Edge(prev.get(1), src));
 
             boolean widen = isLoopHead(src);
+            ProgramState temp = new ProgramState();
+            out.copy(temp);
+
             for (Value var : in1.getVariables()) {
                 IntegerInterval interval1 = in1.get(var);
                 IntegerInterval interval2 = in2.get(var);
@@ -156,13 +213,12 @@ public class NewLoopBoundAnalysis {
 
             if (widen) {
                 Set<Value> invariants = loopInvariants.get(src);
-                ProgramState oldState = states.get(outEdge);
-                for (Value var : oldState.getVariables()) {
+                for (Value var : temp.getVariables()) {
                     if (invariants.contains(var)) {
                         // restricted widening
                         continue;
                     }
-                    IntegerInterval interval1 = oldState.get(var);
+                    IntegerInterval interval1 = temp.get(var);
                     IntegerInterval interval2 = out.get(var);
                     out.updateState(var, interval1.widen(interval2));
                 }
@@ -190,6 +246,9 @@ public class NewLoopBoundAnalysis {
                 }
             }
         } else if (src instanceof IfStmt) {
+            if (in == null) {
+                throw new IllegalStateException("in set was null");
+            }
             IfStmt ifStmt = (IfStmt) src;
             if (dst.equals(ifStmt.getTarget())) {
                 Value condition = ifStmt.getCondition();
@@ -203,6 +262,16 @@ public class NewLoopBoundAnalysis {
                         IntegerInterval interval = in.get(op1);
                         out.updateState(op1, interval.gt(in.get(op2)));
                     }
+                } else if (condition instanceof GeExpr) {
+                    Value op1 = ((GeExpr) condition).getOp1();
+                    Value op2 = ((GeExpr) condition).getOp2();
+                    if (op1 instanceof JimpleLocal && op2 instanceof IntConstant) {
+                        IntegerInterval interval = in.get(op1);
+                        out.updateState(op1, interval.gte(((IntConstant) op2).value));
+                    } else if (op1 instanceof JimpleLocal && op2 instanceof JimpleLocal) {
+                        IntegerInterval interval = in.get(op1);
+                        out.updateState(op1, interval.gte(in.get(op2)));
+                    }
                 }
             } else {
                 Value condition = ifStmt.getCondition();
@@ -215,6 +284,16 @@ public class NewLoopBoundAnalysis {
                     } else if (op1 instanceof JimpleLocal && op2 instanceof JimpleLocal) {
                         IntegerInterval interval = in.get(op1);
                         out.updateState(op1, interval.lte(in.get(op2)));
+                    }
+                } else if (condition instanceof GeExpr) {
+                    Value op1 = ((GeExpr) condition).getOp1();
+                    Value op2 = ((GeExpr) condition).getOp2();
+                    if (op1 instanceof JimpleLocal && op2 instanceof IntConstant) {
+                        IntegerInterval interval = in.get(op1);
+                        out.updateState(op1, interval.lt(((IntConstant) op2).value));
+                    } else if (op1 instanceof JimpleLocal && op2 instanceof JimpleLocal) {
+                        IntegerInterval interval = in.get(op1);
+                        out.updateState(op1, interval.lt(in.get(op2)));
                     }
                 }
             }

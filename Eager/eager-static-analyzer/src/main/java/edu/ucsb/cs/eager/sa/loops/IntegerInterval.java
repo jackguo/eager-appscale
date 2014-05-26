@@ -29,14 +29,6 @@ public class IntegerInterval {
         this.upperBound = upperBound;
     }
 
-    public int getLowerBound() {
-        return lowerBound;
-    }
-
-    public int getUpperBound() {
-        return upperBound;
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof IntegerInterval) {
@@ -102,6 +94,46 @@ public class IntegerInterval {
         return new IntegerInterval(lBound, uBound);
     }
 
+    public IntegerInterval gte(int value) {
+        return gte(new IntegerInterval(value, value));
+    }
+
+    public IntegerInterval gte(IntegerInterval interval) {
+        int lBound, uBound;
+        if (upperBound >= interval.upperBound) {
+            uBound = upperBound;
+        } else {
+            uBound = Integer.MAX_VALUE;
+        }
+
+        if (lowerBound >= interval.upperBound) {
+            lBound = lowerBound;
+        } else {
+            lBound = interval.upperBound;
+        }
+        return new IntegerInterval(lBound, uBound);
+    }
+
+    public IntegerInterval lt(int value) {
+        return lt(new IntegerInterval(value, value));
+    }
+
+    public IntegerInterval lt(IntegerInterval interval) {
+        int lBound, uBound;
+        if (upperBound >= interval.lowerBound) {
+            uBound = interval.lowerBound - 1;
+        } else {
+            uBound = upperBound;
+        }
+
+        if (lowerBound > interval.lowerBound) {
+            lBound = Integer.MIN_VALUE;
+        } else {
+            lBound = lowerBound;
+        }
+        return new IntegerInterval(lBound, uBound);
+    }
+
     public IntegerInterval lte(int value) {
         return lte(new IntegerInterval(value, value));
     }
@@ -126,4 +158,12 @@ public class IntegerInterval {
     public String toString() {
         return "[" + lowerBound + "," + upperBound + "]";
     }
+
+    public int getStates() {
+        if (lowerBound != Integer.MIN_VALUE && upperBound != Integer.MAX_VALUE) {
+            return upperBound - lowerBound + 1;
+        }
+        return -1;
+    }
+
 }
