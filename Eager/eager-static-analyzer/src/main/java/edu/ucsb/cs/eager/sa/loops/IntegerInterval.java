@@ -84,6 +84,38 @@ public class IntegerInterval {
         return new IntegerInterval(lBound, uBound);
     }
 
+    public IntegerInterval gt(int value) {
+        int lBound, uBound;
+        if (upperBound > value) {
+            uBound = upperBound;
+        } else {
+            uBound = value + 1;
+        }
+
+        if (lowerBound < value) {
+            lBound = value + 1;
+        } else {
+            lBound = lowerBound;
+        }
+        return new IntegerInterval(lBound, uBound);
+    }
+
+    public IntegerInterval lte(int value) {
+        int lBound, uBound;
+        if (upperBound > value) {
+            uBound = value;
+        } else {
+            uBound = upperBound;
+        }
+
+        if (lowerBound < value) {
+            lBound = lowerBound;
+        } else {
+            lBound = value;
+        }
+        return new IntegerInterval(lBound, uBound);
+    }
+
     @Override
     public String toString() {
         return "[" + lowerBound + "," + upperBound + "]";

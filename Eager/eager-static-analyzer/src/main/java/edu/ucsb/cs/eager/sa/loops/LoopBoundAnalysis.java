@@ -23,10 +23,7 @@ import soot.Body;
 import soot.IntType;
 import soot.Value;
 import soot.ValueBox;
-import soot.jimple.AddExpr;
-import soot.jimple.AssignStmt;
-import soot.jimple.IntConstant;
-import soot.jimple.Stmt;
+import soot.jimple.*;
 import soot.jimple.internal.JimpleLocal;
 import soot.jimple.toolkits.annotation.logic.Loop;
 import soot.jimple.toolkits.annotation.logic.LoopFinder;
@@ -44,6 +41,9 @@ public class LoopBoundAnalysis extends ForwardFlowAnalysis<Stmt,ProgramState> {
     private ProgramState mergeState;
     private Set<Value> variables = new HashSet<Value>();
     private Map<Stmt,Set<Value>> loopInvariants = new HashMap<Stmt, Set<Value>>();
+    private Map<Stmt,IfStmt> conditionTargets = new HashMap<Stmt, IfStmt>();
+    private Map<Stmt,IfStmt> conditionExits = new HashMap<Stmt, IfStmt>();
+    private Set<IfStmt> conditions = new HashSet<IfStmt>();
 
     public LoopBoundAnalysis(Body body) {
         super((DirectedGraph) new BriefUnitGraph(body));
@@ -88,6 +88,31 @@ public class LoopBoundAnalysis extends ForwardFlowAnalysis<Stmt,ProgramState> {
         if (in != null) {
             in.copy(out);
         }
+
+        if (in != null && conditionTargets.containsKey(stmt)) {
+            IfStmt ifStmt = conditionTargets.get(stmt);
+            Value condition = ifStmt.getCondition();
+            if (condition instanceof GtExpr) {
+                Value op1 = ((GtExpr) condition).getOp1();
+                Value op2 = ((GtExpr) condition).getOp2();
+                if (op1 instanceof JimpleLocal && op2 instanceof IntConstant) {
+                    IntegerInterval interval = in.get(op1);
+                    out.updateState(op1, interval.gt(((IntConstant) op2).value));
+                }
+            }
+        } else if (in != null && conditionExits.containsKey(stmt)) {
+            IfStmt ifStmt = conditionExits.get(stmt);
+            Value condition = ifStmt.getCondition();
+            if (condition instanceof GtExpr) {
+                Value op1 = ((GtExpr) condition).getOp1();
+                Value op2 = ((GtExpr) condition).getOp2();
+                if (op1 instanceof JimpleLocal && op2 instanceof IntConstant) {
+                    IntegerInterval interval = in.get(op1);
+                    out.updateState(op1, interval.lte(((IntConstant) op2).value));
+                }
+            }
+        }
+
         if (stmt instanceof AssignStmt) {
             Value rightOp = ((AssignStmt) stmt).getRightOp();
             if (rightOp.getType() instanceof IntType) {
@@ -103,6 +128,22 @@ public class LoopBoundAnalysis extends ForwardFlowAnalysis<Stmt,ProgramState> {
                     }
                 }
             }
+        } else if (stmt instanceof IfStmt) {
+            IfStmt ifStmt = (IfStmt) stmt;
+            if (conditions.contains(ifStmt)) {
+                return;
+            }
+            conditions.add(ifStmt);
+            List<Stmt> nextList = graph.getSuccsOf(stmt);
+            for (int i = 0; i < 2; i++) {
+                Stmt next = nextList.get(i);
+                if (next.equals(ifStmt.getTarget())) {
+                    conditionTargets.put(next, ifStmt);
+                } else {
+                    conditionExits.put(next, ifStmt);
+                }
+            }
+
         }
     }
 
