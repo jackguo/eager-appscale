@@ -42,7 +42,6 @@ public class NewLoopBoundAnalysis {
     private boolean done;
 
     private Map<Edge,ProgramState> states = new LinkedHashMap<Edge, ProgramState>();
-    private Map<Edge,ProgramState> newStates;
     private Set<Value> variables = new HashSet<Value>();
     private Map<Stmt,Set<Value>> loopInvariants = new HashMap<Stmt, Set<Value>>();
 
@@ -53,9 +52,9 @@ public class NewLoopBoundAnalysis {
 
     public NewLoopBoundAnalysis(Body body) {
         graph = (DirectedGraph) new BriefUnitGraph(body);
-        Iterator iterator = graph.iterator();
-        while (iterator.hasNext()) {
-            Stmt stmt = (Stmt) iterator.next();
+
+        // Find all integer variables
+        for (Stmt stmt : graph) {
             for (ValueBox value : stmt.getDefBoxes()) {
                 Value v = value.getValue();
                 if (v.getType() instanceof IntType) {
@@ -84,9 +83,10 @@ public class NewLoopBoundAnalysis {
     }
 
     public void analyze() {
-        findEdges(graph);
-        System.out.println("Found states: " + states.size());
-        computeStates();
+        if (loops.size() > 0) {
+            findEdges(graph);
+            computeStates();
+        }
         done = true;
     }
 
@@ -132,7 +132,7 @@ public class NewLoopBoundAnalysis {
     private void computeStates() {
         while (true) {
             // Create a new state for this iteration
-            newStates = new LinkedHashMap<Edge, ProgramState>();
+            Map<Edge,ProgramState> newStates = new LinkedHashMap<Edge, ProgramState>();
             for (Map.Entry<Edge,ProgramState> entry : states.entrySet()) {
                 ProgramState temp = null;
                 if (entry.getValue() != null) {
@@ -144,7 +144,7 @@ public class NewLoopBoundAnalysis {
 
             // Run the computation
             Stmt head = graph.getHeads().get(0);
-            visitAndCompute(head, new HashSet<Stmt>());
+            visitAndCompute(head, new HashSet<Stmt>(), newStates);
 
             // Check whether the algorithm has converged
             boolean stabilized = true;
@@ -164,27 +164,27 @@ public class NewLoopBoundAnalysis {
                 System.out.flush();
             }
 
+            // Update the states
             states = newStates;
             if (stabilized) {
                 break;
             }
-
         }
     }
 
-    private void visitAndCompute(Stmt node, Set<Stmt> visitedNodes) {
+    private void visitAndCompute(Stmt node, Set<Stmt> visitedNodes, Map<Edge,ProgramState> newStates) {
         if (visitedNodes.contains(node)) {
             return;
         }
         visitedNodes.add(node);
 
         for (Stmt child : graph.getSuccsOf(node)) {
-            computeEdgeValue(node, child);
-            visitAndCompute(child, visitedNodes);
+            computeEdgeValue(node, child, newStates);
+            visitAndCompute(child, visitedNodes, newStates);
         }
     }
 
-    private void computeEdgeValue(Stmt src, Stmt dst) {
+    private void computeEdgeValue(Stmt src, Stmt dst, Map<Edge,ProgramState> newStates) {
         Edge outEdge = new Edge(src, dst);
         ProgramState out = newStates.get(outEdge);
         ProgramState in;
@@ -331,7 +331,7 @@ public class NewLoopBoundAnalysis {
         return state;
     }
 
-    private boolean isLoopHead(Stmt stmt) {
+    public boolean isLoopHead(Stmt stmt) {
         for (Loop loop : loops) {
             if (loop.getHead().equals(stmt)) {
                 return true;
