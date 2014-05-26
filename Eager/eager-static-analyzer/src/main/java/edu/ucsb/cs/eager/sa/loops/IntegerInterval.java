@@ -19,8 +19,6 @@
 
 package edu.ucsb.cs.eager.sa.loops;
 
-import soot.Value;
-
 public class IntegerInterval {
 
     private int lowerBound;
@@ -85,33 +83,41 @@ public class IntegerInterval {
     }
 
     public IntegerInterval gt(int value) {
+        return gt(new IntegerInterval(value, value));
+    }
+
+    public IntegerInterval gt(IntegerInterval interval) {
         int lBound, uBound;
-        if (upperBound > value) {
+        if (upperBound > interval.upperBound) {
             uBound = upperBound;
         } else {
-            uBound = value + 1;
+            uBound = Integer.MAX_VALUE;
         }
 
-        if (lowerBound < value) {
-            lBound = value + 1;
-        } else {
+        if (lowerBound > interval.upperBound) {
             lBound = lowerBound;
+        } else {
+            lBound = interval.upperBound + 1;
         }
         return new IntegerInterval(lBound, uBound);
     }
 
     public IntegerInterval lte(int value) {
+        return lte(new IntegerInterval(value, value));
+    }
+
+    public IntegerInterval lte(IntegerInterval interval) {
         int lBound, uBound;
-        if (upperBound > value) {
-            uBound = value;
+        if (upperBound > interval.lowerBound) {
+            uBound = interval.lowerBound;
         } else {
             uBound = upperBound;
         }
 
-        if (lowerBound < value) {
-            lBound = lowerBound;
+        if (lowerBound > interval.lowerBound) {
+            lBound = Integer.MIN_VALUE;
         } else {
-            lBound = value;
+            lBound = lowerBound;
         }
         return new IntegerInterval(lBound, uBound);
     }

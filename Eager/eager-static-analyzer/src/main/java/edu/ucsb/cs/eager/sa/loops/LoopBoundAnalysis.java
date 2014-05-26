@@ -98,6 +98,9 @@ public class LoopBoundAnalysis extends ForwardFlowAnalysis<Stmt,ProgramState> {
                 if (op1 instanceof JimpleLocal && op2 instanceof IntConstant) {
                     IntegerInterval interval = in.get(op1);
                     out.updateState(op1, interval.gt(((IntConstant) op2).value));
+                } else if (op1 instanceof JimpleLocal && op2 instanceof JimpleLocal) {
+                    IntegerInterval interval = in.get(op1);
+                    out.updateState(op1, interval.gt(in.get(op2)));
                 }
             }
         } else if (in != null && conditionExits.containsKey(stmt)) {
@@ -143,8 +146,8 @@ public class LoopBoundAnalysis extends ForwardFlowAnalysis<Stmt,ProgramState> {
                     conditionExits.put(next, ifStmt);
                 }
             }
-
         }
+        System.out.println(stmt + ": " + out);
     }
 
     @Override
