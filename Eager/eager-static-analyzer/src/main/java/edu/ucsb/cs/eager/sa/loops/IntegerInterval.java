@@ -83,7 +83,7 @@ public class IntegerInterval {
         if (upperBound > interval.upperBound) {
             uBound = upperBound;
         } else {
-            uBound = Integer.MAX_VALUE;
+            return null;
         }
 
         if (lowerBound > interval.upperBound) {
@@ -100,16 +100,16 @@ public class IntegerInterval {
 
     public IntegerInterval gte(IntegerInterval interval) {
         int lBound, uBound;
-        if (upperBound >= interval.upperBound) {
+        if (upperBound >= interval.lowerBound) {
             uBound = upperBound;
         } else {
-            uBound = Integer.MAX_VALUE;
+            return null;
         }
 
-        if (lowerBound >= interval.upperBound) {
+        if (lowerBound >= interval.lowerBound) {
             lBound = lowerBound;
         } else {
-            lBound = interval.upperBound;
+            lBound = interval.lowerBound;
         }
         return new IntegerInterval(lBound, uBound);
     }
@@ -120,16 +120,16 @@ public class IntegerInterval {
 
     public IntegerInterval lt(IntegerInterval interval) {
         int lBound, uBound;
-        if (upperBound >= interval.lowerBound) {
-            uBound = interval.lowerBound - 1;
+        if (lowerBound < interval.upperBound) {
+            lBound = lowerBound;
         } else {
-            uBound = upperBound;
+            return null;
         }
 
-        if (lowerBound > interval.lowerBound) {
-            lBound = Integer.MIN_VALUE;
+        if (upperBound < interval.upperBound) {
+            uBound = upperBound;
         } else {
-            lBound = lowerBound;
+            uBound = interval.upperBound - 1;
         }
         return new IntegerInterval(lBound, uBound);
     }
@@ -140,16 +140,16 @@ public class IntegerInterval {
 
     public IntegerInterval lte(IntegerInterval interval) {
         int lBound, uBound;
-        if (upperBound > interval.lowerBound) {
-            uBound = interval.upperBound;
+        if (lowerBound <= interval.upperBound) {
+            lBound = lowerBound;
         } else {
-            uBound = upperBound;
+            return null;
         }
 
-        if (lowerBound > interval.lowerBound) {
-            lBound = interval.lowerBound;
+        if (upperBound <= interval.upperBound) {
+            uBound = upperBound;
         } else {
-            lBound = lowerBound;
+            uBound = interval.upperBound;
         }
         return new IntegerInterval(lBound, uBound);
     }

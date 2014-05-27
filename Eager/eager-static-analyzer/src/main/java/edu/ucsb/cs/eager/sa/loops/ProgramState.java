@@ -30,11 +30,15 @@ public class ProgramState {
     private Map<Value,IntegerInterval> variables = new HashMap<Value, IntegerInterval>();
 
     public void updateState(Value variable, int upperBound, int lowerBound) {
-        variables.put(variable, new IntegerInterval(upperBound, lowerBound));
+        updateState(variable, new IntegerInterval(upperBound, lowerBound));
     }
 
     public void updateState(Value variable, IntegerInterval interval) {
-        variables.put(variable, interval);
+        if (interval == null) {
+            variables.remove(variable);
+        } else {
+            variables.put(variable, interval);
+        }
     }
 
     public void copy(ProgramState state) {
