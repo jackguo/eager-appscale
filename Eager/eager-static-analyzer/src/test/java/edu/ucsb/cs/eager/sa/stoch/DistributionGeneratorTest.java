@@ -49,4 +49,13 @@ public class DistributionGeneratorTest extends TestCase {
         }
         System.out.println();
     }
+
+    public void testStdNormal() {
+        System.out.println("Standard normal distribution:");
+        StandardNormalDistributionGenerator gen = new StandardNormalDistributionGenerator();
+        for (int i = 0; i < 10; i++) {
+            System.out.println(gen.next());
+        }
+        System.out.println();
+    }
 }

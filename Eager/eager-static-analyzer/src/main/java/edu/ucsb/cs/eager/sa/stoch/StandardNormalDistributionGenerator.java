@@ -19,27 +19,32 @@
 
 package edu.ucsb.cs.eager.sa.stoch;
 
-import java.nio.ByteBuffer;
-import java.security.SecureRandom;
 import java.util.Random;
 
-public abstract class RandomDistributionGenerator {
+public class StandardNormalDistributionGenerator extends RandomDistributionGenerator {
 
-    protected Random rand = new Random();
+    private Random rand1;
+    private Random rand2;
 
-    public abstract double next();
-
-    /**
-     * Code borrowed from http://www.javamex.com/tutorials/random_numbers/seeding_entropy.shtml
-     * with thanks.
-     *
-     * @return a random seed
-     */
-    public long getLongSeed() {
-        SecureRandom sec = new SecureRandom();
-        byte[] sbuf = sec.generateSeed(8);
-        ByteBuffer bb = ByteBuffer.wrap(sbuf);
-        return bb.getLong();
+    public StandardNormalDistributionGenerator() {
+        this.rand1 = new Random(getLongSeed());
+        this.rand2 = new Random(getLongSeed());
     }
 
+    @Override
+    public double next() {
+        while (true) {
+            double u1 = rand1.nextDouble();
+            double u2 = rand2.nextDouble();
+            double x = -1 * Math.log(u1);
+            double y = (-1 * (x - 1) * (x - 1)) / 2.0;
+            if (u2 <= Math.exp(y)) {
+                if (rand.nextBoolean()) {
+                    return x;
+                } else {
+                    return -1 * x;
+                }
+            }
+        }
+    }
 }
