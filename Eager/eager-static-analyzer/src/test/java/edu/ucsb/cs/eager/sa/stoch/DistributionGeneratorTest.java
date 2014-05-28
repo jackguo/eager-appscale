@@ -58,4 +58,13 @@ public class DistributionGeneratorTest extends TestCase {
         }
         System.out.println();
     }
+
+    public void testNormal() {
+        System.out.println("Normal distribution:");
+        NormalDistributionGenerator gen = new NormalDistributionGenerator(5, 2.5);
+        for (int i = 0; i < 10; i++) {
+            System.out.println(gen.next());
+        }
+        System.out.println();
+    }
 }
