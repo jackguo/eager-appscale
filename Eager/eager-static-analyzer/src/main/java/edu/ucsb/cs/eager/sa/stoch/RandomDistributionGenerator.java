@@ -23,6 +23,11 @@ import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import java.util.Random;
 
+/**
+ * Most concrete implementations of this abstract class are based on the algorithms
+ * described in chapter 5 of "Computer Performance Modeling Handbook" by Stephen
+ * Lavenberg.
+ */
 public abstract class RandomDistributionGenerator {
 
     protected Random rand = new Random();

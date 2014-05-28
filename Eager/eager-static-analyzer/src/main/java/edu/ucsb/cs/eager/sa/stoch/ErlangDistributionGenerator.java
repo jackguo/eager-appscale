@@ -23,7 +23,9 @@ import java.util.Random;
 
 public class ErlangDistributionGenerator extends RandomDistributionGenerator {
 
+    /** Scale parameter */
     private double lambda;
+    /** Shape parameter */
     private int k;
     private Random random[];
 
