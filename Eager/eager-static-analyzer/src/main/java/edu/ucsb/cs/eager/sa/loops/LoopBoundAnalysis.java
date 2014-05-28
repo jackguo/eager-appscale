@@ -34,7 +34,7 @@ import java.util.*;
  * titled "Static WCET analysis based on abstract interpretation and counting of
  * elements".
  */
-public class NewLoopBoundAnalysis {
+public class LoopBoundAnalysis {
 
     private Collection<Loop> loops;
     private final DirectedGraph<Stmt> graph;
@@ -45,12 +45,12 @@ public class NewLoopBoundAnalysis {
     private Set<Value> variables = new HashSet<Value>();
     private Map<Stmt,Set<Value>> loopInvariants = new HashMap<Stmt, Set<Value>>();
 
-    public NewLoopBoundAnalysis(Body body, boolean debug) {
+    public LoopBoundAnalysis(Body body, boolean debug) {
         this(body);
         this.debug = debug;
     }
 
-    public NewLoopBoundAnalysis(Body body) {
+    public LoopBoundAnalysis(Body body) {
         graph = (DirectedGraph) new BriefUnitGraph(body);
 
         // Find all integer variables

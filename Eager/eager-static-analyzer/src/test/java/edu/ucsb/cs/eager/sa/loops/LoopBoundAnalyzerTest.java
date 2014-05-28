@@ -42,7 +42,7 @@ public class LoopBoundAnalyzerTest extends TestCase {
         SootMethod m = c.getMethodByName("main");
         Body b = m.retrieveActiveBody();
 
-        NewLoopBoundAnalysis analysis = new NewLoopBoundAnalysis(b, true);
+        LoopBoundAnalysis analysis = new LoopBoundAnalysis(b, true);
         Map<Loop,Integer> loopBounds = analysis.getLoopBounds();
 
         List<Integer> results = new ArrayList<Integer>(Arrays.asList(100, 100, 10, 5, -1));
