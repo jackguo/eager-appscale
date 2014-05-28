@@ -83,11 +83,13 @@ public class IntegerInterval {
         if (upperBound > interval.upperBound) {
             uBound = upperBound;
         } else {
-            return null;
+            return unbounded();
         }
 
         if (lowerBound > interval.upperBound) {
             lBound = lowerBound;
+        } else if (interval.upperBound == Integer.MAX_VALUE) {
+            return unbounded();
         } else {
             lBound = interval.upperBound + 1;
         }
@@ -103,7 +105,7 @@ public class IntegerInterval {
         if (upperBound >= interval.lowerBound) {
             uBound = upperBound;
         } else {
-            return null;
+            return unbounded();
         }
 
         if (lowerBound >= interval.lowerBound) {
@@ -120,18 +122,18 @@ public class IntegerInterval {
 
     public IntegerInterval lt(IntegerInterval interval) {
         int lBound, uBound;
-        if (lowerBound < interval.upperBound) {
+        if (lowerBound < interval.lowerBound) {
             lBound = lowerBound;
         } else {
-            return null;
+            return unbounded();
         }
 
-        if (upperBound < interval.upperBound) {
+        if (upperBound < interval.lowerBound) {
             uBound = upperBound;
-        } else if (interval.upperBound == Integer.MAX_VALUE) {
-            uBound = interval.upperBound;
+        } else if (interval.lowerBound == Integer.MIN_VALUE) {
+            return unbounded();
         } else {
-            uBound = interval.upperBound - 1;
+            uBound = interval.lowerBound - 1;
         }
         return new IntegerInterval(lBound, uBound);
     }
@@ -145,7 +147,7 @@ public class IntegerInterval {
         if (lowerBound <= interval.upperBound) {
             lBound = lowerBound;
         } else {
-            return null;
+            return unbounded();
         }
 
         if (upperBound <= interval.upperBound) {
@@ -154,6 +156,10 @@ public class IntegerInterval {
             uBound = interval.upperBound;
         }
         return new IntegerInterval(lBound, uBound);
+    }
+
+    private IntegerInterval unbounded() {
+        return new IntegerInterval(Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
     @Override
