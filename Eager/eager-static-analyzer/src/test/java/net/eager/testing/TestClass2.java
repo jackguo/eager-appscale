@@ -36,5 +36,9 @@ public class TestClass2 {
                 System.out.println("ok");
             }
         }
+
+        for (String arg : args) {
+            System.out.println();
+        }
     }
 }

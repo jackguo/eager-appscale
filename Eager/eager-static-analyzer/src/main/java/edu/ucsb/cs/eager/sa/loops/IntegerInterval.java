@@ -128,6 +128,8 @@ public class IntegerInterval {
 
         if (upperBound < interval.upperBound) {
             uBound = upperBound;
+        } else if (interval.upperBound == Integer.MAX_VALUE) {
+            uBound = interval.upperBound;
         } else {
             uBound = interval.upperBound - 1;
         }

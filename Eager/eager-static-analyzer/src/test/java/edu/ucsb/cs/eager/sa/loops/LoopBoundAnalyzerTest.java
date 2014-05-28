@@ -28,7 +28,7 @@ import soot.SootClass;
 import soot.SootMethod;
 import soot.jimple.toolkits.annotation.logic.Loop;
 
-import java.util.Map;
+import java.util.*;
 
 public class LoopBoundAnalyzerTest extends TestCase {
 
@@ -44,8 +44,13 @@ public class LoopBoundAnalyzerTest extends TestCase {
 
         NewLoopBoundAnalysis analysis = new NewLoopBoundAnalysis(b, true);
         Map<Loop,Integer> loopBounds = analysis.getLoopBounds();
+
+        List<Integer> results = new ArrayList<Integer>(Arrays.asList(100, 100, 10, 5, -1));
         for (Map.Entry<Loop,Integer> entry : loopBounds.entrySet()) {
             System.out.println(entry.getKey().getHead() + " : " + entry.getValue());
+            assertTrue(results.contains(entry.getValue()));
+            results.remove(entry.getValue());
         }
+        assertTrue(results.isEmpty());
     }
 }
