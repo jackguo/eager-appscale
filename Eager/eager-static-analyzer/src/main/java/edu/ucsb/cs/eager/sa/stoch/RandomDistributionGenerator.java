@@ -30,7 +30,7 @@ import java.util.Random;
  */
 public abstract class RandomDistributionGenerator {
 
-    protected Random rand = new Random();
+    protected Random rand = new Random(getLongSeed());
 
     public abstract double next();
 
