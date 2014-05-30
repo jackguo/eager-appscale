@@ -123,6 +123,13 @@ class Eager:
       detail = { 'detail' : message }
       return self.__generate_response(False, self.REASON_API_PUBLISH_FAILED, detail)
 
+  def add_policy(self, secret, name, content, active):
+    if self.secret != secret:
+      return self.__generate_response(False, self.REASON_BAD_SECRET)
+
+    return  self.policy_engine.add_policy(name, content, active)
+
+
   def __is_api_name_valid(self, name):
     for char in "'/ &+*@%\"<>!,":
       if char in name:

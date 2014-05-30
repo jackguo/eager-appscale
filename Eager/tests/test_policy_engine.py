@@ -11,7 +11,7 @@ class TestPolicyEngine(TestCase):
 
   def __add_policy(self, name, engine):
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    full_path = os.path.join(current_dir, 'samples', name + '.py')
+    full_path = os.path.join(current_dir, 'samples', name + '.a.py')
     policy = Policy(full_path)
     engine.active_policies.append(policy)
 

@@ -56,7 +56,8 @@ class Policy:
 
   def __get_policy_name(self):
     base_name = os.path.basename(self.policy_file)
-    return os.path.splitext(base_name)[0]
+    return basename.split('.')[0]
+#    return os.path.splitext(base_name)[0]
 
   def __get_policy_content(self):
     file_handle = open(self.policy_file, 'r')
