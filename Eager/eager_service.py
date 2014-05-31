@@ -66,6 +66,13 @@ class EagerService:
     self.server.registerFunction(e.ping)
     self.server.registerFunction(e.validate_application_for_deployment)
     self.server.registerFunction(e.publish_api_list)
+    self.server.registerFunction(e.add_policy)
+    self.server.registerFunction(e.remove_policy)
+    self.server.registerFunction(e.enable_policy)
+    self.server.registerFunction(e.disable_policy)
+    self.server.registerFunction(e.list_policy)
+    self.server.registerFunction(e.info_policy)
+ 
     self.started = False
 
   def start(self):

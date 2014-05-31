@@ -129,6 +129,30 @@ class Eager:
 
     return  self.policy_engine.add_policy(name, content, active)
 
+  def remove_policy(self, secret, name):
+    if self.secret != secret:
+      return self.__generate_response(False, self.REASON_BAD_SECRET)
+    return self.policy_engine.remove_policy(name)
+
+  def enable_policy(self, secret, name):
+    if self.secret != secret:
+      return self.__generate_response(False, self.REASON_BAD_SECRET)
+    return self.policy_engine.enable_policy(name)
+
+  def disable_policy(self, secret, name):
+    if self.secret != secret:
+      return self.__generate_response(False, self.REASON_BAD_SECRET)
+    return self.policy_engine.disable_policy(name)
+
+  def list_policy(self, secret, status):
+     if self.secret != secret:
+      return self.__generate_response(False, self.REASON_BAD_SECRET)
+     return self.policy_engine.list_policy(status)
+
+  def info_policy(self, secret, name):
+    if self.secret != secret:
+      return self.__generate_response(False, self.REASON_BAD_SECRET)
+    return self.policy_engine.info_policy(name)
 
   def __is_api_name_valid(self, name):
     for char in "'/ &+*@%\"<>!,":
