@@ -17,30 +17,14 @@
  *  under the License.
  */
 
-package net.eager.testing;
+package edu.ucsb.cs.eager.sa.cerebro;
 
-import edu.ucsb.cs.eager.gae.DataStore;
+import junit.framework.TestCase;
 
-public class TestClass {
+public class CerebroTest extends TestCase {
 
-    public static void main(String[] args) {
-        TestClass test = new TestClass();
-        int x = 5;
-        if (x > 3) {
-            System.out.println(x);
-        } else {
-            DataStore.query1();
-            test.testMe();
-            DataStore.query2();
-        }
-        DataStore.query3();
-
-        for (int i = 0; i < 3; i++) {
-            System.out.println();
-        }
-    }
-
-    public void testMe() {
-        System.out.println("testMe");
+    public void testCerebro() {
+        Cerebro cerebro = new Cerebro();
+        cerebro.analyze("", "net.eager.testing.TestClass");
     }
 }

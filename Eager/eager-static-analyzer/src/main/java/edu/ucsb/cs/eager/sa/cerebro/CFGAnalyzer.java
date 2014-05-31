@@ -20,34 +20,75 @@
 package edu.ucsb.cs.eager.sa.cerebro;
 
 import soot.Unit;
+import soot.jimple.IfStmt;
+import soot.jimple.InvokeExpr;
 import soot.jimple.Stmt;
+import soot.jimple.toolkits.annotation.logic.Loop;
+import soot.jimple.toolkits.annotation.logic.LoopFinder;
 import soot.toolkits.graph.UnitGraph;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class CFGAnalyzer {
 
-    private Set<Stmt> visited = new HashSet<Stmt>();
+    private Collection<Loop> loops;
+
+    private static final String[] GAE_PACKAGES = new String[] {
+        "javax.persistence",
+        "edu.ucsb.cs.eager.gae",
+    };
 
     public void analyze(UnitGraph graph) {
-        visited.clear();
+        LoopFinder loopFinder = new LoopFinder();
+        loopFinder.transform(graph.getBody());
+        loops = loopFinder.loops();
+        System.out.println("Total loops: " + loops.size());
         Stmt stmt = (Stmt) graph.getHeads().get(0);
-        visit(stmt, graph);
+        visit(stmt, graph, 0);
     }
 
-    public void visit(Stmt stmt, UnitGraph graph) {
-        if (visited.contains(stmt)) {
-            return;
+    public void visit(Stmt stmt, UnitGraph graph, int apiCallCount) {
+        if (stmt.containsInvokeExpr()) {
+            InvokeExpr invocation = stmt.getInvokeExpr();
+            if (isApiCall(invocation)) {
+                apiCallCount++;
+            }
         }
-        visited.add(stmt);
-        // Todo: process stmt
-        System.out.println(stmt);
 
         List<Unit> children = graph.getSuccsOf(stmt);
-        for (Unit child : children) {
-            visit((Stmt) child, graph);
+
+        Loop loop = findLoop(stmt);
+        if (loop != null) {
+            IfStmt head = (IfStmt) loop.getHead(); //todo: fix me
+            Stmt target = head.getTarget();
+            children = new ArrayList<Unit>();
+            children.add(target);
         }
+
+        for (Unit child : children) {
+            visit((Stmt) child, graph, apiCallCount);
+        }
+        if (children.isEmpty()) {
+            System.out.println("API calls in path: " + apiCallCount);
+        }
+    }
+
+    private boolean isApiCall(InvokeExpr invocation) {
+        String pkg = invocation.getMethod().getDeclaringClass().getPackageName();
+        for (String gaePackage : GAE_PACKAGES) {
+            if (gaePackage.equals(pkg)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Loop findLoop(Stmt stmt) {
+        for (Loop loop : loops) {
+            if (loop.getHead().equals(stmt)) {
+                return loop;
+            }
+        }
+        return null;
     }
 }

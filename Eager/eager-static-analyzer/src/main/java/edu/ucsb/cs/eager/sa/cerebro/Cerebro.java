@@ -27,8 +27,6 @@ import soot.SootMethod;
 import soot.toolkits.graph.BriefUnitGraph;
 import soot.toolkits.graph.UnitGraph;
 
-import java.util.List;
-
 public class Cerebro {
 
     public static void main(String[] args) {
@@ -57,12 +55,17 @@ public class Cerebro {
             System.err.println("Starting point class (c) argument is required");
         }
 
+        Cerebro cerebro = new Cerebro();
+        cerebro.analyze(classPath, startingPoint);
+    }
+
+    public void analyze(String classPath, String startingPoint) {
         soot.options.Options.v().set_allow_phantom_refs(true);
         Scene.v().setSootClassPath(Scene.v().getSootClassPath() + ":" + classPath);
 
         SootClass clazz = Scene.v().loadClassAndSupport(startingPoint);
         Scene.v().loadNecessaryClasses();
-        System.out.println("\n\nStarting the analysis of class: " + clazz.getName());
+        System.out.println("\n\nStarting the analysis of class: " + clazz.getName() + "\n");
         for (SootMethod method : clazz.getMethods()) {
             analyzeMethod(method);
         }
