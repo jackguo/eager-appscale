@@ -32,6 +32,7 @@ import java.util.*;
 public class CFGAnalyzer {
 
     private Collection<Loop> loops;
+    private Map<Loop,Integer> loopedApiCalls = new HashMap<Loop, Integer>();
 
     private static final String[] GAE_PACKAGES = new String[] {
         "javax.persistence",
@@ -42,9 +43,45 @@ public class CFGAnalyzer {
         LoopFinder loopFinder = new LoopFinder();
         loopFinder.transform(graph.getBody());
         loops = loopFinder.loops();
-        System.out.println("Total loops: " + loops.size());
+
         Stmt stmt = (Stmt) graph.getHeads().get(0);
         visit(stmt, graph, 0);
+    }
+
+    private void analyzeLoop(Loop loop, int nestingLevel) {
+        if (loopedApiCalls.containsKey(loop)) {
+            return;
+        }
+
+        Set<Loop> nestedLoops = new HashSet<Loop>();
+        for (Stmt stmt : loop.getLoopStatements()) {
+            Loop nestedLoop = findLoop(stmt);
+            if (nestedLoop != null && !nestedLoop.equals(loop)) {
+                nestedLoops.add(nestedLoop);
+            }
+        }
+
+        int apiCallCount = 0;
+        for (Stmt stmt : loop.getLoopStatements()) {
+            Loop nestedLoop = findLoop(stmt);
+            if (nestedLoop != null && !nestedLoop.equals(loop)) {
+                analyzeLoop(nestedLoop, nestingLevel + 1);
+            }
+
+            if (isStmtInNestedLoopBody(stmt, nestedLoops)) {
+                continue;
+            }
+
+            if (stmt.containsInvokeExpr()) {
+                InvokeExpr invocation = stmt.getInvokeExpr();
+                if (isApiCall(invocation)) {
+                    apiCallCount++;
+                }
+            }
+        }
+        loopedApiCalls.put(loop, apiCallCount);
+        System.out.println("API calls in loop [ " + loop.getHead() + "]: " + apiCallCount +
+                " [Nesting level = " + nestingLevel + "]");
     }
 
     public void visit(Stmt stmt, UnitGraph graph, int apiCallCount) {
@@ -59,7 +96,8 @@ public class CFGAnalyzer {
 
         Loop loop = findLoop(stmt);
         if (loop != null) {
-            IfStmt head = (IfStmt) loop.getHead(); //todo: fix me
+            analyzeLoop(loop, 1);
+            IfStmt head = getLoopHeadBranchStmt(loop);
             Stmt target = head.getTarget();
             children = new ArrayList<Unit>();
             children.add(target);
@@ -90,5 +128,23 @@ public class CFGAnalyzer {
             }
         }
         return null;
+    }
+
+    private IfStmt getLoopHeadBranchStmt(Loop loop) {
+        for (Stmt stmt : loop.getLoopStatements()) {
+            if (stmt instanceof IfStmt) {
+                return (IfStmt) stmt;
+            }
+        }
+        throw new IllegalStateException("Failed to find loop head branch");
+    }
+
+    private boolean isStmtInNestedLoopBody(Stmt stmt, Set<Loop> nestedLoops) {
+        for (Loop nestedLoop : nestedLoops) {
+            if (nestedLoop.getLoopStatements().contains(stmt)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -25,6 +25,6 @@ public class CerebroTest extends TestCase {
 
     public void testCerebro() {
         Cerebro cerebro = new Cerebro();
-        cerebro.analyze("", "net.eager.testing.TestClass");
+        cerebro.analyze("", "net.eager.testing.TestClass", false);
     }
 }

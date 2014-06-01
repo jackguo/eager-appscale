@@ -30,17 +30,13 @@ public class TestClass {
             System.out.println(x);
         } else {
             DataStore.query1();
-            test.testMe();
+            test.method1();
             DataStore.query2();
         }
         DataStore.query3();
-
-        for (int i = 0; i < 3; i++) {
-            System.out.println();
-        }
     }
 
-    public void testMe() {
+    public void method1() {
         System.out.println("testMe");
     }
 }

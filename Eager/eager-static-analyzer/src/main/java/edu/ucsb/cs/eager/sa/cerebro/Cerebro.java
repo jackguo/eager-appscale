@@ -31,16 +31,18 @@ public class Cerebro {
 
     public static void main(String[] args) {
         Options options = new Options();
-        options.addOption("ccp", true, "Cerebro classpath");
-        options.addOption("c", true, "Class to be used as the starting point");
+        options.addOption("ccp", "cerebro-classpath", true, "Cerebro classpath");
+        options.addOption("c", "class", true, "Class to be used as the starting point");
+        options.addOption("dnc", "disable-necessary-classes", false, "Disable loading of necessary classes");
 
         CommandLine cmd;
         try {
             CommandLineParser parser = new BasicParser();
             cmd = parser.parse( options, args);
         } catch (ParseException e) {
-            System.err.println("Error while parsing command line arguments");
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage() + "\n");
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("Cerebro", options);
             return;
         }
 
@@ -55,16 +57,22 @@ public class Cerebro {
             System.err.println("Starting point class (c) argument is required");
         }
 
+        boolean disableNecessaryClasses = false;
+        if (cmd.hasOption("dnc")) {
+            disableNecessaryClasses = true;
+        }
+
         Cerebro cerebro = new Cerebro();
-        cerebro.analyze(classPath, startingPoint);
+        cerebro.analyze(classPath, startingPoint, !disableNecessaryClasses);
     }
 
-    public void analyze(String classPath, String startingPoint) {
+    public void analyze(String classPath, String startingPoint, boolean loadNecessary) {
         soot.options.Options.v().set_allow_phantom_refs(true);
         Scene.v().setSootClassPath(Scene.v().getSootClassPath() + ":" + classPath);
-
         SootClass clazz = Scene.v().loadClassAndSupport(startingPoint);
-        Scene.v().loadNecessaryClasses();
+        if (loadNecessary) {
+            Scene.v().loadNecessaryClasses();
+        }
         System.out.println("\n\nStarting the analysis of class: " + clazz.getName() + "\n");
         for (SootMethod method : clazz.getMethods()) {
             analyzeMethod(method);
