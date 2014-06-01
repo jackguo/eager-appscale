@@ -25,8 +25,10 @@ import soot.SootClass;
 import soot.SootMethod;
 import soot.jimple.toolkits.annotation.logic.Loop;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class Cerebro {
 
@@ -67,8 +69,11 @@ public class Cerebro {
         cerebro.analyze(classPath, startingPoint, !disableNecessaryClasses);
     }
 
+    private Set<SootMethod> analyzedMethods = new HashSet<SootMethod>();
+
     public void analyze(String classPath, String startingPoint, boolean loadNecessary) {
         soot.options.Options.v().set_allow_phantom_refs(true);
+        soot.options.Options.v().set_whole_program(true);
         Scene.v().setSootClassPath(Scene.v().getSootClassPath() + ":" + classPath);
         SootClass clazz = Scene.v().loadClassAndSupport(startingPoint);
         if (loadNecessary) {
@@ -76,20 +81,28 @@ public class Cerebro {
         }
         System.out.println("\n\nStarting the analysis of class: " + clazz.getName() + "\n");
         for (SootMethod method : clazz.getMethods()) {
-            if (method.isPublic()) {
-                analyzeMethod(method);
-            }
+            analyzeMethod(method);
         }
     }
 
-    private static void analyzeMethod(SootMethod method) {
-        System.out.println("Analyzing method: " + method.getName());
-        System.out.println("===========================");
+    private void analyzeMethod(SootMethod method) {
+        if (analyzedMethods.contains(method)) {
+            return;
+        }
+        analyzedMethods.add(method);
+
+        String msg = "Analyzing: " + method.getDeclaringClass().getName() + "#" +
+                method.getName() + "()";
+        System.out.println(msg);
+        for (int i = 0; i < msg.length(); i++) {
+            System.out.print("=");
+        }
+        System.out.println();
 
         CFGAnalyzer analyzer = new CFGAnalyzer(method);
         analyzer.analyze();
 
-        List<Integer> pathApiCalls = analyzer.getPathApiCalls();
+        Collection<Integer> pathApiCalls = analyzer.getPathApiCalls();
         System.out.println("Distinct paths through the code: " + pathApiCalls.size());
         System.out.print("API calls in paths: [");
         for (int count : pathApiCalls) {
@@ -107,6 +120,10 @@ public class Cerebro {
         }
 
         System.out.println();
+
+        for (SootMethod calledMethod : analyzer.getUserMethodCalls()) {
+            analyzeMethod(calledMethod);
+        }
     }
 
 }

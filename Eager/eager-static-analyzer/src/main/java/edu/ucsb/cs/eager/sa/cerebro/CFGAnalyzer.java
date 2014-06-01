@@ -38,9 +38,10 @@ public class CFGAnalyzer {
     private Collection<Loop> loops;
     private Map<Loop,Integer> loopedApiCalls = new HashMap<Loop, Integer>();
     private List<Integer> pathApiCalls = new ArrayList<Integer>();
+    private Set<SootMethod> userMethodCalls = new LinkedHashSet<SootMethod>();
 
-    private UnitGraph graph;
-    private SootMethod method;
+    private final UnitGraph graph;
+    private final SootMethod method;
 
     private static final String[] GAE_PACKAGES = new String[] {
         "javax.persistence",
@@ -63,11 +64,15 @@ public class CFGAnalyzer {
     }
 
     public Map<Loop, Integer> getLoopedApiCalls() {
-        return loopedApiCalls;
+        return Collections.unmodifiableMap(loopedApiCalls);
     }
 
-    public List<Integer> getPathApiCalls() {
-        return pathApiCalls;
+    public Collection<Integer> getPathApiCalls() {
+        return Collections.unmodifiableList(pathApiCalls);
+    }
+
+    public Collection<SootMethod> getUserMethodCalls() {
+        return Collections.unmodifiableSet(userMethodCalls);
     }
 
     private void analyzeLoop(Loop loop, int nestingLevel) {
@@ -98,6 +103,8 @@ public class CFGAnalyzer {
                 InvokeExpr invocation = stmt.getInvokeExpr();
                 if (isApiCall(invocation)) {
                     apiCallCount++;
+                } else if (isUserMethodCall(invocation.getMethod())) {
+                    userMethodCalls.add(invocation.getMethod());
                 }
             }
         }
@@ -109,6 +116,8 @@ public class CFGAnalyzer {
             InvokeExpr invocation = stmt.getInvokeExpr();
             if (isApiCall(invocation)) {
                 apiCallCount++;
+            } else if (isUserMethodCall(invocation.getMethod())) {
+                userMethodCalls.add(invocation.getMethod());
             }
         }
 
@@ -146,6 +155,12 @@ public class CFGAnalyzer {
             }
         }
         return false;
+    }
+
+    private boolean isUserMethodCall(SootMethod target) {
+        String userPackage = method.getDeclaringClass().getJavaPackageName();
+        String targetPackage = target.getDeclaringClass().getJavaPackageName();
+        return targetPackage.startsWith(userPackage);
     }
 
     private Loop findLoop(Stmt stmt) {
