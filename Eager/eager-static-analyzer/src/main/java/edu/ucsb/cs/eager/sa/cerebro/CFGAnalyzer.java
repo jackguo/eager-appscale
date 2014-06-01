@@ -20,9 +20,10 @@
 package edu.ucsb.cs.eager.sa.cerebro;
 
 import soot.Unit;
-import soot.jimple.IfStmt;
 import soot.jimple.InvokeExpr;
 import soot.jimple.Stmt;
+import soot.jimple.internal.JCaughtExceptionRef;
+import soot.jimple.internal.JIdentityStmt;
 import soot.jimple.toolkits.annotation.logic.Loop;
 import soot.jimple.toolkits.annotation.logic.LoopFinder;
 import soot.toolkits.graph.UnitGraph;
@@ -99,15 +100,22 @@ public class CFGAnalyzer {
             }
         }
 
-        List<Unit> children = graph.getSuccsOf(stmt);
+        Collection<Unit> children = graph.getSuccsOf(stmt);
 
         Loop loop = findLoop(stmt);
         if (loop != null) {
             analyzeLoop(loop, 1);
-            IfStmt head = getLoopHeadBranchStmt(loop);
-            Stmt target = head.getTarget();
-            children = new ArrayList<Unit>();
-            children.add(target);
+            children = new HashSet<Unit>();
+            for (Stmt exit : loop.getLoopExits()) {
+                for (Stmt exitTarget : loop.targetsOfLoopExit(exit)) {
+                    if (exitTarget instanceof JIdentityStmt) {
+                        if (((JIdentityStmt) exitTarget).getRightOp() instanceof JCaughtExceptionRef) {
+                            continue;
+                        }
+                    }
+                    children.add(exitTarget);
+                }
+            }
         }
 
         for (Unit child : children) {
@@ -135,15 +143,6 @@ public class CFGAnalyzer {
             }
         }
         return null;
-    }
-
-    private IfStmt getLoopHeadBranchStmt(Loop loop) {
-        for (Stmt stmt : loop.getLoopStatements()) {
-            if (stmt instanceof IfStmt) {
-                return (IfStmt) stmt;
-            }
-        }
-        throw new IllegalStateException("Failed to find loop head branch");
     }
 
     private boolean isStmtInNestedLoopBody(Stmt stmt, Set<Loop> nestedLoops) {
