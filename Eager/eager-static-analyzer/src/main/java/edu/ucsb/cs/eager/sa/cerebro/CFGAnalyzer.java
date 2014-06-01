@@ -39,6 +39,7 @@ public class CFGAnalyzer {
     private Map<Loop,Integer> loopedApiCalls = new HashMap<Loop, Integer>();
     private List<Integer> pathApiCalls = new ArrayList<Integer>();
     private Set<SootMethod> userMethodCalls = new LinkedHashSet<SootMethod>();
+    private boolean analyzed = false;
 
     private final UnitGraph graph;
     private final SootMethod method;
@@ -52,15 +53,20 @@ public class CFGAnalyzer {
         this.method = method;
         Body b = method.retrieveActiveBody();
         this.graph = new BriefUnitGraph(b);
+        doAnalyze();
     }
 
-    public void analyze() {
+    private void doAnalyze() {
+        if (analyzed) {
+            return;
+        }
         LoopFinder loopFinder = new LoopFinder();
         loopFinder.transform(graph.getBody());
         loops = loopFinder.loops();
 
         Stmt stmt = (Stmt) graph.getHeads().get(0);
         visit(stmt, graph, 0);
+        analyzed = true;
     }
 
     public Map<Loop, Integer> getLoopedApiCalls() {
@@ -111,13 +117,14 @@ public class CFGAnalyzer {
         loopedApiCalls.put(loop, apiCallCount);
     }
 
-    public void visit(Stmt stmt, UnitGraph graph, int apiCallCount) {
+    private void visit(Stmt stmt, UnitGraph graph, int apiCallCount) {
         if (stmt.containsInvokeExpr()) {
             InvokeExpr invocation = stmt.getInvokeExpr();
             if (isApiCall(invocation)) {
                 apiCallCount++;
             } else if (isUserMethodCall(invocation.getMethod())) {
                 userMethodCalls.add(invocation.getMethod());
+                apiCallCount += XMansion.getInstance().getMaxApiCalls(invocation.getMethod());
             }
         }
 

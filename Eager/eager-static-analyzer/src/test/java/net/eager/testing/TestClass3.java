@@ -32,6 +32,7 @@ public class TestClass3 {
             DataStore.query1();
             test.method1();
             DataStore.query2();
+            doQuery();
         }
         DataStore.query3();
 
@@ -43,5 +44,9 @@ public class TestClass3 {
             DataStore.query4();
             x++;
         }
+    }
+
+    private static void doQuery() {
+        DataStore.query1();
     }
 }

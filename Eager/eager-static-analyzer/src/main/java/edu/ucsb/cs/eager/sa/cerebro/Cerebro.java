@@ -72,6 +72,8 @@ public class Cerebro {
     private Set<SootMethod> analyzedMethods = new HashSet<SootMethod>();
 
     public void analyze(String classPath, String startingPoint, boolean loadNecessary) {
+        XMansion.getInstance().clear();
+
         soot.options.Options.v().set_allow_phantom_refs(true);
         soot.options.Options.v().set_whole_program(true);
         Scene.v().setSootClassPath(Scene.v().getSootClassPath() + ":" + classPath);
@@ -81,7 +83,9 @@ public class Cerebro {
         }
         System.out.println("\n\nStarting the analysis of class: " + clazz.getName() + "\n");
         for (SootMethod method : clazz.getMethods()) {
-            analyzeMethod(method);
+            if (method.isPublic()) {
+                analyzeMethod(method);
+            }
         }
     }
 
@@ -91,6 +95,23 @@ public class Cerebro {
         }
         analyzedMethods.add(method);
 
+        CFGAnalyzer analyzer = XMansion.getInstance().getAnalyzer(method);
+        printResult(method, analyzer);
+
+        // Analyzing the previous method will generally cause more methods to be
+        // analyzed, whose results will be added to the XMansion. So here we iterate
+        // through all the results present in XMansion, and print them out.
+        Map<SootMethod,CFGAnalyzer> results = XMansion.getInstance().getResults();
+        for (Map.Entry<SootMethod,CFGAnalyzer> entry : results.entrySet()) {
+            if (analyzedMethods.contains(entry.getKey())) {
+                continue;
+            }
+            analyzedMethods.add(entry.getKey());
+            printResult(entry.getKey(), entry.getValue());
+        }
+    }
+
+    private void printResult(SootMethod method, CFGAnalyzer analyzer) {
         String msg = "Analyzing: " + method.getDeclaringClass().getName() + "#" +
                 method.getName() + "()";
         System.out.println(msg);
@@ -98,9 +119,6 @@ public class Cerebro {
             System.out.print("=");
         }
         System.out.println();
-
-        CFGAnalyzer analyzer = new CFGAnalyzer(method);
-        analyzer.analyze();
 
         Collection<Integer> pathApiCalls = analyzer.getPathApiCalls();
         System.out.println("Distinct paths through the code: " + pathApiCalls.size());
@@ -119,11 +137,16 @@ public class Cerebro {
             }
         }
 
-        System.out.println();
-
-        for (SootMethod calledMethod : analyzer.getUserMethodCalls()) {
-            analyzeMethod(calledMethod);
+        Collection<SootMethod> calledUserMethods = analyzer.getUserMethodCalls();
+        if (calledUserMethods.size() > 0) {
+            System.out.println("Called user-defined methods: ");
+            for (SootMethod calledMethod : calledUserMethods) {
+                System.out.println("  " + calledMethod.getDeclaringClass().getName() + "#" +
+                        calledMethod.getName() + "()");
+            }
         }
+
+        System.out.println();
     }
 
 }
