@@ -24,8 +24,12 @@ import soot.Body;
 import soot.Scene;
 import soot.SootClass;
 import soot.SootMethod;
+import soot.jimple.toolkits.annotation.logic.Loop;
 import soot.toolkits.graph.BriefUnitGraph;
 import soot.toolkits.graph.UnitGraph;
+
+import java.util.List;
+import java.util.Map;
 
 public class Cerebro {
 
@@ -81,11 +85,29 @@ public class Cerebro {
 
     private static void analyzeMethod(SootMethod method) {
         System.out.println("Analyzing method: " + method.getName());
-        System.out.println("======================================");
+        System.out.println("===========================");
         Body b = method.retrieveActiveBody();
         UnitGraph g = new BriefUnitGraph(b);
         CFGAnalyzer analyzer = new CFGAnalyzer();
         analyzer.analyze(g);
+
+        List<Integer> pathApiCalls = analyzer.getPathApiCalls();
+        System.out.println("Distinct paths through the code: " + pathApiCalls.size());
+        System.out.print("API calls in paths:");
+        for (int count : pathApiCalls) {
+            System.out.print(" " + count);
+        }
+        System.out.println();
+
+        Map<Loop,Integer> loopedApiCalls = analyzer.getLoopedApiCalls();
+        System.out.println("Loops: " + loopedApiCalls.size());
+        if (loopedApiCalls.size() > 0) {
+            System.out.println("API calls in loops: ");
+            for (Map.Entry<Loop,Integer> entry : loopedApiCalls.entrySet()) {
+                System.out.println("  " + entry.getKey().getHead() + ": " + entry.getValue());
+            }
+        }
+
         System.out.println();
     }
 

@@ -33,6 +33,7 @@ public class CFGAnalyzer {
 
     private Collection<Loop> loops;
     private Map<Loop,Integer> loopedApiCalls = new HashMap<Loop, Integer>();
+    private List<Integer> pathApiCalls = new ArrayList<Integer>();
 
     private static final String[] GAE_PACKAGES = new String[] {
         "javax.persistence",
@@ -46,6 +47,14 @@ public class CFGAnalyzer {
 
         Stmt stmt = (Stmt) graph.getHeads().get(0);
         visit(stmt, graph, 0);
+    }
+
+    public Map<Loop, Integer> getLoopedApiCalls() {
+        return loopedApiCalls;
+    }
+
+    public List<Integer> getPathApiCalls() {
+        return pathApiCalls;
     }
 
     private void analyzeLoop(Loop loop, int nestingLevel) {
@@ -80,8 +89,6 @@ public class CFGAnalyzer {
             }
         }
         loopedApiCalls.put(loop, apiCallCount);
-        System.out.println("API calls in loop [ " + loop.getHead() + "]: " + apiCallCount +
-                " [Nesting level = " + nestingLevel + "]");
     }
 
     public void visit(Stmt stmt, UnitGraph graph, int apiCallCount) {
@@ -107,7 +114,7 @@ public class CFGAnalyzer {
             visit((Stmt) child, graph, apiCallCount);
         }
         if (children.isEmpty()) {
-            System.out.println("API calls in path: " + apiCallCount);
+            pathApiCalls.add(apiCallCount);
         }
     }
 
