@@ -52,16 +52,6 @@ public class XMansion {
         return analyzer;
     }
 
-    public int getMaxApiCalls(SootMethod method) {
-        if (cache.containsKey(method)) {
-            return getMax(cache.get(method));
-        }
-
-        CFGAnalyzer analyzer = new CFGAnalyzer(method);
-        cache.put(method, analyzer);
-        return getMax(analyzer);
-    }
-
     public Map<SootMethod,CFGAnalyzer> getResults() {
         return Collections.unmodifiableMap(cache);
     }

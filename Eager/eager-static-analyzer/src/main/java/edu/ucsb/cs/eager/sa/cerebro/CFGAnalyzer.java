@@ -81,6 +81,16 @@ public class CFGAnalyzer {
         return Collections.unmodifiableSet(userMethodCalls);
     }
 
+    public int getMaxApiCalls() {
+        int max = 0;
+        for (int calls : pathApiCalls) {
+            if (calls > max) {
+                max = calls;
+            }
+        }
+        return max;
+    }
+
     private void analyzeLoop(Loop loop, int nestingLevel) {
         if (loopedApiCalls.containsKey(loop)) {
             return;
@@ -111,6 +121,8 @@ public class CFGAnalyzer {
                     apiCallCount++;
                 } else if (isUserMethodCall(invocation.getMethod())) {
                     userMethodCalls.add(invocation.getMethod());
+                    CFGAnalyzer analyzer = XMansion.getInstance().getAnalyzer(invocation.getMethod());
+                    apiCallCount += analyzer.getMaxApiCalls();
                 }
             }
         }
@@ -124,7 +136,8 @@ public class CFGAnalyzer {
                 apiCallCount++;
             } else if (isUserMethodCall(invocation.getMethod())) {
                 userMethodCalls.add(invocation.getMethod());
-                apiCallCount += XMansion.getInstance().getMaxApiCalls(invocation.getMethod());
+                CFGAnalyzer analyzer = XMansion.getInstance().getAnalyzer(invocation.getMethod());
+                apiCallCount += analyzer.getMaxApiCalls();
             }
         }
 
