@@ -19,6 +19,8 @@
 
 package edu.ucsb.cs.eager.sa.cerebro;
 
+import soot.Body;
+import soot.SootMethod;
 import soot.Unit;
 import soot.jimple.InvokeExpr;
 import soot.jimple.Stmt;
@@ -26,6 +28,7 @@ import soot.jimple.internal.JCaughtExceptionRef;
 import soot.jimple.internal.JIdentityStmt;
 import soot.jimple.toolkits.annotation.logic.Loop;
 import soot.jimple.toolkits.annotation.logic.LoopFinder;
+import soot.toolkits.graph.BriefUnitGraph;
 import soot.toolkits.graph.UnitGraph;
 
 import java.util.*;
@@ -36,12 +39,21 @@ public class CFGAnalyzer {
     private Map<Loop,Integer> loopedApiCalls = new HashMap<Loop, Integer>();
     private List<Integer> pathApiCalls = new ArrayList<Integer>();
 
+    private UnitGraph graph;
+    private SootMethod method;
+
     private static final String[] GAE_PACKAGES = new String[] {
         "javax.persistence",
         "edu.ucsb.cs.eager.gae",
     };
 
-    public void analyze(UnitGraph graph) {
+    public CFGAnalyzer(SootMethod method) {
+        this.method = method;
+        Body b = method.retrieveActiveBody();
+        this.graph = new BriefUnitGraph(b);
+    }
+
+    public void analyze() {
         LoopFinder loopFinder = new LoopFinder();
         loopFinder.transform(graph.getBody());
         loops = loopFinder.loops();

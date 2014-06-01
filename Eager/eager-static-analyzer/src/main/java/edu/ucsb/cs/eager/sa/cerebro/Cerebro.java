@@ -20,13 +20,10 @@
 package edu.ucsb.cs.eager.sa.cerebro;
 
 import org.apache.commons.cli.*;
-import soot.Body;
 import soot.Scene;
 import soot.SootClass;
 import soot.SootMethod;
 import soot.jimple.toolkits.annotation.logic.Loop;
-import soot.toolkits.graph.BriefUnitGraph;
-import soot.toolkits.graph.UnitGraph;
 
 import java.util.List;
 import java.util.Map;
@@ -79,25 +76,26 @@ public class Cerebro {
         }
         System.out.println("\n\nStarting the analysis of class: " + clazz.getName() + "\n");
         for (SootMethod method : clazz.getMethods()) {
-            analyzeMethod(method);
+            if (method.isPublic()) {
+                analyzeMethod(method);
+            }
         }
     }
 
     private static void analyzeMethod(SootMethod method) {
         System.out.println("Analyzing method: " + method.getName());
         System.out.println("===========================");
-        Body b = method.retrieveActiveBody();
-        UnitGraph g = new BriefUnitGraph(b);
-        CFGAnalyzer analyzer = new CFGAnalyzer();
-        analyzer.analyze(g);
+
+        CFGAnalyzer analyzer = new CFGAnalyzer(method);
+        analyzer.analyze();
 
         List<Integer> pathApiCalls = analyzer.getPathApiCalls();
         System.out.println("Distinct paths through the code: " + pathApiCalls.size());
-        System.out.print("API calls in paths:");
+        System.out.print("API calls in paths: [");
         for (int count : pathApiCalls) {
             System.out.print(" " + count);
         }
-        System.out.println();
+        System.out.println(" ]");
 
         Map<Loop,Integer> loopedApiCalls = analyzer.getLoopedApiCalls();
         System.out.println("Loops: " + loopedApiCalls.size());

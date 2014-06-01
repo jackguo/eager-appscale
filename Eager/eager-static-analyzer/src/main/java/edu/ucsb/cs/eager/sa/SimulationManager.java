@@ -78,7 +78,7 @@ public class SimulationManager {
     private Unit getNextInstruction(UnitGraph graph, Unit currentInstruction) {
         List<Unit> candidates;
         if (currentInstruction == null) {
-            candidates = graph.getHeads();
+            return graph.getHeads().get(0);
         } else {
             candidates = new ArrayList<Unit>();
             candidates.addAll(graph.getSuccsOf(currentInstruction));
@@ -93,7 +93,7 @@ public class SimulationManager {
             }
         }
 
-        if (candidates == null || candidates.size() == 0) {
+        if (candidates.size() == 0) {
             return null;
         } else if (candidates.size() == 1) {
             return candidates.get(0);
