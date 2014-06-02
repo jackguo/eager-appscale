@@ -20,11 +20,26 @@
 package edu.ucsb.cs.eager.sa.cerebro;
 
 import junit.framework.TestCase;
+import soot.SootMethod;
+
+import java.util.Map;
 
 public class CerebroTest extends TestCase {
 
     public void testCerebro() {
-        Cerebro cerebro = new Cerebro();
-        cerebro.analyze("", "net.eager.testing.TestClass3", false);
+        Cerebro cerebro = new Cerebro("", "net.eager.testing.TestClass3");
+        cerebro.setWholeProgramMode(true);
+        cerebro.setLoadNecessaryClasses(false);
+
+        Map<SootMethod,CFGAnalyzer> results = cerebro.analyze();
+        assertEquals(5, results.size());
+        boolean mainFound = false;
+        for (Map.Entry<SootMethod,CFGAnalyzer> entry : results.entrySet()) {
+            if (entry.getKey().getName().equals("main")) {
+                assertEquals(entry.getValue().getMaxApiCalls(), 4);
+                mainFound = true;
+            }
+        }
+        assertTrue(mainFound);
     }
 }

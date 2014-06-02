@@ -43,14 +43,16 @@ public class CFGAnalyzer {
 
     private final UnitGraph graph;
     private final SootMethod method;
+    private final XMansion xmansion;
 
     private static final String[] GAE_PACKAGES = new String[] {
         "javax.persistence",
         "edu.ucsb.cs.eager.gae",
     };
 
-    public CFGAnalyzer(SootMethod method) {
+    public CFGAnalyzer(SootMethod method, XMansion xmansion) {
         this.method = method;
+        this.xmansion = xmansion;
         Body b = method.retrieveActiveBody();
         this.graph = new BriefUnitGraph(b);
         doAnalyze();
@@ -121,7 +123,7 @@ public class CFGAnalyzer {
                     apiCallCount++;
                 } else if (isUserMethodCall(invocation.getMethod())) {
                     userMethodCalls.add(invocation.getMethod());
-                    CFGAnalyzer analyzer = XMansion.getInstance().getAnalyzer(invocation.getMethod());
+                    CFGAnalyzer analyzer = xmansion.getAnalyzer(invocation.getMethod());
                     apiCallCount += analyzer.getMaxApiCalls();
                 }
             }
@@ -136,7 +138,7 @@ public class CFGAnalyzer {
                 apiCallCount++;
             } else if (isUserMethodCall(invocation.getMethod())) {
                 userMethodCalls.add(invocation.getMethod());
-                CFGAnalyzer analyzer = XMansion.getInstance().getAnalyzer(invocation.getMethod());
+                CFGAnalyzer analyzer = xmansion.getAnalyzer(invocation.getMethod());
                 apiCallCount += analyzer.getMaxApiCalls();
             }
         }

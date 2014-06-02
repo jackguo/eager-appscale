@@ -30,24 +30,14 @@ import java.util.Map;
  */
 public class XMansion {
 
-    private Map<SootMethod,CFGAnalyzer> cache = new HashMap<SootMethod,CFGAnalyzer>();
-
-    private static final XMansion instance = new XMansion();
-
-    private XMansion() {
-
-    }
-
-    public static XMansion getInstance() {
-        return instance;
-    }
+    private final Map<SootMethod,CFGAnalyzer> cache = new HashMap<SootMethod,CFGAnalyzer>();
 
     public CFGAnalyzer getAnalyzer(SootMethod method) {
         if (cache.containsKey(method)) {
             return cache.get(method);
         }
 
-        CFGAnalyzer analyzer = new CFGAnalyzer(method);
+        CFGAnalyzer analyzer = new CFGAnalyzer(method, this);
         cache.put(method, analyzer);
         return analyzer;
     }
@@ -56,17 +46,4 @@ public class XMansion {
         return Collections.unmodifiableMap(cache);
     }
 
-    public void clear() {
-        cache.clear();
-    }
-
-    private int getMax(CFGAnalyzer analyzer) {
-        int max = 0;
-        for (int calls : analyzer.getPathApiCalls()) {
-            if (calls > max) {
-                max = calls;
-            }
-        }
-        return max;
-    }
 }

@@ -32,11 +32,24 @@ import java.util.Set;
 
 public class Cerebro {
 
+    private Set<SootMethod> analyzedMethods = new HashSet<SootMethod>();
+    private boolean loadNecessaryClasses = true;
+    private boolean wholeProgramMode = false;
+    private boolean verbose = false;
+    private String classPath;
+    private String starterClass;
+
+    public Cerebro(String classPath, String starterClass) {
+        this.classPath = classPath;
+        this.starterClass = starterClass;
+    }
+
     public static void main(String[] args) {
         Options options = new Options();
         options.addOption("ccp", "cerebro-classpath", true, "Cerebro classpath");
         options.addOption("c", "class", true, "Class to be used as the starting point");
-        options.addOption("dnc", "disable-necessary-classes", false, "Disable loading of necessary classes");
+        options.addOption("dnc", "disable-nec-classes", false, "Disable loading of necessary classes");
+        options.addOption("wp", "whole-program", false, "Enable whole program mode");
 
         CommandLine cmd;
         try {
@@ -51,57 +64,57 @@ public class Cerebro {
 
         String classPath = cmd.getOptionValue("ccp");
         if (classPath == null) {
-            System.err.println("Cerebro classpath (ccp) argument is required");
+            System.err.println("Cerebro classpath (ccp) option is required");
             return;
         }
 
         String startingPoint = cmd.getOptionValue("c");
         if (startingPoint == null) {
-            System.err.println("Starting point class (c) argument is required");
+            System.err.println("Starting point class (c) option is required");
         }
 
-        boolean disableNecessaryClasses = false;
-        if (cmd.hasOption("dnc")) {
-            disableNecessaryClasses = true;
-        }
-
-        Cerebro cerebro = new Cerebro();
-        cerebro.analyze(classPath, startingPoint, !disableNecessaryClasses);
+        Cerebro cerebro = new Cerebro(classPath, startingPoint);
+        cerebro.setLoadNecessaryClasses(!cmd.hasOption("dnc"));
+        cerebro.setWholeProgramMode(cmd.hasOption("wp"));
+        cerebro.setVerbose(true);
+        cerebro.analyze();
     }
 
-    private Set<SootMethod> analyzedMethods = new HashSet<SootMethod>();
-
-    public void analyze(String classPath, String startingPoint, boolean loadNecessary) {
-        XMansion.getInstance().clear();
+    public Map<SootMethod,CFGAnalyzer> analyze() {
+        XMansion xmansion = new XMansion();
 
         soot.options.Options.v().set_allow_phantom_refs(true);
-        soot.options.Options.v().set_whole_program(true);
+        if (wholeProgramMode) {
+            soot.options.Options.v().set_whole_program(true);
+        }
+
         Scene.v().setSootClassPath(Scene.v().getSootClassPath() + ":" + classPath);
-        SootClass clazz = Scene.v().loadClassAndSupport(startingPoint);
-        if (loadNecessary) {
+        SootClass clazz = Scene.v().loadClassAndSupport(starterClass);
+        if (loadNecessaryClasses) {
             Scene.v().loadNecessaryClasses();
         }
-        System.out.println("\n\nStarting the analysis of class: " + clazz.getName() + "\n");
+
         for (SootMethod method : clazz.getMethods()) {
             if (method.isPublic()) {
-                analyzeMethod(method);
+                analyzeMethod(method, xmansion);
             }
         }
+        return xmansion.getResults();
     }
 
-    private void analyzeMethod(SootMethod method) {
+    private void analyzeMethod(SootMethod method, XMansion xmansion) {
         if (analyzedMethods.contains(method)) {
             return;
         }
         analyzedMethods.add(method);
 
-        CFGAnalyzer analyzer = XMansion.getInstance().getAnalyzer(method);
+        CFGAnalyzer analyzer = xmansion.getAnalyzer(method);
         printResult(method, analyzer);
 
         // Analyzing the previous method will generally cause more methods to be
         // analyzed, whose results will be added to the XMansion. So here we iterate
         // through all the results present in XMansion, and print them out.
-        Map<SootMethod,CFGAnalyzer> results = XMansion.getInstance().getResults();
+        Map<SootMethod,CFGAnalyzer> results = xmansion.getResults();
         for (Map.Entry<SootMethod,CFGAnalyzer> entry : results.entrySet()) {
             if (analyzedMethods.contains(entry.getKey())) {
                 continue;
@@ -112,7 +125,10 @@ public class Cerebro {
     }
 
     private void printResult(SootMethod method, CFGAnalyzer analyzer) {
-        String msg = "Analyzing: " + method.getDeclaringClass().getName() + "#" +
+        if (!verbose) {
+            return;
+        }
+        String msg = "\nAnalyzing: " + method.getDeclaringClass().getName() + "#" +
                 method.getName() + "()";
         System.out.println(msg);
         for (int i = 0; i < msg.length(); i++) {
@@ -145,8 +161,17 @@ public class Cerebro {
                         calledMethod.getName() + "()");
             }
         }
-
-        System.out.println();
     }
 
+    public void setLoadNecessaryClasses(boolean loadNecessaryClasses) {
+        this.loadNecessaryClasses = loadNecessaryClasses;
+    }
+
+    public void setWholeProgramMode(boolean wholeProgramMode) {
+        this.wholeProgramMode = wholeProgramMode;
+    }
+
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
+    }
 }
