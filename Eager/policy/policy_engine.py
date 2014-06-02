@@ -59,13 +59,15 @@ class PolicyEngine:
     if not regex.match(name):
       return False, 'Invalid policy name: Only letters, digits and underscores are allowed'
 
+    reg_name = re.compile(name + '\\.([ai])\\.py')
+    for item in os.listdir(self.policy_store_dir):
+      if reg_name.match(item):
+       return False, 'Policy {0} already exists'.format(name)
+
     if active:
       file_path = os.path.join(self.policy_store_dir, name + '.a.py')
     else:
       file_path = os.path.join(self.policy_store_dir, name + '.i.py')
-
-    if os.path.exists(file_path):
-      return False, 'Policy {0} already exists'.format(name)
 
     file_handle = open(file_path, 'w')
     file_handle.write(content)
