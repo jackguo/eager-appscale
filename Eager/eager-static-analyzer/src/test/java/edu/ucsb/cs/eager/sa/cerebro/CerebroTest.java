@@ -30,6 +30,7 @@ public class CerebroTest extends TestCase {
         Cerebro cerebro = new Cerebro("", "net.eager.testing.TestClass3");
         cerebro.setWholeProgramMode(true);
         cerebro.setLoadNecessaryClasses(false);
+        //cerebro.setVerbose(true);
 
         Map<SootMethod,CFGAnalyzer> results = cerebro.analyze();
         assertEquals(5, results.size());

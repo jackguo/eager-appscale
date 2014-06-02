@@ -145,11 +145,13 @@ public class Cerebro {
         System.out.println(" ]");
 
         Map<Loop,Integer> loopedApiCalls = analyzer.getLoopedApiCalls();
+        Map<Loop,Integer> loopNestingLevels = analyzer.getLoopNestingLevels();
         System.out.println("Loops: " + loopedApiCalls.size());
         if (loopedApiCalls.size() > 0) {
             System.out.println("API calls in loops: ");
             for (Map.Entry<Loop,Integer> entry : loopedApiCalls.entrySet()) {
-                System.out.println("  " + entry.getKey().getHead() + ": " + entry.getValue());
+                System.out.println("  " + entry.getKey().getHead() + " [Nesting Level: " +
+                        loopNestingLevels.get(entry.getKey()) + "] : " + entry.getValue());
             }
         }
 

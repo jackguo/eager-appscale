@@ -37,6 +37,7 @@ public class CFGAnalyzer {
 
     private Collection<Loop> loops;
     private Map<Loop,Integer> loopedApiCalls = new HashMap<Loop, Integer>();
+    private Map<Loop,Integer> loopNestingLevels = new HashMap<Loop, Integer>();
     private List<Integer> pathApiCalls = new ArrayList<Integer>();
     private Set<SootMethod> userMethodCalls = new LinkedHashSet<SootMethod>();
 
@@ -68,6 +69,10 @@ public class CFGAnalyzer {
 
     public Map<Loop, Integer> getLoopedApiCalls() {
         return Collections.unmodifiableMap(loopedApiCalls);
+    }
+
+    public Map<Loop, Integer> getLoopNestingLevels() {
+        return Collections.unmodifiableMap(loopNestingLevels);
     }
 
     public Collection<Integer> getPathApiCalls() {
@@ -119,11 +124,14 @@ public class CFGAnalyzer {
                 } else if (isUserMethodCall(invocation.getMethod())) {
                     userMethodCalls.add(invocation.getMethod());
                     CFGAnalyzer analyzer = xmansion.getAnalyzer(invocation.getMethod());
-                    apiCallCount += analyzer.getMaxApiCalls();
+                    if (analyzer != null) {
+                        apiCallCount += analyzer.getMaxApiCalls();
+                    }
                 }
             }
         }
         loopedApiCalls.put(loop, apiCallCount);
+        loopNestingLevels.put(loop, nestingLevel);
     }
 
     private void visit(Stmt stmt, UnitGraph graph, int apiCallCount) {
@@ -134,7 +142,9 @@ public class CFGAnalyzer {
             } else if (isUserMethodCall(invocation.getMethod())) {
                 userMethodCalls.add(invocation.getMethod());
                 CFGAnalyzer analyzer = xmansion.getAnalyzer(invocation.getMethod());
-                apiCallCount += analyzer.getMaxApiCalls();
+                if (analyzer != null) {
+                    apiCallCount += analyzer.getMaxApiCalls();
+                }
             }
         }
 

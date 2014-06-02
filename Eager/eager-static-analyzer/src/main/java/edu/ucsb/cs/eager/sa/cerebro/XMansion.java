@@ -21,9 +21,7 @@ package edu.ucsb.cs.eager.sa.cerebro;
 
 import soot.SootMethod;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A cache for storing intermediate method analysis results.
@@ -31,14 +29,20 @@ import java.util.Map;
 public class XMansion {
 
     private final Map<SootMethod,CFGAnalyzer> cache = new HashMap<SootMethod,CFGAnalyzer>();
+    private final Set<SootMethod> calledMethods = new HashSet<SootMethod>();
 
     public CFGAnalyzer getAnalyzer(SootMethod method) {
         if (cache.containsKey(method)) {
             return cache.get(method);
+        } else if (calledMethods.contains(method)) {
+            // recursion defense
+            return null;
         }
 
+        calledMethods.add(method);
         CFGAnalyzer analyzer = new CFGAnalyzer(method, this);
         cache.put(method, analyzer);
+        calledMethods.remove(method);
         return analyzer;
     }
 
