@@ -92,7 +92,7 @@ class PolicyEngine:
         break;
 
     if not match:
-      return False
+      return False, "Policy {0} is not found!".format(name)
 
     path = os.path.join(self.policy_store_dir, name + '.' + match.groups()[0] + '.py')
     os.remove(path)
@@ -104,13 +104,13 @@ class PolicyEngine:
       for p in self.inactive_policies:
         if p.name == name:
           self.inactive_policies.remove(p)
-    return True
+    return True, "Policy removed successfully"
 
   # Enable an inactive policy, this policy must exist in the policy store
   def __enable_policy(self, name):
     path = os.path.join(self.policy_store_dir, name + '.i.py')
     if not os.path.exists(path):
-      return False, "Error while enabling policy: {0}, no such inactive policy!\n".format(name)
+      return False, "Error while enabling policy: {0}, no such inactive policy!".format(name)
 
     for p in self.inactive_policies:
       if p.name == name:
