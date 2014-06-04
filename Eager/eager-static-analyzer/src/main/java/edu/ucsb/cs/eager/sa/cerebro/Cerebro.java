@@ -137,9 +137,16 @@ public class Cerebro {
         System.out.println();
 
         Collection<Integer> pathApiCalls = analyzer.getPathApiCalls();
+        Collection<Integer> pathAllocations = analyzer.getPathAllocations();
         System.out.println("Distinct paths through the code: " + pathApiCalls.size());
         System.out.print("API calls in paths: [");
         for (int count : pathApiCalls) {
+            System.out.print(" " + count);
+        }
+        System.out.println(" ]");
+
+        System.out.print("Memory (heap) allocations in paths: [");
+        for (int count : pathAllocations) {
             System.out.print(" " + count);
         }
         System.out.println(" ]");

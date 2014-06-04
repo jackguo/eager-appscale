@@ -22,8 +22,8 @@ package edu.ucsb.cs.eager.sa.cerebro;
 import soot.Body;
 import soot.SootMethod;
 import soot.Unit;
-import soot.jimple.InvokeExpr;
-import soot.jimple.Stmt;
+import soot.Value;
+import soot.jimple.*;
 import soot.jimple.internal.JCaughtExceptionRef;
 import soot.jimple.internal.JIdentityStmt;
 import soot.jimple.toolkits.annotation.logic.Loop;
@@ -39,6 +39,7 @@ public class CFGAnalyzer {
     private Map<Loop,Integer> loopedApiCalls = new HashMap<Loop, Integer>();
     private Map<Loop,Integer> loopNestingLevels = new HashMap<Loop, Integer>();
     private List<Integer> pathApiCalls = new ArrayList<Integer>();
+    private List<Integer> pathAllocations = new ArrayList<Integer>();
     private Set<SootMethod> userMethodCalls = new LinkedHashSet<SootMethod>();
 
     private final UnitGraph graph;
@@ -64,7 +65,7 @@ public class CFGAnalyzer {
         loops = loopFinder.loops();
 
         Stmt stmt = (Stmt) graph.getHeads().get(0);
-        visit(stmt, graph, 0);
+        visit(stmt, graph, 0, 0);
     }
 
     public Map<Loop, Integer> getLoopedApiCalls() {
@@ -79,6 +80,10 @@ public class CFGAnalyzer {
         return Collections.unmodifiableList(pathApiCalls);
     }
 
+    public Collection<Integer> getPathAllocations() {
+        return Collections.unmodifiableList(pathAllocations);
+    }
+
     public Collection<SootMethod> getUserMethodCalls() {
         return Collections.unmodifiableSet(userMethodCalls);
     }
@@ -86,6 +91,16 @@ public class CFGAnalyzer {
     public int getMaxApiCalls() {
         int max = 0;
         for (int calls : pathApiCalls) {
+            if (calls > max) {
+                max = calls;
+            }
+        }
+        return max;
+    }
+
+    public int getMaxAllocations() {
+        int max = 0;
+        for (int calls : pathAllocations) {
             if (calls > max) {
                 max = calls;
             }
@@ -134,7 +149,10 @@ public class CFGAnalyzer {
         loopNestingLevels.put(loop, nestingLevel);
     }
 
-    private void visit(Stmt stmt, UnitGraph graph, int apiCallCount) {
+    private void visit(Stmt stmt, UnitGraph graph, int apiCallCount, int allocationCount) {
+        if (allocationCount > 12) {
+            System.out.println();
+        }
         if (stmt.containsInvokeExpr()) {
             InvokeExpr invocation = stmt.getInvokeExpr();
             if (isApiCall(invocation)) {
@@ -144,7 +162,15 @@ public class CFGAnalyzer {
                 CFGAnalyzer analyzer = xmansion.getAnalyzer(invocation.getMethod());
                 if (analyzer != null) {
                     apiCallCount += analyzer.getMaxApiCalls();
+                    allocationCount += analyzer.getMaxAllocations();
                 }
+            }
+        } else if (stmt instanceof NewExpr || stmt instanceof NewArrayExpr) {
+            allocationCount++;
+        } else if (stmt instanceof AssignStmt) {
+            Value rightOp = ((AssignStmt) stmt).getRightOp();
+            if (rightOp instanceof NewExpr || rightOp instanceof NewArrayExpr) {
+                allocationCount++;
             }
         }
 
@@ -167,10 +193,11 @@ public class CFGAnalyzer {
         }
 
         for (Unit child : children) {
-            visit((Stmt) child, graph, apiCallCount);
+            visit((Stmt) child, graph, apiCallCount, allocationCount);
         }
         if (children.isEmpty()) {
             pathApiCalls.add(apiCallCount);
+            pathAllocations.add(allocationCount);
         }
     }
 
