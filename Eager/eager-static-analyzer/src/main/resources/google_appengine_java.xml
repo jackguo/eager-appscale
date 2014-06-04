@@ -1,0 +1,22 @@
+<config>
+    <repo>
+        <name>AppEngineAndStorage</name>
+        <classpath>appengine.cs/target/classes</classpath>
+        <classes>
+            <class>sfeir.poc.appengine.cs.GoogleCloudStorageServlet</class>
+        </classes>
+    </repo>
+    <repo>
+        <name>DUBwise-Download</name>
+        <classpath>war/WEB-INF/classes</classpath>
+        <classes>
+            <class>org.ligi.dubwise.download.EnterCodeServlet</class>
+            <class>org.ligi.dubwise.download.DownloadBuildsServlet</class>
+            <class>org.ligi.dubwise.download.FileSenderServlet</class>
+            <class>org.ligi.dubwise.download.GetInstallRecordServlet</class>
+            <class>org.ligi.dubwise.download.MetaInfoServlet</class>
+            <class>org.ligi.dubwise.download.NotifyServlet</class>
+            <class>org.ligi.dubwise.download.RefreshDownloadSourceServlet</class>
+        </classes>
+    </repo>
+</config>

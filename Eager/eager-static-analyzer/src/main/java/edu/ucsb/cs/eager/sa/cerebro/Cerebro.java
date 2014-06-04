@@ -71,6 +71,7 @@ public class Cerebro {
         String startingPoint = cmd.getOptionValue("c");
         if (startingPoint == null) {
             System.err.println("Starting point class (c) option is required");
+            return;
         }
 
         Cerebro cerebro = new Cerebro(classPath, startingPoint);

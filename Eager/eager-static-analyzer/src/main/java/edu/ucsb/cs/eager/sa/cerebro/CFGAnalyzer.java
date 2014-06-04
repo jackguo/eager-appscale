@@ -48,7 +48,14 @@ public class CFGAnalyzer {
 
     private static final String[] GAE_PACKAGES = new String[] {
         "javax.persistence",
+        "javax.jdo",
         "edu.ucsb.cs.eager.gae",
+        "com.google.appengine.api.files",
+        "com.google.appengine.api.users",
+        "com.google.appengine.api.datastore",
+        "com.google.appengine.api.images",
+        "com.google.appengine.api.blobstore",
+        "com.google.appengine.api.taskqueue",
     };
 
     public CFGAnalyzer(SootMethod method, XMansion xmansion) {
@@ -150,9 +157,6 @@ public class CFGAnalyzer {
     }
 
     private void visit(Stmt stmt, UnitGraph graph, int apiCallCount, int allocationCount) {
-        if (allocationCount > 12) {
-            System.out.println();
-        }
         if (stmt.containsInvokeExpr()) {
             InvokeExpr invocation = stmt.getInvokeExpr();
             if (isApiCall(invocation)) {
