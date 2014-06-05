@@ -20,11 +20,13 @@
 package edu.ucsb.cs.eager.sa.cerebro;
 
 import org.apache.commons.cli.*;
+import soot.G;
 import soot.Scene;
 import soot.SootClass;
 import soot.SootMethod;
 import soot.jimple.toolkits.annotation.logic.Loop;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -42,6 +44,10 @@ public class Cerebro {
     public Cerebro(String classPath, String starterClass) {
         this.classPath = classPath;
         this.starterClass = starterClass;
+    }
+
+    public void cleanup() {
+        G.v().reset();
     }
 
     public static void main(String[] args) {
@@ -66,6 +72,15 @@ public class Cerebro {
         if (classPath == null) {
             System.err.println("Cerebro classpath (ccp) option is required");
             return;
+        } else {
+            String[] paths = classPath.split(":");
+            for (String p : paths) {
+                File file = new File(p);
+                if (!file.exists()) {
+                    System.err.println("Path segment: " + p + " mentioned in classpath does not exist");
+                    return;
+                }
+            }
         }
 
         String startingPoint = cmd.getOptionValue("c");
@@ -125,7 +140,7 @@ public class Cerebro {
         }
     }
 
-    private void printResult(SootMethod method, CFGAnalyzer analyzer) {
+    void printResult(SootMethod method, CFGAnalyzer analyzer) {
         if (!verbose) {
             return;
         }
