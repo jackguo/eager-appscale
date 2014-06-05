@@ -59,6 +59,95 @@ public class CFGAnalyzer {
         "com.google.appengine.api.urlfetch",
     };
 
+    private static final String[] GAE_API_CALLS = new String[] {
+        "com.google.appengine.api.datastore.Cursor#fromWebSafeString()",
+        "com.google.appengine.api.datastore.Cursor#toWebSafeString()",
+        "com.google.appengine.api.datastore.DatastoreService#delete()",
+        "!com.google.appengine.api.datastore.DatastoreService#prepare()",
+        "com.google.appengine.api.datastore.DatastoreService#put()",
+        "!com.google.appengine.api.datastore.DatastoreServiceFactory#getDatastoreService()",
+        "!com.google.appengine.api.datastore.FetchOptions$Builder#withDefaults()",
+        "!com.google.appengine.api.datastore.Key#getId()",
+        "!com.google.appengine.api.datastore.Key#getName()",
+        "com.google.appengine.api.datastore.KeyFactory#createKey()",
+        "com.google.appengine.api.datastore.PreparedQuery#asIterable()",
+        "com.google.appengine.api.datastore.PreparedQuery#asList()",
+        "!com.google.appengine.api.datastore.Query#<init>()",
+        "!com.google.appengine.api.datastore.Query#addFilter()",
+        "!com.google.appengine.api.datastore.Query#setAncestor()",
+        "!com.google.appengine.api.datastore.Entity#<init>()",
+        "!com.google.appengine.api.datastore.Entity#getKey()",
+        "!com.google.appengine.api.datastore.Entity#setProperty()",
+        "!com.google.appengine.api.datastore.Entity#getProperties()",
+        "!com.google.appengine.api.datastore.Entity#getProperty()",
+
+        "com.google.appengine.api.files.FileService#createNewGSFile()",
+        "com.google.appengine.api.files.FileService#openWriteChannel()",
+        "!com.google.appengine.api.files.FileServiceFactory#getFileService()",
+        "com.google.appengine.api.files.FileWriteChannel#closeFinally()",
+        "!com.google.appengine.api.files.GSFileOptions$GSFileOptionsBuilder#<init>()",
+        "com.google.appengine.api.files.GSFileOptions$GSFileOptionsBuilder#build()",
+        "!com.google.appengine.api.files.GSFileOptions$GSFileOptionsBuilder#setAcl()",
+        "!com.google.appengine.api.files.GSFileOptions$GSFileOptionsBuilder#setBucket()",
+        "!com.google.appengine.api.files.GSFileOptions$GSFileOptionsBuilder#setKey()",
+        "!com.google.appengine.api.files.GSFileOptions$GSFileOptionsBuilder#setMimeType()",
+
+        "com.google.appengine.api.taskqueue.Queue#add()",
+        "com.google.appengine.api.taskqueue.QueueFactory#getDefaultQueue()",
+        "!com.google.appengine.api.taskqueue.TaskOptions$Builder#withUrl()",
+
+        "com.google.appengine.api.urlfetch.HTTPResponse#getContent()",
+        "com.google.appengine.api.urlfetch.URLFetchService#fetch()",
+        "!com.google.appengine.api.urlfetch.URLFetchServiceFactory#getURLFetchService()",
+
+        "!com.google.appengine.api.users.User#getEmail()",
+        "!com.google.appengine.api.users.User#getNickname()",
+        "!com.google.appengine.api.users.User#getUserId()",
+        "com.google.appengine.api.users.UserService#createLoginURL()",
+        "com.google.appengine.api.users.UserService#createLogoutURL()",
+        "com.google.appengine.api.users.UserService#getCurrentUser()",
+        "com.google.appengine.api.users.UserService#isUserLoggedIn()",
+        "!com.google.appengine.api.users.UserServiceFactory#getUserService()",
+
+        "!javax.jdo.JDODetachedFieldAccessException#<init>()",
+        "javax.jdo.PersistenceManager#close()",
+        "javax.jdo.PersistenceManager#deletePersistent()",
+        "javax.jdo.PersistenceManager#getObjectById()",
+        "javax.jdo.PersistenceManager#getObjectsById()",
+        "javax.jdo.PersistenceManager#makePersistent()",
+        "javax.jdo.PersistenceManager#newObjectIdInstance()",
+        "!javax.jdo.PersistenceManager#newQuery()",
+        "!javax.jdo.PersistenceManagerFactory#getPersistenceManager()",
+        "javax.jdo.Query#closeAll()",
+        "javax.jdo.Query#declareParameters()",
+        "javax.jdo.Query#execute()",
+        "!javax.jdo.Query#setExtensions()",
+        "!javax.jdo.Query#setFilter()",
+        "!javax.jdo.Query#setOrdering()",
+        "!javax.jdo.Query#setRange()",
+        "!javax.persistence.EntityExistsException#<init>()",
+        "javax.persistence.EntityManager#clear()",
+        "javax.persistence.EntityManager#close()",
+        "!javax.persistence.EntityManager#createQuery()",
+        "javax.persistence.EntityManager#find()",
+        "javax.persistence.EntityManager#getTransaction()",
+        "javax.persistence.EntityManager#persist()",
+        "javax.persistence.EntityManager#remove()",
+        "javax.persistence.EntityManagerFactory#createEntityManager()",
+        "!javax.persistence.EntityNotFoundException#<init>()",
+        "javax.persistence.EntityTransaction#begin()",
+        "javax.persistence.EntityTransaction#commit()",
+        "javax.persistence.Query#getResultList()",
+        "!javax.persistence.Query#setFirstResult()",
+        "!javax.persistence.Query#setHint()",
+        "!javax.persistence.Query#setMaxResults()",
+
+        "edu.ucsb.cs.eager.gae.DataStore#query1()",
+        "edu.ucsb.cs.eager.gae.DataStore#query2()",
+        "edu.ucsb.cs.eager.gae.DataStore#query3()",
+        "edu.ucsb.cs.eager.gae.DataStore#query4()",
+    };
+
     public CFGAnalyzer(SootMethod method, XMansion xmansion) {
         this.method = method;
         this.xmansion = xmansion;
@@ -207,13 +296,28 @@ public class CFGAnalyzer {
     }
 
     private boolean isApiCall(InvokeExpr invocation) {
-        String pkg = invocation.getMethod().getDeclaringClass().getPackageName();
-        for (String gaePackage : GAE_PACKAGES) {
-            if (gaePackage.equals(pkg)) {
+        String signature = getSignature(invocation.getMethod());
+        for (String apiCall : GAE_API_CALLS) {
+            if (apiCall.equals(signature)) {
                 return true;
+            } else if (apiCall.equals("!" + signature)) {
+                return false;
             }
         }
+
+
+        String pkg = invocation.getMethod().getDeclaringClass().getPackageName();
+        for (String apiPkg : GAE_PACKAGES) {
+            if (pkg.equals(apiPkg)) {
+                System.out.println("[GCALL] " + signature);
+            }
+        }
+
         return false;
+    }
+
+    private String getSignature(SootMethod method) {
+        return method.getDeclaringClass().getName() + "#" + method.getName() + "()";
     }
 
     private boolean isUserMethodCall(SootMethod target) {

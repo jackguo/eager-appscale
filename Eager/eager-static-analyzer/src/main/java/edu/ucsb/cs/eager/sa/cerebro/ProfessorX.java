@@ -92,7 +92,7 @@ public class ProfessorX {
     private static void analyzeRepo(String root, String name, String classPath,
                                     Collection<String> classes) {
 
-        System.out.println("----------------- PROJECT: " + name + " -----------------");
+        System.out.println("----------------- PROJECT: " + name + " -----------------\n");
         File repoDir = new File(root, name);
         File classPathDir = new File(repoDir, classPath);
         Set<String> analyzedMethods = new HashSet<String>();

@@ -37,7 +37,7 @@ public class CerebroTest extends TestCase {
         boolean mainFound = false;
         for (Map.Entry<SootMethod,CFGAnalyzer> entry : results.entrySet()) {
             if (entry.getKey().getName().equals("main")) {
-                assertEquals(entry.getValue().getMaxApiCalls(), 4);
+                assertEquals(4, entry.getValue().getMaxApiCalls());
                 mainFound = true;
             }
         }
