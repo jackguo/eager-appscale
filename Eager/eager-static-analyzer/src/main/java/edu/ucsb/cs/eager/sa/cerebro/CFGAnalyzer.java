@@ -56,6 +56,7 @@ public class CFGAnalyzer {
         "com.google.appengine.api.images",
         "com.google.appengine.api.blobstore",
         "com.google.appengine.api.taskqueue",
+        "com.google.appengine.api.urlfetch",
     };
 
     public CFGAnalyzer(SootMethod method, XMansion xmansion) {
