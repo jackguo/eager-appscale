@@ -37,6 +37,8 @@ public class XMansion {
         } else if (calledMethods.contains(method)) {
             // recursion defense
             return null;
+        } else if (!method.isConcrete()) {
+            return null;
         }
 
         calledMethods.add(method);

@@ -111,7 +111,7 @@ public class Cerebro {
         }
 
         for (SootMethod method : clazz.getMethods()) {
-            if (method.isPublic()) {
+            if (method.isPublic() || method.isProtected()) {
                 analyzeMethod(method, xmansion);
             }
         }
