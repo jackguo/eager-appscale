@@ -46,19 +46,6 @@ public class CFGAnalyzer {
     private final SootMethod method;
     private final XMansion xmansion;
 
-    private static final String[] GAE_PACKAGES = new String[] {
-        "javax.persistence",
-        "javax.jdo",
-        "edu.ucsb.cs.eager.gae",
-        "com.google.appengine.api.files",
-        "com.google.appengine.api.users",
-        "com.google.appengine.api.datastore",
-        "com.google.appengine.api.images",
-        "com.google.appengine.api.blobstore",
-        "com.google.appengine.api.taskqueue",
-        "com.google.appengine.api.urlfetch",
-    };
-
     private static final String[] GAE_API_CALLS = new String[] {
         "com.google.appengine.api.datastore.Cursor#fromWebSafeString()",
         "com.google.appengine.api.datastore.Cursor#toWebSafeString()",
@@ -89,6 +76,22 @@ public class CFGAnalyzer {
         "!com.google.appengine.api.datastore.Blob#getBytes()",
         "!com.google.appengine.api.datastore.Text#<init>()",
         "!com.google.appengine.api.datastore.Text#getValue()",
+        "!com.google.appengine.api.datastore.Query#setKeysOnly()",
+        "!com.google.appengine.api.datastore.KeyFactory#keyToString()",
+        "!com.google.appengine.api.datastore.KeyFactory#stringToKey()",
+        "!com.google.appengine.api.datastore.Query#addSort()",
+        "!com.google.appengine.api.datastore.Query$FilterOperator#of()",
+        "!com.google.appengine.api.datastore.Query#setFilter()",
+        "!com.google.appengine.api.datastore.Query$CompositeFilterOperator#and()",
+        "com.google.appengine.api.datastore.PreparedQuery#asSingleEntity()",
+        "!com.google.appengine.api.datastore.FetchOptions$Builder#withLimit()",
+        "!com.google.appengine.api.datastore.KeyFactory$Builder#<init>()",
+        "!com.google.appengine.api.datastore.KeyFactory$Builder#addChild()",
+        "!com.google.appengine.api.datastore.KeyFactory$Builder#getKey()",
+        "!com.google.appengine.api.datastore.TransactionOptions$Builder#withXG()",
+
+        "com.google.appengine.datanucleus.query.JPACursorHelper#getCursor()",
+        "com.google.appengine.datanucleus.query.JDOCursorHelper#getCursor()",
 
         "com.google.appengine.api.files.FileService#createNewGSFile()",
         "com.google.appengine.api.files.FileService#openWriteChannel()",
@@ -103,14 +106,18 @@ public class CFGAnalyzer {
 
         "com.google.appengine.api.taskqueue.Queue#add()",
         "com.google.appengine.api.taskqueue.QueueFactory#getDefaultQueue()",
+        "com.google.appengine.api.taskqueue.QueueFactory#getQueue()",
         "!com.google.appengine.api.taskqueue.TaskOptions$Builder#withUrl()",
         "!com.google.appengine.api.taskqueue.TaskOptions#retryOptions()",
         "!com.google.appengine.api.taskqueue.RetryOptions$Builder#withTaskAgeLimitSeconds()",
         "!com.google.appengine.api.taskqueue.TaskOptions#param()",
+        "!com.google.appengine.api.taskqueue.TaskOptions#method()",
 
         "com.google.appengine.api.urlfetch.HTTPResponse#getContent()",
         "com.google.appengine.api.urlfetch.URLFetchService#fetch()",
         "!com.google.appengine.api.urlfetch.URLFetchServiceFactory#getURLFetchService()",
+        "!com.google.appengine.api.urlfetch.HTTPResponse#getResponseCode()",
+        "!com.google.appengine.api.urlfetch.HTTPRequest#<init>()",
 
         "!com.google.appengine.api.users.User#getEmail()",
         "!com.google.appengine.api.users.User#getNickname()",
@@ -155,6 +162,25 @@ public class CFGAnalyzer {
         "!javax.persistence.Query#setHint()",
         "!javax.persistence.Query#setMaxResults()",
         "!javax.persistence.Query#setParameter()",
+
+        "!com.google.appengine.api.memcache.MemcacheServiceFactory#getMemcacheService()",
+        "com.google.appengine.api.memcache.MemcacheService#get()",
+        "com.google.appengine.api.memcache.MemcacheService#contains()",
+        "com.google.appengine.api.memcache.MemcacheService#put()",
+        "com.google.appengine.api.memcache.MemcacheService#delete()",
+        "com.google.appengine.api.memcache.MemcacheService#getAll()",
+        "com.google.appengine.api.memcache.MemcacheService#deleteAll()",
+        "!com.google.appengine.api.memcache.Expiration#byDeltaSeconds()",
+
+        "com.google.appengine.api.xmpp.XMPPService#parseMessage()",
+        "com.google.appengine.api.xmpp.XMPPService#sendPresence()",
+        "com.google.appengine.api.xmpp.Presence#getFromJid()",
+        "!com.google.appengine.api.xmpp.JID#<init>()",
+        "!com.google.appengine.api.xmpp.JID#getId()",
+
+        "!com.google.appengine.api.channel.ChannelServiceFactory#getChannelService()",
+        "!com.google.appengine.api.channel.ChannelMessage#<init>()",
+        "com.google.appengine.api.channel.ChannelService#sendMessage()",
 
         "edu.ucsb.cs.eager.gae.DataStore#query1()",
         "edu.ucsb.cs.eager.gae.DataStore#query2()",
@@ -321,10 +347,8 @@ public class CFGAnalyzer {
 
 
         String pkg = invocation.getMethod().getDeclaringClass().getPackageName();
-        for (String apiPkg : GAE_PACKAGES) {
-            if (pkg.equals(apiPkg)) {
-                System.out.println("[GCALL] " + signature);
-            }
+        if (pkg.startsWith("com.google.appengine.") && !pkg.contains(".codelab")) {
+            System.out.println("[GCALL] " + signature);
         }
 
         return false;
