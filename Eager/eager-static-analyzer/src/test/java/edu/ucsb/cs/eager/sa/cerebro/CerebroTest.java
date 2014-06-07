@@ -17,26 +17,30 @@
  *  under the License.
  */
 
-package net.eager.testing;
+package edu.ucsb.cs.eager.sa.cerebro;
 
-import edu.ucsb.cs.eager.gae.DataStore;
+import junit.framework.TestCase;
+import soot.SootMethod;
 
-public class TestClass {
+import java.util.Map;
 
-    public static void main(String[] args) {
-        TestClass test = new TestClass();
-        int x = 5;
-        if (x > 3) {
-            System.out.println(x);
-        } else {
-            DataStore.query1();
-            test.method1();
-            DataStore.query2();
+public class CerebroTest extends TestCase {
+
+    public void testCerebro() {
+        Cerebro cerebro = new Cerebro("", "net.eager.testing.TestClass3");
+        cerebro.setWholeProgramMode(true);
+        cerebro.setLoadNecessaryClasses(false);
+        //cerebro.setVerbose(true);
+
+        Map<SootMethod,CFGAnalyzer> results = cerebro.analyze();
+        assertEquals(5, results.size());
+        boolean mainFound = false;
+        for (Map.Entry<SootMethod,CFGAnalyzer> entry : results.entrySet()) {
+            if (entry.getKey().getName().equals("main")) {
+                assertEquals(4, entry.getValue().getMaxApiCalls());
+                mainFound = true;
+            }
         }
-        DataStore.query3();
-    }
-
-    public void method1() {
-        System.out.println("testMe");
+        assertTrue(mainFound);
     }
 }

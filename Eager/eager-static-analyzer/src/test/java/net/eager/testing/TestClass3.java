@@ -21,7 +21,7 @@ package net.eager.testing;
 
 import edu.ucsb.cs.eager.gae.DataStore;
 
-public class TestClass {
+public class TestClass3 {
 
     public static void main(String[] args) {
         TestClass test = new TestClass();
@@ -32,11 +32,21 @@ public class TestClass {
             DataStore.query1();
             test.method1();
             DataStore.query2();
+            doQuery();
         }
         DataStore.query3();
+
+        for (int i = 0; i < 5; i++) {
+            System.out.println(i);
+        }
+
+        while (x < 10) {
+            DataStore.query4();
+            x++;
+        }
     }
 
-    public void method1() {
-        System.out.println("testMe");
+    private static void doQuery() {
+        DataStore.query1();
     }
 }
