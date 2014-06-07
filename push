@@ -1,0 +1,7 @@
+# /usr/bin/env bash
+
+cp eager.py eager_service.py ~/appscale/Eager -v
+cp policy/models.py policy/policy_engine.py ~/appscale/Eager/policy -v
+rm ~/appscale/Eager/*.pyc ~/appscale/Eager/policy/*.pyc -v
+id=`ps -aux | grep eager_service | awk '{ if($11=="/usr/bin/python") print $2}'`
+kill -9 $id
